@@ -3,6 +3,7 @@ import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://ezcalc.xyz';
+  const currentDate = new Date();
   
   // Define your static routes here
   const routes = [
@@ -23,7 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return routes.map((route) => ({
     url: `${baseUrl}${route}`,
-    lastModified: new Date('2025-12-18'),
+    lastModified: currentDate,
     changeFrequency: 'weekly',
     priority: route === '' ? 1 : 0.8,
   }));

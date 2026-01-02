@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   metadataBase: new URL('https://ezcalc.xyz'),
   title: {
-    default: "EZCalc – Free Online Calculators (Age, BMI, Gold, Land & More)",
+    default: "EZCalc - Free Online Calculators (Age, BMI, Gold, Land & More)",
     template: "%s | EZCalc"
   },
   applicationName: "EZCalc",

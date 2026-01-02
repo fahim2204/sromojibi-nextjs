@@ -5,6 +5,7 @@ const nextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
   },
+  output: 'standalone',
   // Optimize JavaScript bundles
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
