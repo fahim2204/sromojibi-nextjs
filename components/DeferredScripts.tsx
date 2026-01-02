@@ -76,12 +76,8 @@ export default function DeferredScripts() {
         `}
       </Script>
 
-      {/* Google AdSense - Deferred loading */}
-      <Script
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7554208332966422"
-        strategy="lazyOnload"
-        crossOrigin="anonymous"
-      />
+
+      
     </>
   );
 }

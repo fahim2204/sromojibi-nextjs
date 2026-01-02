@@ -5,6 +5,7 @@ import "./globals.css";
 import Providers from "./providers";
 import Navbar from "@/components/Navbar";
 import DeferredScripts from "@/components/DeferredScripts";
+import GoogleAdsense from "@/components/GoogleAdsense";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -137,6 +138,7 @@ export default function RootLayout({
         </Providers>
         
         {/* Deferred third-party scripts - loads after interaction or idle */}
+        <GoogleAdsense />
         <DeferredScripts />
       </body>
     </html>
