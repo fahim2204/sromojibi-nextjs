@@ -32,12 +32,13 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.VPS_KEY }}
 
-      - name: Prepare standalone build
+      - name: Prepare static export
         run: |
-          mkdir -p .next/standalone/.next/static
-          mkdir -p .next/standalone/public
-          cp -r .next/static/* .next/standalone/.next/static/
-          cp -r public/* .next/standalone/public/
+          # Next.js "output: export" generates the "out" directory by default
+          if [ ! -d "out" ]; then
+            echo "Error: 'out' directory not found. Make sure 'output: export' is set in next.config.js"
+            exit 1
+          fi
           
       - name: Deploy build artifacts to VPS
         env:
@@ -45,15 +46,8 @@ jobs:
         run: |
           rsync -avz --delete \
             --exclude '.env' \
-            .next/standalone/ \
+            out/ \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PATH }}/
 
-      - name: Restart application on VPS
-        run: |
-          ssh -T -o StrictHostKeyChecking=no \
-            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            "cd ${{ secrets.VPS_PATH }} && \
-            pm2 stop ezcalc || true && \
-            pm2 delete ezcalc || true && \
-            PORT=3001 NODE_ENV=production pm2 start server.js --name ezcalc && \
-            pm2 save"
+      # PM2 restart is not needed for static site deployment
+

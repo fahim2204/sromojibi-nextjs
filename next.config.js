@@ -4,8 +4,9 @@ const nextConfig = {
   poweredByHeader: false,
   images: {
     formats: ['image/avif', 'image/webp'],
+    unoptimized: true,
   },
-  output: 'standalone',
+  output: 'export',
   // Optimize JavaScript bundles
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
