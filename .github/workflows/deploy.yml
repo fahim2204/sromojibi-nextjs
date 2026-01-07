@@ -45,6 +45,7 @@ jobs:
           RSYNC_RSH: "ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR"
         run: |
           rsync -avz --delete \
+            --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r \
             --exclude '.env' \
             out/ \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PATH }}/public_html/

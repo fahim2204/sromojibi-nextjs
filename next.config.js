@@ -7,6 +7,7 @@ const nextConfig = {
     unoptimized: true,
   },
   output: 'export',
+  trailingSlash: false,
   // Optimize JavaScript bundles
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
