@@ -46,6 +46,15 @@ jobs:
             exit 1
           fi
           echo "✓ sitemap.xml found in out directory"
+          
+          # Copy .htaccess to out directory for deployment
+          if [ -f "public/.htaccess" ]; then
+            cp public/.htaccess out/.htaccess
+            echo "✓ .htaccess copied to out directory"
+          else
+            echo "Warning: public/.htaccess not found"
+          fi
+          
       - name: Deploy build artifacts to VPS
         env:
           RSYNC_RSH: "ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR"
