@@ -2,6 +2,10 @@
   RewriteEngine On
   RewriteBase /
 
+  # Explicitly serve sitemap.xml and robots.txt with correct MIME types
+  RewriteRule ^sitemap\.xml$ /sitemap.xml [L,T=application/xml]
+  RewriteRule ^robots\.txt$ /robots.txt [L,T=text/plain]
+
   # Allow access to existing files and directories immediately
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
