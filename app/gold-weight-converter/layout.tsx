@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Gold Weight Converter - Traditional Units to Grams | EZCalc",
+  title: "Gold Weight Converter - Traditional Units to Grams",
   description:
     "Convert between traditional gold units (Vori, Ana, Roti, Point) and grams. Free online gold weight calculator with accurate conversions for jewelry and precious metals.",
   keywords: [
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     description:
       "Convert between traditional gold units (Vori, Ana, Roti, Point) and grams instantly. Accurate and free gold weight calculator.",
     type: "website",
-    url: "https://ezcalc.app/gold-weight-converter",
+    url: "https://ezcalc.xyz/gold-weight-converter",
   },
   twitter: {
     card: "summary_large_image",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
       "Convert between traditional gold units (Vori, Ana, Roti, Point) and grams instantly. Free and accurate.",
   },
   alternates: {
-    canonical: "https://ezcalc.app/gold-weight-converter",
+    canonical: "https://ezcalc.xyz/gold-weight-converter",
   },
 };
 

@@ -2,7 +2,7 @@ import { Card, CardBody as CardContent } from "@nextui-org/react";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Terms of Service | EZCalc",
+  title: "Terms of Service",
   description: "Terms of Service for EZCalc. Please read our terms and conditions carefully.",
   alternates: {
     canonical: "https://ezcalc.xyz/terms",

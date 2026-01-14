@@ -20,6 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/mortgage-calculator',
     '/percentage-calculator',
     '/tip-calculator',
+    '/gold-weight-converter',
   ];
 
   return routes.map((route) => ({

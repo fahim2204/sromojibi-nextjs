@@ -2,7 +2,7 @@ import { Card, CardBody as CardContent } from "@nextui-org/react";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Privacy Policy | EZCalc",
+  title: "Privacy Policy",
   description: "Privacy Policy for EZCalc. Learn how we handle your data.",
   alternates: {
     canonical: "https://ezcalc.xyz/privacy-policy",

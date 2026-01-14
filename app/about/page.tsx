@@ -2,7 +2,7 @@ import { Card, CardBody as CardContent } from "@nextui-org/react";
 import Link from "next/link";
 
 export const metadata = {
-  title: "About Us | EZCalc",
+  title: "About Us",
   description: "Learn about EZCalc's mission to provide free, accurate, and easy-to-use online calculators for everyone.",
   alternates: {
     canonical: "https://ezcalc.xyz/about",

@@ -2,7 +2,7 @@ import { Card, CardBody as CardContent } from "@nextui-org/react";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Contact Us | EZCalc",
+  title: "Contact Us",
   description: "Get in touch with the EZCalc team for support, suggestions, or inquiries.",
   alternates: {
     canonical: "https://ezcalc.xyz/contact",
