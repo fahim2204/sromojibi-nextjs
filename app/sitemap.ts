@@ -7,7 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   
   // Define your static routes here
   const routes = [
-    '',
+    '/',
     '/about',
     '/contact',
     '/privacy-policy',
@@ -24,9 +24,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   return routes.map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: currentDate,
+    url: `${baseUrl}${route === '/' ? '' : route}`,
+    lastModified: currentDate.toISOString().split('T')[0],
     changeFrequency: 'weekly',
-    priority: route === '' ? 1 : 0.8,
+    priority: route === '/' ? 1 : 0.8,
   }));
 }
