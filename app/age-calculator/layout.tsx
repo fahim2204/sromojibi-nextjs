@@ -1,13 +1,15 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Age Calculator",
-  description: "Calculate your precise age, explore life insights, and discover which historical figures share your birthday.",
+  title: "Age Calculator - Find Your Exact Age & Life Insights",
+  description: "Calculate your exact age in years, months, and days. Explore unique life insights, consumption statistics, and discover which famous historical figures share your birthday.",
   alternates: {
-    canonical: "https://ezcalc.xyz/age-calculator",
+    canonical: "/age-calculator",
   },
   openGraph: {
-    url: "https://ezcalc.xyz/age-calculator",
+    url: "/age-calculator",
+    title: "Age Calculator - Find Your Exact Age & Life Insights",
+    description: "Calculate your exact age and discover fascinating life facts instantly.",
   },
 };
 

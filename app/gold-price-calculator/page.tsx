@@ -2,13 +2,15 @@
 import GoldPriceCalculator from "@/components/GoldPriceCalculator";
 
 export const metadata = {
-    title: 'Gold Price Calculator - Calculate Gold Value Instantly',
-    description: 'Calculate the value of your gold based on weight, purity (24k, 22k, etc.), and current market rates. Supports various units like grams, ounces, and tolas.',
+    title: 'Gold Price Calculator - Calculate Value by Weight & Purity',
+    description: 'Determine the exact value of your gold based on weight, purity (24k, 22k, etc.), and current market rates. Supports grams, ounces, tolas and various gold karats.',
     alternates: {
-        canonical: "https://ezcalc.xyz/gold-price-calculator",
+        canonical: "/gold-price-calculator",
     },
     openGraph: {
-        url: "https://ezcalc.xyz/gold-price-calculator",
+        url: "/gold-price-calculator",
+        title: 'Gold Price Calculator - Instant Gold Value Estimation',
+        description: 'Calculate the worth of your gold ornaments or bullion with real-time accuracy.',
     },
 };
 

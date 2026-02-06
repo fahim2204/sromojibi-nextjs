@@ -1,13 +1,15 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "BMI Calculator",
-  description: "Calculate your Body Mass Index (BMI) to understand your health status and find your ideal weight range.",
+  title: "BMI Calculator - Calculate Body Mass Index & Ideal Weight",
+  description: "Calculate your Body Mass Index (BMI) easily with our free tool. Get insights into your health status, find your ideal weight range, and understand the BMI categories for adults.",
   alternates: {
-    canonical: "https://ezcalc.xyz/bmi-calculator",
+    canonical: "/bmi-calculator",
   },
   openGraph: {
-    url: "https://ezcalc.xyz/bmi-calculator",
+    url: "/bmi-calculator",
+    title: "BMI Calculator - Calculate Body Mass Index & Ideal Weight",
+    description: "Check your BMI and health status instantly with our easy-to-use calculator.",
   },
 };
 

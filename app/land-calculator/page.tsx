@@ -2,13 +2,15 @@
 import LandCalculator from "@/components/LandCalculator";
 
 export const metadata = {
-    title: 'Land Calculator - Calculate Land Area in Sq Ft, Acres, Hectares',
-    description: 'Calculate land area for varied shapes (rectangle, triangle, circle) and convert between different units like square feet, square meters, acres, and hectares.',
+    title: 'Land Calculator - Calculate Area & Convert Units (Sq Ft, Acres)',
+    description: 'Calculate land area for various shapes including rectangles, triangles, and circles. Effortlessly convert between square feet, square meters, acres, hectares, and more.',
     alternates: {
-        canonical: "https://ezcalc.xyz/land-calculator",
+        canonical: "/land-calculator",
     },
     openGraph: {
-        url: "https://ezcalc.xyz/land-calculator",
+        url: "/land-calculator",
+        title: 'Land Calculator - Accurate Area & Unit Conversion',
+        description: 'Need to measure property? Use our free tool for land area calculations and unit conversions.',
     },
 };
 

@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   alternates: {
-    canonical: "https://ezcalc.xyz",
+    canonical: "/",
   },
   authors: [{ name: "EZCalc" }],
   creator: "EZCalc",
