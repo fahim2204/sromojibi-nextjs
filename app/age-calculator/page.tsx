@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardBody as CardContent, Button, DatePicker } from "@nextui-org/react";
 import { getLocalTimeZone, today, CalendarDate } from "@internationalized/date";
-import { motion, AnimatePresence } from "framer-motion";
 import { calculateAge, calculateNextBirthday, calculateLifeInsights, AgeResult, NextBirthday, LifeInsights as LifeInsightsType } from "@/lib/ageCalculations";
 import { getFamousBirthdays, FamousPerson } from "@/data/famousBirthdays";
 import ResultsDisplay from "@/components/ResultsDisplay";
@@ -66,35 +65,24 @@ export default function AgeCalculator() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent pb-20">
+    <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 pb-20">
       {/* Hero Section */}
-      <section className="relative pt-20 pb-32 px-4 overflow-hidden">
-        <div className="container mx-auto text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 gradient-text">
-              Age Calculator
-            </h1>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10">
-              Calculate your precise age, explore life insights, and discover which historical figures share your birthday.
-            </p>
-          </motion.div>
+      <section className="pt-12 pb-16 px-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+        <div className="container mx-auto text-center max-w-4xl">
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 dark:text-white">
+            Age Calculator
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+            Calculate your precise age in years, months, and days. Explore life insights and discover which historical figures share your birthday.
+          </p>
 
           {/* Calculator Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="max-w-xl mx-auto"
-          >
-            <Card className="glass-strong border-2 border-purple-500/20 shadow-2xl shadow-purple-900/20">
-              <CardHeader className="flex flex-col gap-2 pb-0">
-                <h3 className="text-2xl font-bold text-center text-white">Enter Date of Birth</h3>
-                <p className="text-sm text-gray-400 text-center">
-                  We'll calculate everything else for you
+          <div className="max-w-xl mx-auto text-left">
+            <Card className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-sm rounded-none">
+              <CardHeader className="flex flex-col gap-1 pb-4 pt-6 border-b border-gray-100 dark:border-gray-700">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Enter Date of Birth</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Select your birth date below to get your full age breakdown.
                 </p>
               </CardHeader>
               <CardContent className="space-y-6 p-6">
@@ -109,69 +97,89 @@ export default function AgeCalculator() {
                     description="Format: MM/DD/YYYY"
                     className="max-w-full"
                     classNames={{
-                      inputWrapper: "border-purple-500/30 bg-black/20 hover:bg-black/30",
-                      label: "text-gray-300",
+                      inputWrapper: "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus-within:border-blue-500 dark:focus-within:border-blue-500",
+                      label: "text-gray-700 dark:text-gray-300 font-medium",
+                      description: "text-gray-500 dark:text-gray-400",
                     }}
                   />
                 </div>
 
                 {error && (
-                  <div className="text-red-400 text-sm text-center font-medium bg-red-500/10 py-2 rounded">
+                  <div className="text-red-700 dark:text-red-300 text-sm font-medium bg-red-50 dark:bg-red-900/30 p-3 rounded border border-red-200 dark:border-red-800">
                     {error}
                   </div>
                 )}
 
                 <Button 
                   onPress={handleCalculate}
-                  className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-purple-500/25 text-white border-0"
+                  className="w-full h-12 text-base font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors border-0"
                 >
                   Calculate Age
                 </Button>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         </div>
       </section>
       
-      <AnimatePresence>
-        {isCalculated && ageResult && nextBirthday && lifeInsights && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="container mx-auto px-4 space-y-12"
-          >
-            <div id="results">
-              <ResultsDisplay ageResult={ageResult} nextBirthday={nextBirthday} />
-            </div>
+      {isCalculated && ageResult && nextBirthday && lifeInsights && (
+        <div className="container mx-auto px-4 py-12 space-y-12 max-w-5xl">
+          <div id="results">
+            <ResultsDisplay ageResult={ageResult} nextBirthday={nextBirthday} />
+          </div>
 
-            <LifeInsights insights={lifeInsights} />
-            
-            <FamousBirthdays people={famousPeople} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+          <LifeInsights insights={lifeInsights} />
+          
+          <FamousBirthdays people={famousPeople} />
+        </div>
+      )}
 
-      <FAQ 
-        items={[
-          {
-            question: "How accurate is this age calculator?",
-            answer: "Our age calculator is extremely accurate. It calculates your exact age down to the day by considering the full date (year, month, and day) of your birth. The calculations account for leap years and varying month lengths to provide precise results."
-          },
-          {
-            question: "How are the life insights calculated?",
-            answer: "Life insights are based on average human consumption estimates. We use approximately 2.5 liters of water per day, 550 liters of oxygen inhaled, and 200 liters of CO₂ exhaled. These are general averages and actual values vary based on individual factors like activity level, health, and environment."
-          },
-          {
-            question: "What is the next birthday countdown?",
-            answer: "The next birthday countdown shows exactly how many days, hours, and minutes remain until your next birthday. It's calculated in real-time based on your birth date and the current date, helping you track when you'll turn a year older!"
-          },
-          {
-            question: "Are the famous birthdays accurate?",
-            answer: "Yes! Our famous birthdays database includes well-documented historical figures, celebrities, and notable personalities. We've curated a collection of people from various fields including science, arts, politics, and entertainment who were born on each day of the year."
-          }
-        ]}
-      />
+      {/* SEO Thick Content */}
+      <article className="container mx-auto px-4 py-12 max-w-4xl">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-none mb-12">
+          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2">
+            Understanding Age Calculation & Chronological Age
+          </h2>
+          <div className="prose dark:prose-invert prose-blue max-w-none text-gray-700 dark:text-gray-300 space-y-4">
+            <p>
+              Calculating your exact age requires more than simply subtracting your birth year from the current year. To determine a precise "chronological age," one must account for the varied number of days in different months, as well as the occurrence of leap years. Our age calculator uses advanced date mathematical algorithms to compute your exact age in years, months, weeks, and days.
+            </p>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6">Why is Exact Age Important?</h3>
+            <p>
+              Knowing your precise chronological age is useful across various administrative and medical fields. For example, pediatric dosing and childhood development milestones are often measured in specific months and weeks, rather than just years. Furthermore, many legal rights (such as driving licenses, voting rights, and retirement benefits) are anchored to a very specific date.
+            </p>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6">How Do Leap Years Affect My Age?</h3>
+            <p>
+              A leap year occurs every four years, adding an extra day (February 29th) to the calendar to keep our calendar year synchronized with the astronomical year. If you were born on a leap day (a "leapling"), age calculation conventions differ by region. Usually, leaplings celebrate their birthdays on February 28th or March 1st in non-leap years. Our calculator seamlessly handles leap seconds, leap days, and standard planetary calendar shifts to provide down-to-the-minute accuracy.
+            </p>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6">Life Insights and Fun Facts</h3>
+            <p>
+              Beyond just knowing how old you are, it's fascinating to put time into perspective. Converting your age into total days or total seconds emphasizes the sheer scale of a human lifespan. Additionally, our tool provides fun "life insights" simulating average biological impacts—like how many breaths you've taken or heartbeats you've experienced—based on standard medical baselines of 60-100 heartbeats per minute and 12-20 breaths per minute. 
+            </p>
+          </div>
+        </div>
+
+        <FAQ 
+          items={[
+            {
+              question: "How accurate is this chronological age calculator?",
+              answer: "Our chronological age calculator evaluates the full scope of your birth date. It calculates your exact age down to the day by utilizing strict native JavaScript date object rules. This guarantees absolute precision, accounting automatically for leap years, varying month lengths (28, 30, or 31 days), and timezones."
+            },
+            {
+              question: "How are the biological life insights calculated?",
+              answer: "Life insights are generated using established adult baseline averages. For example, we calculate breaths taken assuming an average resting rate of 16 breaths per minute. Averages for water consumption and heartbeats operate similarly. It is important to note these are statistical estimations for entertainment and visualization purposes, and actual biological metrics depend on health, fitness level, and genetics."
+            },
+            {
+              question: "What is the next birthday countdown feature?",
+              answer: "The next birthday countdown uses your month and day of birth, combined with the current chronological year, to calculate the delta (difference) between today and your upcoming birthday. It displays the remaining days, hours, and minutes until you celebrate."
+            },
+            {
+              question: "How does the tool calculate my age in months or weeks?",
+              answer: "To get total months, the calculator multiplies your full years by twelve, then adds the remaining calendar months since your last birthday. To get your exact age in weeks, it takes your absolute total days alive and simply divides by seven."
+            }
+          ]}
+        />
+      </article>
     </div>
   );
 }

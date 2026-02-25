@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardBody as CardContent } from "@nextui-org/react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -10,8 +9,6 @@ interface CalculatorCard {
   description: string;
   icon: string;
   href: string;
-  color: string;
-  gradient: string;
   tags: string[];
 }
 
@@ -22,8 +19,6 @@ const calculators: CalculatorCard[] = [
       "Calculate your exact age in years, months, and days. Discover life insights and famous birthdays.",
     icon: "🎂",
     href: "/age-calculator",
-    color: "purple",
-    gradient: "from-purple-600 to-pink-600",
     tags: ["age", "birthday", "date", "time", "years"],
   },
   {
@@ -32,8 +27,6 @@ const calculators: CalculatorCard[] = [
       "Calculate your Body Mass Index and understand your health status with detailed insights.",
     icon: "💪",
     href: "/bmi-calculator",
-    color: "blue",
-    gradient: "from-blue-600 to-cyan-600",
     tags: ["bmi", "health", "weight", "fitness", "body"],
   },
   {
@@ -42,8 +35,6 @@ const calculators: CalculatorCard[] = [
       "Calculate gold prices, convert between different units, and track precious metal values.",
     icon: "🥇",
     href: "/gold-price-calculator",
-    color: "yellow",
-    gradient: "from-yellow-600 to-orange-600",
     tags: ["gold", "price", "metal", "investment", "currency"],
   },
   {
@@ -52,8 +43,6 @@ const calculators: CalculatorCard[] = [
       "Convert between traditional gold units (Vori, Ana, Roti, Point) and grams instantly.",
     icon: "⚖️",
     href: "/gold-weight-converter",
-    color: "amber",
-    gradient: "from-amber-600 to-yellow-600",
     tags: ["gold", "converter", "vori", "ana", "weight", "traditional units"],
   },
   {
@@ -62,8 +51,6 @@ const calculators: CalculatorCard[] = [
       "Calculate land area, convert between different units, and measure property dimensions.",
     icon: "🏞️",
     href: "/land-calculator",
-    color: "green",
-    gradient: "from-green-600 to-emerald-600",
     tags: ["land", "area", "property", "measurement", "real estate"],
   },
   {
@@ -72,8 +59,6 @@ const calculators: CalculatorCard[] = [
       "Calculate loan payments, interest rates, and amortization schedules for any loan type.",
     icon: "💰",
     href: "/loan-calculator",
-    color: "indigo",
-    gradient: "from-indigo-600 to-purple-600",
     tags: ["loan", "finance", "interest", "payment", "debt"],
   },
   {
@@ -82,8 +67,6 @@ const calculators: CalculatorCard[] = [
       "Calculate monthly mortgage payments, total interest, and plan your home purchase.",
     icon: "🏠",
     href: "/mortgage-calculator",
-    color: "pink",
-    gradient: "from-pink-600 to-rose-600",
     tags: ["mortgage", "home", "property", "finance", "payment"],
   },
   {
@@ -92,8 +75,6 @@ const calculators: CalculatorCard[] = [
       "Calculate percentages, percentage increase/decrease, and solve percentage problems.",
     icon: "📊",
     href: "/percentage-calculator",
-    color: "teal",
-    gradient: "from-teal-600 to-cyan-600",
     tags: ["percentage", "math", "calculation", "ratio", "proportion"],
   },
   {
@@ -102,8 +83,6 @@ const calculators: CalculatorCard[] = [
       "Calculate tips, split bills, and determine fair gratuity amounts for any service.",
     icon: "🍽️",
     href: "/tip-calculator",
-    color: "orange",
-    gradient: "from-orange-600 to-red-600",
     tags: ["tip", "gratuity", "bill", "restaurant", "service"],
   },
 ];
@@ -124,102 +103,61 @@ export default function Home() {
   });
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900">
-      {/* Background decoration */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-48 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
-      </div>
-      <div className="relative z-10 container mx-auto px-4 py-12">
+    <main className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-6xl md:text-7xl font-bold mb-4 gradient-text">
-            EZCalc - Calulate Everything
+        <header className="text-center mb-10 pb-6 border-b border-gray-200 dark:border-gray-800">
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-3 text-gray-900 dark:text-white">
+            EZCalc - Calculate Everything
           </h1>
-          <p className="text-xl md:text-2xl text-gray-400 mb-2">
+          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-2">
             Free Online Calculators for Every Need
           </p>
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+          <p className="text-base text-gray-500 dark:text-gray-500 max-w-3xl mx-auto">
             Calculate, convert, and compute with our comprehensive collection of
             free online calculators. Fast, accurate, and easy to use.
           </p>
-        </motion.div>
+        </header>
 
         {/* Search Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="max-w-2xl mx-auto mb-12"
-        >
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-              <svg
-                className="h-5 w-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
+        <div className="max-w-xl mx-auto mb-10">
+          <div className="relative flex items-center">
             <input
               type="text"
+              id="search-calculators"
+              aria-label="Search calculators"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search calculators by name, description, or tags..."
-              className="w-full pl-12 pr-12 py-4 bg-gray-800/50 border-2 border-purple-500/30 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/70 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 backdrop-blur-sm"
+              placeholder="Search calculators..."
+              className="w-full pl-4 pr-10 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
+                aria-label="Clear search"
+                title="Clear search"
+                className="absolute right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               >
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                ✕
               </button>
             )}
           </div>
           {searchQuery && (
-            <p className="mt-3 text-sm text-gray-400 text-center">
-              Found {filteredCalculators.length} calculator{filteredCalculators.length !== 1 ? 's' : ''}
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 text-center">
+              Found {filteredCalculators.length} result{filteredCalculators.length !== 1 ? 's' : ''}
             </p>
           )}
-        </motion.div>
+        </div>
 
         {/* Calculator Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
+        <section aria-label="Available Calculators" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
           {filteredCalculators.length > 0 ? (
-            filteredCalculators.map((calculator, index) => (
-            <motion.div
-              key={calculator.href}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
+            filteredCalculators.map((calculator) => (
               <Link 
+                key={calculator.href}
                 href={calculator.href}
+                title={`Go to ${calculator.title}`}
+                className="block h-full group outline-none"
                 onClick={() => {
                   if (typeof window !== 'undefined' && (window as any).gtag) {
                     (window as any).gtag('event', 'tool_click', {
@@ -230,102 +168,75 @@ export default function Home() {
                   }
                 }}
               >
-                <Card className="glass-strong border-2 border-purple-500/20 hover:border-purple-500/50 transition-all duration-300 h-full cursor-pointer group hover:scale-105 bg-transparent">
-                  <CardContent className="p-6">
-                    <div className="text-center">
-                      <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                        {calculator.icon}
-                      </div>
-                      <h3 className="text-xl font-bold mb-2 text-white group-hover:text-purple-300 transition-colors">
+                <Card className="h-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500 transition-all">
+                  <CardContent className="p-5 flex items-start gap-4">
+                    <div className="text-3xl shrink-0" aria-hidden="true">
+                      {calculator.icon}
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold mb-1 text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                         {calculator.title}
-                      </h3>
-                      <p className="text-sm text-gray-400 line-clamp-3">
+                      </h2>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
                         {calculator.description}
                       </p>
-                      <div
-                        className={`mt-4 inline-block px-4 py-2 rounded-lg bg-gradient-to-r ${calculator.gradient} text-white text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
-                      >
-                        Calculate →
-                      </div>
                     </div>
                   </CardContent>
                 </Card>
               </Link>
-            </motion.div>
             ))
           ) : (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="col-span-full flex flex-col items-center justify-center py-20"
-            >
-              <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-2xl font-bold text-white mb-2">No calculators found</h3>
-              <p className="text-gray-400 mb-6">
-                Try searching with different keywords or tags
-              </p>
+            <div className="col-span-full py-12 text-center border border-gray-200 dark:border-gray-800 rounded-md bg-gray-50 dark:bg-gray-900/50">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">No calculators found for "{searchQuery}"</p>
               <button
                 onClick={() => setSearchQuery("")}
-                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
               >
                 Clear Search
               </button>
-            </motion.div>
+            </div>
           )}
-        </div>
+        </section>
 
         {/* SEO Content */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="max-w-4xl mx-auto glass-strong rounded-2xl p-8 border border-purple-500/20"
-        >
-          <h2 className="text-3xl font-bold mb-4 gradient-text">
+        <article className="max-w-4xl mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md p-6 md:p-8 mt-12 mb-8">
+          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2">
             Free Online Calculators by EZCalc
           </h2>
-          <div className="text-gray-300 space-y-4">
+          <div className="text-gray-700 dark:text-gray-300 space-y-4 text-sm md:text-base leading-relaxed">
             <p>
               Welcome to EZCalc - your one-stop destination for free, accurate,
               and easy-to-use online calculators. Whether you need to calculate
               your age, determine your BMI, convert units, or solve complex
               financial equations, we have the perfect calculator for you.
             </p>
-            <h3 className="text-xl font-semibold text-purple-300 mt-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6">
               Our Calculator Collection:
             </h3>
-            <ul className="list-disc list-inside space-y-2 text-gray-400">
+            <ul className="list-disc list-inside space-y-1.5 text-gray-600 dark:text-gray-400 pl-2">
               <li>
-                <strong>Age Calculator</strong> - Calculate your exact age with
-                life insights and famous birthdays
+                <strong className="text-gray-900 dark:text-gray-200">Age Calculator</strong> - Calculate your exact age with life insights and famous birthdays
               </li>
               <li>
-                <strong>BMI Calculator</strong> - Determine your Body Mass Index
-                and health status
+                <strong className="text-gray-900 dark:text-gray-200">BMI Calculator</strong> - Determine your Body Mass Index and health status
               </li>
               <li>
-                <strong>Gold Price Calculator</strong> - Track and convert gold
-                prices in real-time
+                <strong className="text-gray-900 dark:text-gray-200">Gold Price Calculator</strong> - Track and convert gold prices in real-time
               </li>
               <li>
-                <strong>Land Calculator</strong> - Calculate land area and
-                convert between measurement units
+                <strong className="text-gray-900 dark:text-gray-200">Land Calculator</strong> - Calculate land area and convert between measurement units
               </li>
               <li>
-                <strong>Loan Calculator</strong> - Calculate loan payments,
-                interest, and amortization
+                <strong className="text-gray-900 dark:text-gray-200">Loan Calculator</strong> - Calculate loan payments, interest, and amortization
               </li>
               <li>
-                <strong>Mortgage Calculator</strong> - Plan your home purchase
-                with detailed mortgage calculations
+                <strong className="text-gray-900 dark:text-gray-200">Mortgage Calculator</strong> - Plan your home purchase with detailed mortgage calculations
               </li>
               <li>
-                <strong>Percentage Calculator</strong> - Solve percentage
-                problems and conversions
+                <strong className="text-gray-900 dark:text-gray-200">Percentage Calculator</strong> - Solve percentage problems and conversions
               </li>
               <li>
-                <strong>Tip Calculator</strong> - Calculate tips and split bills
-                easily
+                <strong className="text-gray-900 dark:text-gray-200">Tip Calculator</strong> - Calculate tips and split bills easily
               </li>
             </ul>
             <p className="mt-6">
@@ -336,32 +247,31 @@ export default function Home() {
             </p>
             <p className="mt-4">
               EZCalc is designed with user experience in mind - fast loading
-              times, beautiful interfaces, and mobile-friendly designs ensure
-              you can calculate anything, anywhere, anytime.
+              times, simple interfaces, and mobile-friendly designs ensure
+              you can calculate anything seamlessly.
             </p>
           </div>
-        </motion.div>
+        </article>
 
         {/* Footer */}
-        <footer className="mt-20 text-center text-gray-500 text-sm pb-8">
-          <div className="flex justify-center flex-wrap gap-6 mb-8 text-base">
-            <Link href="/about" className="hover:text-purple-400 transition-colors">
+        <footer className="mt-16 text-center text-gray-500 dark:text-gray-500 text-sm border-t border-gray-200 dark:border-gray-800 pt-8 pb-4">
+          <div className="flex justify-center flex-wrap gap-x-6 gap-y-3 mb-6">
+            <Link href="/about" className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline">
               About
             </Link>
-            <Link href="/contact" className="hover:text-purple-400 transition-colors">
+            <Link href="/contact" className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline">
               Contact
             </Link>
-            <Link href="/privacy-policy" className="hover:text-purple-400 transition-colors">
+            <Link href="/privacy-policy" className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="hover:text-purple-400 transition-colors">
+            <Link href="/terms" className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline">
               Terms of Service
             </Link>
           </div>
           <p>© 2025 EZCalc. All rights reserved.</p>
-          <p className="mt-2">
-            Free online calculators for age, BMI, gold prices, land area, loans,
-            and more
+          <p className="mt-1">
+            Free online calculators for age, BMI, gold prices, land area, loans, and more.
           </p>
         </footer>
       </div>
