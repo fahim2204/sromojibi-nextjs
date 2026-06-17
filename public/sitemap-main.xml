@@ -43,6 +43,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://ezcalc.xyz/calorie-calculator</loc>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ezcalc.xyz/aft-calculator</loc>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://ezcalc.xyz/gold-price-calculator</loc>
     <lastmod>2026-02-06</lastmod>
     <changefreq>weekly</changefreq>
@@ -81,6 +93,12 @@
   <url>
     <loc>https://ezcalc.xyz/gold-weight-converter</loc>
     <lastmod>2026-02-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ezcalc.xyz/grade-calculator</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

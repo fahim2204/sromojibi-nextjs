@@ -30,6 +30,22 @@ const calculators: CalculatorCard[] = [
     tags: ["bmi", "health", "weight", "fitness", "body"],
   },
   {
+    title: "Calorie Calculator",
+    description:
+      "Calculate your daily calorie needs for weight loss, gain, or maintenance. Estimate BMR and TDEE based on Mifflin-St Jeor or Harris-Benedict formulas.",
+    icon: "🔥",
+    href: "/calorie-calculator",
+    tags: ["calorie", "nutrition", "diet", "weight", "bmr", "tdee", "health", "fitness"],
+  },
+  {
+    title: "AFT Calculator",
+    description:
+      "Calculate your Army Fitness Test (AFT) score. Check your deadlift, push-ups, shuttle run, and planks against latest Army physical standards.",
+    icon: "🪖",
+    href: "/aft-calculator",
+    tags: ["aft", "army", "fitness", "score", "combat", "acft", "test"],
+  },
+  {
     title: "Gold Price Calculator",
     description:
       "Calculate gold prices, convert between different units, and track precious metal values.",
@@ -44,6 +60,14 @@ const calculators: CalculatorCard[] = [
     icon: "⚖️",
     href: "/gold-weight-converter",
     tags: ["gold", "converter", "vori", "ana", "weight", "traditional units"],
+  },
+  {
+    title: "Grade Calculator",
+    description:
+      "Calculate weighted average grades, letter grades, points, GPA, or find the final exam score you need to reach your target grade.",
+    icon: "🎓",
+    href: "/grade-calculator",
+    tags: ["grade", "school", "gpa", "average", "final", "exam", "percentage"],
   },
   {
     title: "Land Calculator",
@@ -221,7 +245,16 @@ export default function Home() {
                 <strong className="text-gray-900 dark:text-gray-200">BMI Calculator</strong> - Determine your Body Mass Index and health status
               </li>
               <li>
+                <strong className="text-gray-900 dark:text-gray-200">Calorie Calculator</strong> - Calculate daily BMR, TDEE, and calorie needs for fitness goals
+              </li>
+              <li>
+                <strong className="text-gray-900 dark:text-gray-200">AFT Calculator</strong> - Calculate your Army Fitness Test score and check operational combat readiness
+              </li>
+              <li>
                 <strong className="text-gray-900 dark:text-gray-200">Gold Price Calculator</strong> - Track and convert gold prices in real-time
+              </li>
+              <li>
+                <strong className="text-gray-900 dark:text-gray-200">Grade Calculator</strong> - Calculate weighted averages, GPAs, and final exam targets
               </li>
               <li>
                 <strong className="text-gray-900 dark:text-gray-200">Land Calculator</strong> - Calculate land area and convert between measurement units

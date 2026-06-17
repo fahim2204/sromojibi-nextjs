@@ -21,11 +21,14 @@ export default function Navbar() {
     { name: "Home", href: "/" },
     { name: "Age Calculator", href: "/age-calculator" },
     { name: "BMI Calculator", href: "/bmi-calculator" },
+    { name: "Calorie", href: "/calorie-calculator" },
+    { name: "AFT Calculator", href: "/aft-calculator" },
     { name: "Gold Price", href: "/gold-price-calculator" },
     { name: "Land Area", href: "/land-calculator" },
     { name: "Loan", href: "/loan-calculator" },
     { name: "Mortgage", href: "/mortgage-calculator" },
     { name: "Percentage", href: "/percentage-calculator" },
+    { name: "Grade", href: "/grade-calculator" },
     { name: "Tip", href: "/tip-calculator" },
   ];
 
