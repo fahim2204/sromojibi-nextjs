@@ -30,6 +30,7 @@ export default function Navbar() {
     { name: "Percentage", href: "/percentage-calculator" },
     { name: "Grade", href: "/grade-calculator" },
     { name: "Tip", href: "/tip-calculator" },
+    { name: "Blogs", href: "/blogs" },
   ];
 
   return (
@@ -74,6 +75,11 @@ export default function Navbar() {
         <NavbarItem>
           <Link href="/loan-calculator" className="text-gray-300 hover:text-white transition-colors">
             Loan
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link href="/blogs" className="text-gray-300 hover:text-white transition-colors">
+            Blogs
           </Link>
         </NavbarItem>
       </NavbarContent>
