@@ -141,28 +141,28 @@ export default function BMICalculator() {
             <Card className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-sm rounded-none">
               <CardHeader className="flex flex-col gap-4 pb-4 pt-6 border-b border-gray-100 dark:border-gray-700">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 text-center">Select Gender</h2>
-                <div className="grid grid-cols-2 gap-4 w-full">
+                <div className="grid grid-cols-2 gap-3 w-full">
                   <button
                     onClick={() => setGender("male")}
-                    className={`aspect-square p-4 rounded-md border-2 transition-colors flex flex-col items-center justify-center ${
+                    className={`h-20 p-3 rounded-md border-2 transition-colors flex flex-col items-center justify-center ${
                       gender === "male"
                         ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
                         : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800"
                     }`}
                   >
-                    <div className="text-4xl mb-2">👨</div>
-                    <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Male</div>
+                    <div className="text-2xl mb-1">👨</div>
+                    <div className="text-xs font-medium text-gray-700 dark:text-gray-300">Male</div>
                   </button>
                   <button
                     onClick={() => setGender("female")}
-                    className={`aspect-square p-4 rounded-md border-2 transition-colors flex flex-col items-center justify-center ${
+                    className={`h-20 p-3 rounded-md border-2 transition-colors flex flex-col items-center justify-center ${
                       gender === "female"
                         ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
                         : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800"
                     }`}
                   >
-                    <div className="text-4xl mb-2">👩</div>
-                    <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Female</div>
+                    <div className="text-2xl mb-1">👩</div>
+                    <div className="text-xs font-medium text-gray-700 dark:text-gray-300">Female</div>
                   </button>
                 </div>
               </CardHeader>

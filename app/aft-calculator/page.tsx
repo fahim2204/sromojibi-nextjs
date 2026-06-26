@@ -219,21 +219,22 @@ export default function AFTCalculator() {
                 {/* Age Bracket */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Age Group</label>
-                  <Tabs 
-                    selectedKey={ageGroup} 
-                    onSelectionChange={(key) => setAgeGroup(key as string)}
-                    size="sm"
-                    color="primary"
-                    variant="bordered"
-                    classNames={{
-                      tabList: "border-gray-300 dark:border-gray-700 flex flex-wrap h-auto",
-                      tabContent: "text-gray-700 dark:text-gray-300 py-1"
-                    }}
-                  >
+                  <div className="flex flex-wrap gap-1">
                     {["17-21", "22-26", "27-31", "32-36", "37-41", "42-46", "47-51", "52-56", "57-61", "62+"].map((age) => (
-                      <Tab key={age} title={age} />
+                      <button
+                        key={age}
+                        type="button"
+                        onClick={() => setAgeGroup(age)}
+                        className={`rounded-xl border px-3 py-1.5 text-sm font-medium transition-colors ${
+                          ageGroup === age
+                            ? "border-blue-500 bg-blue-500 text-white shadow-sm"
+                            : "border-gray-300 bg-white text-gray-700 hover:border-blue-400 hover:bg-blue-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-500 dark:hover:bg-blue-900/20"
+                        }`}
+                      >
+                        {age}
+                      </button>
                     ))}
-                  </Tabs>
+                  </div>
                 </div>
 
                 <hr className="border-gray-200 dark:border-gray-700 my-4" />
