@@ -1,313 +1,392 @@
 "use client";
 
-import { Card, CardBody as CardContent } from "@nextui-org/react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { useState } from "react";
-
-interface CalculatorCard {
-  title: string;
-  description: string;
-  icon: string;
-  href: string;
-  tags: string[];
-}
-
-const calculators: CalculatorCard[] = [
-  {
-    title: "Age Calculator",
-    description:
-      "Calculate your exact age in years, months, and days. Discover life insights and famous birthdays.",
-    icon: "🎂",
-    href: "/age-calculator",
-    tags: ["age", "birthday", "date", "time", "years"],
-  },
-  {
-    title: "BMI Calculator",
-    description:
-      "Calculate your Body Mass Index and understand your health status with detailed insights.",
-    icon: "💪",
-    href: "/bmi-calculator",
-    tags: ["bmi", "health", "weight", "fitness", "body"],
-  },
-  {
-    title: "Calorie Calculator",
-    description:
-      "Calculate your daily calorie needs for weight loss, gain, or maintenance. Estimate BMR and TDEE based on Mifflin-St Jeor or Harris-Benedict formulas.",
-    icon: "🔥",
-    href: "/calorie-calculator",
-    tags: ["calorie", "nutrition", "diet", "weight", "bmr", "tdee", "health", "fitness"],
-  },
-  {
-    title: "AFT Calculator",
-    description:
-      "Calculate your Army Fitness Test (AFT) score. Check your deadlift, push-ups, shuttle run, and planks against latest Army physical standards.",
-    icon: "🪖",
-    href: "/aft-calculator",
-    tags: ["aft", "army", "fitness", "score", "combat", "acft", "test"],
-  },
-  {
-    title: "Gold Price Calculator",
-    description:
-      "Calculate gold prices, convert between different units, and track precious metal values.",
-    icon: "🥇",
-    href: "/gold-price-calculator",
-    tags: ["gold", "price", "metal", "investment", "currency"],
-  },
-  {
-    title: "Gold Weight Converter",
-    description:
-      "Convert between traditional gold units (Vori, Ana, Roti, Point) and grams instantly.",
-    icon: "⚖️",
-    href: "/gold-weight-converter",
-    tags: ["gold", "converter", "vori", "ana", "weight", "traditional units"],
-  },
-  {
-    title: "Grade Calculator",
-    description:
-      "Calculate weighted average grades, letter grades, points, GPA, or find the final exam score you need to reach your target grade.",
-    icon: "🎓",
-    href: "/grade-calculator",
-    tags: ["grade", "school", "gpa", "average", "final", "exam", "percentage"],
-  },
-  {
-    title: "Land Calculator",
-    description:
-      "Calculate land area, convert between different units, and measure property dimensions.",
-    icon: "🏞️",
-    href: "/land-calculator",
-    tags: ["land", "area", "property", "measurement", "real estate"],
-  },
-  {
-    title: "Loan Calculator",
-    description:
-      "Calculate loan payments, interest rates, and amortization schedules for any loan type.",
-    icon: "💰",
-    href: "/loan-calculator",
-    tags: ["loan", "finance", "interest", "payment", "debt"],
-  },
-  {
-    title: "Mortgage Calculator",
-    description:
-      "Calculate monthly mortgage payments, total interest, and plan your home purchase.",
-    icon: "🏠",
-    href: "/mortgage-calculator",
-    tags: ["mortgage", "home", "property", "finance", "payment"],
-  },
-  {
-    title: "Percentage Calculator",
-    description:
-      "Calculate percentages, percentage increase/decrease, and solve percentage problems.",
-    icon: "📊",
-    href: "/percentage-calculator",
-    tags: ["percentage", "math", "calculation", "ratio", "proportion"],
-  },
-  {
-    title: "Tip Calculator",
-    description:
-      "Calculate tips, split bills, and determine fair gratuity amounts for any service.",
-    icon: "🍽️",
-    href: "/tip-calculator",
-    tags: ["tip", "gratuity", "bill", "restaurant", "service"],
-  },
-];
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [notifyEmail, setNotifyEmail] = useState("");
+  const [notifySuccess, setNotifySuccess] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  // Filter calculators based on search query
-  const filteredCalculators = calculators.filter((calculator) => {
-    const query = searchQuery.toLowerCase().trim();
-    if (!query) return true;
+  const categories = [
+    { name: "Rajmistri", icon: "🏠", slug: "rajmistri", description: "Masonry & civil construction specialists" },
+    { name: "Electrician", icon: "⚡", slug: "electrician", description: "Wiring, repairs & electrical installations" },
+    { name: "Plumber", icon: "🚰", slug: "plumber", description: "Pipe fitting, sanitary & water line repairs" },
+    { name: "Tiles Worker", icon: "🧱", slug: "tiles-worker", description: "Floor & wall tile installation mistris" },
+    { name: "Painter", icon: "🎨", slug: "painter", description: "Interior & exterior wall painting experts" },
+    { name: "Carpenter", icon: "🔨", slug: "carpenter", description: "Furniture repair, wood work & fittings" },
+    { name: "AC Technician", icon: "❄️", slug: "ac-technician", description: "Air conditioner servicing & gas refill" },
+    { name: "CCTV Installer", icon: "📹", slug: "cctv-installer", description: "Security camera setup & network wiring" },
+  ];
 
-    return (
-      calculator.title.toLowerCase().includes(query) ||
-      calculator.description.toLowerCase().includes(query) ||
-      calculator.tags.some((tag) => tag.toLowerCase().includes(query))
-    );
-  });
+  const cities = [
+    { name: "Dhaka", count: "Coming Soon", slug: "dhaka", popular: true },
+    { name: "Chittagong", count: "Coming Soon", slug: "chittagong", popular: true },
+    { name: "Mymensingh", count: "Coming Soon", slug: "mymensingh", popular: true },
+    { name: "Sylhet", count: "Coming Soon", slug: "sylhet", popular: false },
+    { name: "Rajshahi", count: "Coming Soon", slug: "rajshahi", popular: false },
+    { name: "Khulna", count: "Coming Soon", slug: "khulna", popular: false },
+  ];
+
+  const faqs = [
+    {
+      question: "What is Sromojibi?",
+      answer:
+        "Sromojibi is a worker directory platform helping people discover skilled professionals across Bangladesh. Our goal is to connect local technicians, mistris, and handymen with nearby homeowners and businesses.",
+    },
+    {
+      question: "How can workers join?",
+      answer:
+        "Workers can create a free profile and share their service information, location, experience, and contact detail so local customers can easily discover them online.",
+    },
+    {
+      question: "Is Sromojibi free?",
+      answer:
+        "Yes, worker listings will be free during the initial launch period to help build Bangladesh's largest open worker directory.",
+    },
+  ];
+
+  const handleNotifySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (notifyEmail.trim()) {
+      setNotifySuccess(true);
+      setTimeout(() => setNotifySuccess(false), 5000);
+      setNotifyEmail("");
+    }
+  };
 
   return (
-    <main className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* Header */}
-        <header className="text-center mb-10 pb-6 border-b border-gray-200 dark:border-gray-800">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-3 text-gray-900 dark:text-white">
-            EZCalc - Calculate Everything
-          </h1>
-          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-2">
-            Free Online Calculators for Every Need
-          </p>
-          <p className="text-base text-gray-500 dark:text-gray-500 max-w-3xl mx-auto">
-            Calculate, convert, and compute with our comprehensive collection of
-            free online calculators. Fast, accurate, and easy to use.
-          </p>
-        </header>
-
-        {/* Search Bar */}
-        <div className="max-w-xl mx-auto mb-10">
-          <div className="relative flex items-center">
-            <input
-              type="text"
-              id="search-calculators"
-              aria-label="Search calculators"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search calculators..."
-              className="w-full pl-4 pr-10 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                aria-label="Clear search"
-                title="Clear search"
-                className="absolute right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-              >
-                ✕
-              </button>
-            )}
+    <main className="min-h-screen bg-gray-950 text-gray-100 overflow-x-hidden selection:bg-emerald-500 selection:text-gray-950">
+      {/* 1. Hero Section */}
+      <section className="relative py-20 lg:py-28 px-4 border-b border-gray-800/80 bg-radial-gradient">
+        <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/20 via-gray-950 to-gray-950 pointer-events-none" />
+        <div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs md:text-sm font-semibold tracking-wide shadow-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            Bangladesh&apos;s Emerging Worker Directory
           </div>
-          {searchQuery && (
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 text-center">
-              Found {filteredCalculators.length} result{filteredCalculators.length !== 1 ? 's' : ''}
+
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight max-w-4xl mx-auto leading-[1.15]">
+            Find Trusted Local Workers Across{" "}
+            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
+              Bangladesh
+            </span>
+          </h1>
+
+          <p className="text-lg md:text-xl text-gray-400 max-w-3xl mx-auto font-normal leading-relaxed">
+            Sromojibi is building a simple way to find electricians, plumbers, tiles workers, rajmistris, and skilled professionals near you.
+          </p>
+
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/join-worker"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold text-base shadow-lg shadow-emerald-500/25 transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
+            >
+              <span>👷‍♂️</span> Join as a Worker
+            </Link>
+            <a
+              href="#notify-section"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-200 border border-gray-700 font-semibold text-base transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
+            >
+              <span>🔔</span> Notify Me When Available
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. Problem Section */}
+      <section className="py-16 px-4 border-b border-gray-800/80 bg-gray-900/40">
+        <div className="max-w-4xl mx-auto text-center space-y-4">
+          <div className="text-emerald-400 font-bold text-xs uppercase tracking-widest">The Challenge</div>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white">
+            Finding a reliable worker is still difficult
+          </h2>
+          <p className="text-base sm:text-lg text-gray-300 leading-relaxed max-w-3xl mx-auto pt-2">
+            Millions of skilled workers provide valuable services every day, but finding the right person often depends on personal contacts and recommendations.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 text-left">
+            <div className="p-6 rounded-2xl bg-gray-900 border border-gray-800 hover:border-gray-700 transition-all">
+              <div className="text-2xl mb-3">🔍</div>
+              <h3 className="font-bold text-white text-lg mb-2">Hard to Search</h3>
+              <p className="text-sm text-gray-400">Word-of-mouth contact lists are limited and often unreliable in emergencies.</p>
+            </div>
+            <div className="p-6 rounded-2xl bg-gray-900 border border-gray-800 hover:border-gray-700 transition-all">
+              <div className="text-2xl mb-3">📱</div>
+              <h3 className="font-bold text-white text-lg mb-2">Limited Online Presence</h3>
+              <p className="text-sm text-gray-400">Skilled mistris lack standard public profiles for local customers to discover.</p>
+            </div>
+            <div className="p-6 rounded-2xl bg-gray-900 border border-gray-800 hover:border-gray-700 transition-all">
+              <div className="text-2xl mb-3">📍</div>
+              <h3 className="font-bold text-white text-lg mb-2">Neighborhood Mismatch</h3>
+              <p className="text-sm text-gray-400">Connecting local talent with nearby households requires organized location mapping.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Categories Section */}
+      <section className="py-16 px-4 border-b border-gray-800/80">
+        <div className="max-w-6xl mx-auto space-y-10">
+          <div className="text-center space-y-3">
+            <span className="px-3 py-1 rounded-full bg-teal-500/10 text-teal-400 text-xs font-semibold uppercase tracking-wider">
+              Browse Directory
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-white">Popular Services Coming Soon</h2>
+            <p className="text-gray-400 text-base max-w-2xl mx-auto">
+              Discover skilled workers by specialty across Bangladesh.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {categories.map((cat) => (
+              <Link
+                key={cat.slug}
+                href={`/workers/${cat.slug}`}
+                className="group relative p-6 rounded-2xl bg-gray-900/90 border border-gray-800 hover:border-emerald-500/50 hover:bg-gray-900 transition-all duration-300 shadow-md hover:shadow-emerald-950/40"
+              >
+                <div className="text-4xl mb-3 group-hover:scale-110 transition-transform duration-300">{cat.icon}</div>
+                <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
+                  {cat.name}
+                </h3>
+                <p className="text-xs text-gray-400 mt-1 leading-relaxed">{cat.description}</p>
+                <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-emerald-400 group-hover:translate-x-1 transition-transform">
+                  <span>Explore Directory</span>
+                  <span>→</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Link
+              href="/categories"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-400 hover:text-emerald-300 hover:underline"
+            >
+              View All Service Categories →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. For Workers Section */}
+      <section className="py-16 px-4 border-b border-gray-800/80 bg-gradient-to-b from-gray-950 via-emerald-950/15 to-gray-950">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6">
+            <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
+              For Skilled Professionals
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
+              Are you a skilled worker?
+            </h2>
+            <p className="text-gray-300 text-base leading-relaxed">
+              Create your free profile and help customers find your services online. Sromojibi empowers mistris, technicians, and local trade specialists to gain direct visibility in their community.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm pt-2">
+              <div className="flex items-center gap-2 text-gray-200">
+                <span className="text-emerald-400 font-bold">✓</span> Free listing
+              </div>
+              <div className="flex items-center gap-2 text-gray-200">
+                <span className="text-emerald-400 font-bold">✓</span> More customer reach
+              </div>
+              <div className="flex items-center gap-2 text-gray-200">
+                <span className="text-emerald-400 font-bold">✓</span> Build your reputation
+              </div>
+              <div className="flex items-center gap-2 text-gray-200">
+                <span className="text-emerald-400 font-bold">✓</span> Get discovered locally
+              </div>
+            </div>
+
+            <div className="pt-4">
+              <Link
+                href="/join-worker"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold text-base shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02]"
+              >
+                Register Free
+              </Link>
+            </div>
+          </div>
+
+          <div className="p-8 rounded-3xl bg-gray-900 border border-gray-800 space-y-6 shadow-2xl relative">
+            <div className="flex items-center justify-between border-b border-gray-800 pb-4">
+              <span className="text-sm font-semibold text-gray-300">Worker Directory Preview</span>
+              <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-medium">Free Listing</span>
+            </div>
+            <div className="space-y-4 text-sm">
+              <div className="p-4 rounded-xl bg-gray-950/80 border border-gray-800/80 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg shrink-0">
+                  ⚡
+                </div>
+                <div>
+                  <div className="font-bold text-white">Electrician Profile</div>
+                  <div className="text-xs text-gray-400">Wiring, Switchboard & Appliance Repairs</div>
+                  <div className="text-xs text-emerald-400 mt-1">📍 Dhaka Division • 5+ Years Exp</div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl bg-gray-950/80 border border-gray-800/80 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold text-lg shrink-0">
+                  🏠
+                </div>
+                <div>
+                  <div className="font-bold text-white">Rajmistri Profile</div>
+                  <div className="text-xs text-gray-400">Brickwork, Plaster & Roof Slab Work</div>
+                  <div className="text-xs text-emerald-400 mt-1">📍 Mymensingh • Verified Listing</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. For Customers Section */}
+      <section className="py-16 px-4 border-b border-gray-800/80">
+        <div className="max-w-5xl mx-auto text-center space-y-8">
+          <div className="space-y-3">
+            <span className="px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-semibold uppercase tracking-wider">
+              For Homeowners & Businesses
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white">Need a worker?</h2>
+            <p className="text-gray-300 text-base max-w-2xl mx-auto">
+              Soon you can search skilled professionals easily by your specific requirements:
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
+            <div className="p-6 rounded-2xl bg-gray-900 border border-gray-800 text-left space-y-2">
+              <div className="text-2xl text-emerald-400">📍</div>
+              <h3 className="font-bold text-white text-base">✓ Location</h3>
+              <p className="text-xs text-gray-400">Discover skilled mistris in your district or neighborhood.</p>
+            </div>
+            <div className="p-6 rounded-2xl bg-gray-900 border border-gray-800 text-left space-y-2">
+              <div className="text-2xl text-teal-400">🛠️</div>
+              <h3 className="font-bold text-white text-base">✓ Service Type</h3>
+              <p className="text-xs text-gray-400">Filter by exact job needs like plumbing, wiring, or tiling.</p>
+            </div>
+            <div className="p-6 rounded-2xl bg-gray-900 border border-gray-800 text-left space-y-2">
+              <div className="text-2xl text-cyan-400">⭐</div>
+              <h3 className="font-bold text-white text-base">✓ Experience</h3>
+              <p className="text-xs text-gray-400">Check trade background and years of local experience.</p>
+            </div>
+            <div className="p-6 rounded-2xl bg-gray-900 border border-gray-800 text-left space-y-2">
+              <div className="text-2xl text-emerald-400">💬</div>
+              <h3 className="font-bold text-white text-base">✓ Customer Reviews</h3>
+              <p className="text-xs text-gray-400">Read honest feedback from neighbors before contacting.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Launch Area Section */}
+      <section className="py-16 px-4 border-b border-gray-800/80 bg-gray-900/30">
+        <div className="max-w-5xl mx-auto text-center space-y-8">
+          <div className="space-y-3">
+            <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
+              SEO Coverage
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-white">Launching first in Bangladesh</h2>
+            <p className="text-gray-400 text-base max-w-xl mx-auto">
+              Building directory listings for primary economic centers and major divisions.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {cities.map((city) => (
+              <Link
+                key={city.slug}
+                href={`/workers/${city.slug}`}
+                className="p-5 rounded-2xl bg-gray-900 border border-gray-800 hover:border-emerald-500/50 hover:bg-gray-800/80 transition-all text-center group"
+              >
+                <div className="text-2xl mb-2">🏙️</div>
+                <div className="font-bold text-white group-hover:text-emerald-400 transition-colors">{city.name}</div>
+                <div className="text-[10px] uppercase font-semibold tracking-wider text-emerald-400/80 mt-1">
+                  {city.count}
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="pt-2">
+            <Link
+              href="/locations"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-400 hover:text-emerald-300 hover:underline"
+            >
+              Explore All Supported Locations →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Early Access Notification Form */}
+      <section id="notify-section" className="py-16 px-4 border-b border-gray-800/80 bg-gradient-to-r from-emerald-950/30 via-gray-900 to-teal-950/30">
+        <div className="max-w-3xl mx-auto text-center space-y-6">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Stay Updated on Sromojibi Launch</h2>
+          <p className="text-gray-300 text-sm sm:text-base">
+            Get notified when directory listings go live in your district or city.
+          </p>
+
+          <form onSubmit={handleNotifySubmit} className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+            <input
+              type="email"
+              required
+              value={notifyEmail}
+              onChange={(e) => setNotifyEmail(e.target.value)}
+              placeholder="Enter your email address..."
+              className="flex-1 px-4 py-3 rounded-xl bg-gray-950 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-sm"
+            />
+            <button
+              type="submit"
+              className="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold text-sm shadow-md transition-all shrink-0"
+            >
+              Notify Me
+            </button>
+          </form>
+
+          {notifySuccess && (
+            <p className="text-emerald-400 text-xs font-semibold animate-fade-in">
+              ✓ Thank you! We will notify you as soon as directory listings launch in your area.
             </p>
           )}
         </div>
+      </section>
 
-        {/* Calculator Grid */}
-        <section aria-label="Available Calculators" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
-          {filteredCalculators.length > 0 ? (
-            filteredCalculators.map((calculator) => (
-              <Link 
-                key={calculator.href}
-                href={calculator.href}
-                title={`Go to ${calculator.title}`}
-                className="block h-full group outline-none"
-                onClick={() => {
-                  if (typeof window !== 'undefined' && (window as any).gtag) {
-                    (window as any).gtag('event', 'tool_click', {
-                      event_category: 'calculator',
-                      event_label: calculator.title,
-                      tool_name: calculator.title
-                    });
-                  }
-                }}
-              >
-                <Card className="h-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500 transition-all">
-                  <CardContent className="p-5 flex items-start gap-4">
-                    <div className="text-3xl shrink-0" aria-hidden="true">
-                      {calculator.icon}
-                    </div>
-                    <div>
-                      <h2 className="text-lg font-bold mb-1 text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                        {calculator.title}
-                      </h2>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
-                        {calculator.description}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))
-          ) : (
-            <div className="col-span-full py-12 text-center border border-gray-200 dark:border-gray-800 rounded-md bg-gray-50 dark:bg-gray-900/50">
-              <p className="text-gray-600 dark:text-gray-400 mb-4">No calculators found for "{searchQuery}"</p>
-              <button
-                onClick={() => setSearchQuery("")}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
-              >
-                Clear Search
-              </button>
-            </div>
-          )}
-        </section>
-
-        {/* SEO Content */}
-        <article className="max-w-4xl mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md p-6 md:p-8 mt-12 mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2">
-            Free Online Calculators by EZCalc
-          </h2>
-          <div className="text-gray-700 dark:text-gray-300 space-y-4 text-sm md:text-base leading-relaxed">
-            <p>
-              Welcome to EZCalc - your one-stop destination for free, accurate,
-              and easy-to-use online calculators. Whether you need to calculate
-              your age, determine your BMI, convert units, or solve complex
-              financial equations, we have the perfect calculator for you.
-            </p>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6">
-              Our Calculator Collection:
-            </h3>
-            <ul className="list-disc list-inside space-y-1.5 text-gray-600 dark:text-gray-400 pl-2">
-              <li>
-                <strong className="text-gray-900 dark:text-gray-200">Age Calculator</strong> - Calculate your exact age with life insights and famous birthdays
-              </li>
-              <li>
-                <strong className="text-gray-900 dark:text-gray-200">BMI Calculator</strong> - Determine your Body Mass Index and health status
-              </li>
-              <li>
-                <strong className="text-gray-900 dark:text-gray-200">Calorie Calculator</strong> - Calculate daily BMR, TDEE, and calorie needs for fitness goals
-              </li>
-              <li>
-                <strong className="text-gray-900 dark:text-gray-200">AFT Calculator</strong> - Calculate your Army Fitness Test score and check operational combat readiness
-              </li>
-              <li>
-                <strong className="text-gray-900 dark:text-gray-200">Gold Price Calculator</strong> - Track and convert gold prices in real-time
-              </li>
-              <li>
-                <strong className="text-gray-900 dark:text-gray-200">Grade Calculator</strong> - Calculate weighted averages, GPAs, and final exam targets
-              </li>
-              <li>
-                <strong className="text-gray-900 dark:text-gray-200">Land Calculator</strong> - Calculate land area and convert between measurement units
-              </li>
-              <li>
-                <strong className="text-gray-900 dark:text-gray-200">Loan Calculator</strong> - Calculate loan payments, interest, and amortization
-              </li>
-              <li>
-                <strong className="text-gray-900 dark:text-gray-200">Mortgage Calculator</strong> - Plan your home purchase with detailed mortgage calculations
-              </li>
-              <li>
-                <strong className="text-gray-900 dark:text-gray-200">Percentage Calculator</strong> - Solve percentage problems and conversions
-              </li>
-              <li>
-                <strong className="text-gray-900 dark:text-gray-200">Tip Calculator</strong> - Calculate tips and split bills easily
-              </li>
-            </ul>
-            <p className="mt-6">
-              All our calculators are completely free to use, require no
-              registration, and provide instant, accurate results. We're
-              constantly adding new calculators to help you with your everyday
-              calculations and complex computations.
-            </p>
-            <p className="mt-4">
-              EZCalc is designed with user experience in mind - fast loading
-              times, simple interfaces, and mobile-friendly designs ensure
-              you can calculate anything seamlessly.
-            </p>
+      {/* 7. FAQ Section (SEO) */}
+      <section className="py-16 px-4">
+        <div className="max-w-3xl mx-auto space-y-8">
+          <div className="text-center space-y-2">
+            <h2 className="text-3xl font-extrabold text-white">Frequently Asked Questions</h2>
+            <p className="text-gray-400 text-sm">Everything you need to know about Sromojibi worker directory</p>
           </div>
-        </article>
 
-        {/* Footer */}
-        <footer className="mt-16 text-center text-gray-500 dark:text-gray-500 text-sm border-t border-gray-200 dark:border-gray-800 pt-8 pb-4">
-          <div className="flex justify-center flex-wrap gap-x-6 gap-y-3 mb-6">
-            <Link href="/about" className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline">
-              About
-            </Link>
-            <Link href="/contact" className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline">
-              Contact
-            </Link>
-            <Link href="/privacy-policy" className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline">
-              Terms of Service
-            </Link>
+          <div className="space-y-4">
+            {faqs.map((faq, index) => {
+              const isOpen = openFaq === index;
+              return (
+                <div
+                  key={index}
+                  className="rounded-2xl bg-gray-900 border border-gray-800 overflow-hidden transition-all"
+                >
+                  <button
+                    onClick={() => setOpenFaq(isOpen ? null : index)}
+                    className="w-full p-6 text-left flex items-center justify-between font-bold text-white text-base hover:text-emerald-400 transition-colors"
+                  >
+                    <span>{faq.question}</span>
+                    <span className="text-xl text-emerald-400 ml-4">{isOpen ? "−" : "+"}</span>
+                  </button>
+                  {isOpen && (
+                    <div className="px-6 pb-6 text-sm text-gray-300 leading-relaxed border-t border-gray-800/60 pt-4">
+                      {faq.answer}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
-          <p>© 2025 EZCalc. All rights reserved.</p>
-          <p className="mt-1">
-            Free online calculators for age, BMI, gold prices, land area, loans, and more.
-          </p>
-        </footer>
-      </div>
+        </div>
+      </section>
     </main>
   );
 }

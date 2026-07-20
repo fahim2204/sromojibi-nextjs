@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import {
   Navbar as NextUINavbar,
   NavbarBrand,
@@ -10,95 +9,97 @@ import {
   NavbarMenuToggle,
   NavbarMenu,
   NavbarMenuItem,
-  Link,
   Button
 } from "@nextui-org/react";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const menuItems = [
     { name: "Home", href: "/" },
-    { name: "Age Calculator", href: "/age-calculator" },
-    { name: "BMI Calculator", href: "/bmi-calculator" },
-    { name: "Calorie", href: "/calorie-calculator" },
-    { name: "AFT Calculator", href: "/aft-calculator" },
-    { name: "Gold Price", href: "/gold-price-calculator" },
-    { name: "Land Area", href: "/land-calculator" },
-    { name: "Loan", href: "/loan-calculator" },
-    { name: "Mortgage", href: "/mortgage-calculator" },
-    { name: "Percentage", href: "/percentage-calculator" },
-    { name: "Grade", href: "/grade-calculator" },
-    { name: "Tip", href: "/tip-calculator" },
-    { name: "Blogs", href: "/blogs" },
+    { name: "Find Workers", href: "/workers" },
+    { name: "Categories", href: "/categories" },
+    { name: "Locations", href: "/locations" },
+    { name: "About Us", href: "/about" },
+    { name: "Join as Worker", href: "/join-worker" },
   ];
 
   return (
-    <NextUINavbar onMenuOpenChange={setIsMenuOpen} className="bg-black/30 backdrop-blur-md border-b border-white/10">
+    <NextUINavbar 
+      onMenuOpenChange={setIsMenuOpen} 
+      className="bg-gray-950/80 backdrop-blur-md border-b border-gray-800/80 sticky top-0 z-50"
+      maxWidth="xl"
+    >
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           className="sm:hidden text-white"
         />
         <NavbarBrand>
-          <Link href="/" className="flex items-center gap-2 font-bold text-inherit text-white text-xl group transition-all duration-300 hover:scale-105">
+          <Link href="/" className="flex items-center gap-2.5 font-extrabold text-white text-xl group">
             <Image
-              src="/images/logo.png"
-              alt="EZCalc Logo"
+              src="/icon-512.png"
+              alt="Sromojibi Logo"
               width={32}
               height={32}
-              className="aspect-square transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110"
+              className="w-8 h-8 object-contain transition-transform group-hover:scale-110"
             />
-            <span className="transition-all duration-300 group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:via-pink-400 group-hover:to-yellow-400 group-hover:bg-clip-text group-hover:text-transparent">
-              EZCalc
+            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent font-black tracking-tight">
+              Sromojibi
             </span>
           </Link>
         </NavbarBrand>
       </NavbarContent>
 
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+      <NavbarContent className="hidden sm:flex gap-6" justify="center">
         <NavbarItem>
-          <Link color="foreground" href="/age-calculator" className="text-gray-300 hover:text-white transition-colors">
-            Age
+          <Link href="/" className="text-gray-300 hover:text-emerald-400 text-sm font-medium transition-colors">
+            Home
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link href="/bmi-calculator" className="text-gray-300 hover:text-white transition-colors">
-            BMI
+          <Link href="/workers" className="text-gray-300 hover:text-emerald-400 text-sm font-medium transition-colors">
+            Workers
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link href="/gold-price-calculator" className="text-gray-300 hover:text-white transition-colors">
-            Gold
+          <Link href="/categories" className="text-gray-300 hover:text-emerald-400 text-sm font-medium transition-colors">
+            Categories
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link href="/loan-calculator" className="text-gray-300 hover:text-white transition-colors">
-            Loan
+          <Link href="/locations" className="text-gray-300 hover:text-emerald-400 text-sm font-medium transition-colors">
+            Locations
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link href="/blogs" className="text-gray-300 hover:text-white transition-colors">
-            Blogs
+          <Link href="/about" className="text-gray-300 hover:text-emerald-400 text-sm font-medium transition-colors">
+            About
           </Link>
         </NavbarItem>
       </NavbarContent>
 
       <NavbarContent justify="end">
         <NavbarItem>
-          <Button as={Link} color="primary" href="/" variant="flat" className="bg-white/10 text-white hover:bg-white/20">
-            All Calculators
+          <Button 
+            as={Link} 
+            href="/join-worker" 
+            className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold text-xs md:text-sm px-4 py-2 rounded-lg shadow-md shadow-emerald-900/30 transition-all hover:scale-[1.02]"
+          >
+            Join as Worker
           </Button>
         </NavbarItem>
       </NavbarContent>
 
-      <NavbarMenu className="bg-black/90 pt-10">
+      <NavbarMenu className="bg-gray-950/95 backdrop-blur-xl pt-6 border-t border-gray-800">
         {menuItems.map((item, index) => (
-          <NavbarMenuItem key={`${item}-${index}`}>
+          <NavbarMenuItem key={`${item.name}-${index}`}>
             <Link
-              className="w-full text-white text-lg py-2"
+              className="w-full text-gray-200 hover:text-emerald-400 text-lg py-2.5 font-medium border-b border-gray-800/50 block"
               href={item.href}
-              size="lg"
+              onClick={() => setIsMenuOpen(false)}
             >
               {item.name}
             </Link>

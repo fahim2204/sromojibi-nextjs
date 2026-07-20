@@ -4,70 +4,58 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import Navbar from "@/components/Navbar";
-import DeferredScripts from "@/components/DeferredScripts";
-import GoogleAdsense from "@/components/GoogleAdsense";
+import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sromojibi.com";
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://ezcalc.xyz'),
+  metadataBase: new URL(siteUrl),
   title: {
-    default: "EZCalc - Free Online Calculators (Age, BMI, Gold, Land & More)",
-    template: "%s | EZCalc"
+    default: "Sromojibi - Find Trusted Local Workers in Bangladesh",
+    template: "%s | Sromojibi",
   },
-  applicationName: "EZCalc",
-  description: "Free online calculators for age, BMI, gold prices, land area, loans, mortgages, percentages, tips, and more. Fast, accurate, and easy-to-use calculators for all your needs.",
+  applicationName: "Sromojibi",
+  description:
+    "Find trusted local workers in Bangladesh including electricians, plumbers, tiles mistri, rajmistri, painters and home service professionals. Sromojibi is building Bangladesh's largest worker directory.",
   keywords: [
-    "EZCalc",
-    "free online calculators",
-    "age calculator",
-    "BMI calculator",
-    "gold price calculator",
-    "land calculator",
-    "loan calculator",
-    "mortgage calculator",
-    "percentage calculator",
-    "tip calculator",
-    "unit converter",
-    "financial calculator",
-    "health calculator",
-    "measurement calculator"
+    "worker directory bangladesh",
+    "mistri bangladesh",
+    "rajmistri",
+    "electrician bangladesh",
+    "plumber bangladesh",
+    "tiles mistri",
+    "home service bangladesh",
+    "local workers near me",
+    "kajer lok",
+    "shromik",
   ],
   icons: {
-    icon: "/icon.png",
-    apple: "/apple-touch-icon.png",
+    icon: "/icon-512.png",
+    apple: "/apple-icon.png",
   },
+  manifest: "/manifest.json",
   alternates: {
-    canonical: "/",
+    canonical: siteUrl,
   },
-  authors: [{ name: "EZCalc" }],
-  creator: "EZCalc",
-  publisher: "EZCalc",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
+  authors: [{ name: "Sromojibi Platform" }],
+  creator: "Sromojibi",
+  publisher: "Sromojibi",
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://ezcalc.xyz",
-    title: "EZCalc - Free Online Calculators",
-    description: "Calculate anything with our free online calculators. Age, BMI, gold prices, land area, loans, and more. Fast, accurate, and easy to use.",
-    siteName: "EZCalc",
-    images: [
-      {
-        url: "/images/ezcalc.webp",
-        width: 1024,
-        height: 1024,
-        alt: "EZCalc - Free Online Calculators",
-      },
-    ],
+    url: siteUrl,
+    title: "Sromojibi - Find Trusted Local Workers in Bangladesh",
+    description:
+      "Find trusted local workers in Bangladesh including electricians, plumbers, tiles mistri, rajmistri, painters and home service professionals. Sromojibi is building Bangladesh's largest worker directory.",
+    siteName: "Sromojibi",
   },
   twitter: {
     card: "summary_large_image",
-    title: "EZCalc - Free Online Calculators",
-    description: "Calculate anything with our free online calculators. Fast, accurate, and easy to use.",
+    title: "Sromojibi - Find Trusted Local Workers in Bangladesh",
+    description:
+      "Find trusted local workers in Bangladesh including electricians, plumbers, tiles mistri, rajmistri, painters and home service professionals.",
   },
   robots: {
     index: true,
@@ -75,13 +63,10 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
-  },
-  other: {
-    "google-adsense-account": "ca-pub-7554208332966422",
   },
 };
 
@@ -92,8 +77,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.className}>
-        {/* Structured Data - Critical, loads before interactive */}
+      <body className={`${inter.className} bg-gray-950 text-gray-100 min-h-screen flex flex-col antialiased`}>
+        {/* Structured Data for Search Engine Optimization */}
         <Script
           id="structured-data"
           type="application/ld+json"
@@ -103,46 +88,29 @@ export default function RootLayout({
               {
                 "@context": "https://schema.org",
                 "@type": "WebSite",
-                "name": "EZCalc",
-                "alternateName": ["EZ Calculator", "EZCalc XYZ"],
-                "url": "https://ezcalc.xyz",
-                "description": "Free online calculators for age, BMI, gold prices, land area, loans, mortgages, percentages, tips, and more"
+                "name": "Sromojibi",
+                "alternateName": ["Sromojibi Bangladesh", "Sromojibi Directory"],
+                "url": siteUrl,
+                "description":
+                  "Find trusted local workers in Bangladesh including electricians, plumbers, tiles mistri, rajmistri, painters and home service professionals.",
               },
               {
                 "@context": "https://schema.org",
-                "@type": "WebApplication",
-                "name": "EZCalc - Free Online Calculators",
-                "description": "Free online calculators for age, BMI, gold prices, land area, loans, mortgages, percentages, tips, and more",
-                "url": "https://ezcalc.xyz",
-                "applicationCategory": "UtilityApplication",
-                "offers": {
-                  "@type": "Offer",
-                  "price": "0",
-                  "priceCurrency": "USD"
-                },
-                "featureList": [
-                  "Age calculator with life insights",
-                  "BMI calculator",
-                  "Gold price calculator",
-                  "Land area calculator",
-                  "Loan and mortgage calculators",
-                  "Percentage calculator",
-                  "Tip calculator",
-                  "Free and easy to use"
-                ]
-              }
-            ])
+                "@type": "Organization",
+                "name": "Sromojibi",
+                "url": siteUrl,
+                "description":
+                  "Bangladesh's largest worker directory connecting skilled local professionals with customers.",
+              },
+            ]),
           }}
         />
-        
+
         <Providers>
           <Navbar />
-          {children}
+          <div className="flex-1">{children}</div>
+          <Footer />
         </Providers>
-        
-        {/* Deferred third-party scripts - loads after interaction or idle */}
-        <GoogleAdsense />
-        <DeferredScripts />
       </body>
     </html>
   );

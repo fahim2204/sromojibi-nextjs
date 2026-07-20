@@ -1,74 +1,91 @@
-import { Card, CardBody as CardContent } from "@nextui-org/react";
 import Link from "next/link";
 
 export const metadata = {
   title: "About Us",
-  description: "Learn about EZCalc's mission to provide free, accurate, and easy-to-use online calculators for everyone.",
+  description:
+    "Learn about Sromojibi's mission to build Bangladesh's largest open worker directory connecting local skilled workers with customers.",
   alternates: {
-    canonical: "https://ezcalc.xyz/about",
-  },
-  openGraph: {
-    url: "https://ezcalc.xyz/about",
+    canonical: "/about",
   },
 };
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-12 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">About EZCalc</h1>
-          <p className="text-xl text-gray-400">Simplifying calculations for everyone, everywhere.</p>
+    <main className="min-h-screen bg-gray-950 text-gray-100 py-16 px-4">
+      <div className="max-w-4xl mx-auto space-y-12">
+        <div className="text-center space-y-4">
+          <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
+            Our Mission
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black text-white">About Sromojibi</h1>
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+            Discover skilled workers across Bangladesh effortlessly.
+          </p>
         </div>
 
-        <Card className="glass-strong mb-8">
-          <CardContent className="p-8 text-gray-300 space-y-6">
-            <section>
-              <h2 className="text-2xl font-bold mb-4 text-white">Our Mission</h2>
-              <p>
-                At EZCalc, we believe that complex calculations shouldn't be a barrier to making informed decisions. 
-                Whether you're planning a mortgage, tracking your health tailored to your body type, or just curious about 
-                how many days you've been alive, we're here to provide instant, accurate, and free answers.
-              </p>
-            </section>
+        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-8 md:p-12 space-y-8 shadow-xl">
+          <section className="space-y-4">
+            <h2 className="text-2xl font-bold text-white">Building Bangladesh&apos;s Worker Directory</h2>
+            <p className="text-gray-300 leading-relaxed text-base">
+              Every day, millions of skilled professionals — from electricians and plumbers to tiles mistris and painters — perform vital work in communities across Bangladesh. However, finding reliable local technicians often relies solely on personal contacts and word-of-mouth.
+            </p>
+            <p className="text-gray-300 leading-relaxed text-base">
+              Sromojibi was founded to bridge this gap. We are building a public, open worker directory that helps homeowners and local businesses discover skilled trade professionals in their own cities and neighborhoods.
+            </p>
+          </section>
 
-            <section>
-              <h2 className="text-2xl font-bold mb-4 text-white">Why Choose EZCalc?</h2>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong className="text-purple-400">100% Free:</strong> No hidden fees, no subscriptions.</li>
-                <li><strong className="text-purple-400">Privacy Focused:</strong> Calculations happen right in your browser. We don't store your personal data.</li>
-                <li><strong className="text-purple-400">Fast & Accurate:</strong> Optimized for speed and precision.</li>
-                <li><strong className="text-purple-400">Easy to Use:</strong> Clean, intuitive interfaces designed for everyone.</li>
-              </ul>
-            </section>
-            
-            <section>
-              <h2 className="text-2xl font-bold mb-4 text-white">Our Calculators</h2>
-              <p className="mb-4">
-                We are constantly expanding our library. Currently, we offer tools for:
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>Age & Life Insights</li>
-                  <li>Health (BMI)</li>
-                  <li>Finance (Loans, Mortgages)</li>
-                </ul>
-                <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>Real Estate (Land Area)</li>
-                  <li>Daily Utilities (Tips, Percentages)</li>
-                  <li>Investments (Gold Price)</li>
-                </ul>
+          <section className="space-y-4 pt-4 border-t border-gray-800">
+            <h2 className="text-2xl font-bold text-white">Core Principles</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+              <div className="p-5 rounded-2xl bg-gray-950 border border-gray-800">
+                <h3 className="font-bold text-emerald-400 text-lg mb-1">🔍 Open Discovery</h3>
+                <p className="text-sm text-gray-400">
+                  Making worker profiles indexed, searchable, and easily reachable for local households.
+                </p>
               </div>
-            </section>
-          </CardContent>
-        </Card>
+              <div className="p-5 rounded-2xl bg-gray-950 border border-gray-800">
+                <h3 className="font-bold text-emerald-400 text-lg mb-1">🆓 Free Worker Profiles</h3>
+                <p className="text-sm text-gray-400">
+                  Worker listings will be free during our initial launch period to maximize opportunity for all skilled mistris.
+                </p>
+              </div>
+              <div className="p-5 rounded-2xl bg-gray-950 border border-gray-800">
+                <h3 className="font-bold text-emerald-400 text-lg mb-1">📍 Local Focus</h3>
+                <p className="text-sm text-gray-400">
+                  Organized by division, city, and trade category for maximum relevance and fast contact.
+                </p>
+              </div>
+              <div className="p-5 rounded-2xl bg-gray-950 border border-gray-800">
+                <h3 className="font-bold text-emerald-400 text-lg mb-1">🛡️ Directory Model</h3>
+                <p className="text-sm text-gray-400">
+                  Providing transparent profile information for direct connection without middleman barriers.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="space-y-4 pt-4 border-t border-gray-800">
+            <h2 className="text-2xl font-bold text-white">Are You a Skilled Professional?</h2>
+            <p className="text-gray-300 text-base leading-relaxed">
+              If you offer skilled home or trade services, register your free profile today to get discovered by local customers.
+            </p>
+            <div>
+              <Link
+                href="/join-worker"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold text-sm transition-all"
+              >
+                Register Free Profile →
+              </Link>
+            </div>
+          </section>
+        </div>
 
         <div className="text-center">
-          <Link 
+          <Link
             href="/"
-            className="inline-block px-8 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:opacity-90 transition-opacity"
+            className="text-gray-400 hover:text-emerald-400 text-sm font-semibold transition-colors"
           >
-            Back to Home
+            ← Back to Home
           </Link>
         </div>
       </div>
