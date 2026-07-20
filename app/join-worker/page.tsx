@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { Input, Select, SelectItem, Textarea, Button } from "@nextui-org/react";
 
 export default function JoinWorkerPage() {
   const [formData, setFormData] = useState({
@@ -18,6 +19,35 @@ export default function JoinWorkerPage() {
     e.preventDefault();
     setSubmitted(true);
   };
+
+  const serviceCategories = [
+    { key: "Electrician", label: "⚡ Electrician (ইলেকট্রিশিয়ান)" },
+    { key: "Rajmistri", label: "🏠 Rajmistri (রাজমিস্ত্রি)" },
+    { key: "Plumber", label: "🚰 Plumber (প্ল্যাম্বার)" },
+    { key: "Tiles Worker", label: "🧱 Tiles Worker (টাইলস মিস্ত্রি)" },
+    { key: "Painter", label: "🎨 Painter (রং মিস্ত্রি)" },
+    { key: "Carpenter", label: "🔨 Carpenter (কাঠ মিস্ত্রি)" },
+    { key: "AC Technician", label: "❄️ AC Technician (এসি টেকনিশিয়ান)" },
+    { key: "CCTV Installer", label: "📹 CCTV Installer (সিসিটিভি মিস্ত্রি)" },
+    { key: "Other", label: "🛠️ Other Skilled Trades" },
+  ];
+
+  const cities = [
+    { key: "Dhaka", label: "Dhaka (ঢাকা)" },
+    { key: "Chittagong", label: "Chittagong (চট্টগ্রাম)" },
+    { key: "Mymensingh", label: "Mymensingh (ময়মনসিংহ)" },
+    { key: "Sylhet", label: "Sylhet (সিলেট)" },
+    { key: "Rajshahi", label: "Rajshahi (রাজশাহী)" },
+    { key: "Khulna", label: "Khulna (খুলনা)" },
+    { key: "Other District", label: "Other District" },
+  ];
+
+  const experienceLevels = [
+    { key: "1-3 Years", label: "1 - 3 Years" },
+    { key: "3-5 Years", label: "3 - 5 Years" },
+    { key: "5-10 Years", label: "5 - 10 Years" },
+    { key: "10+ Years", label: "10+ Years Expert" },
+  ];
 
   return (
     <main className="min-h-screen bg-gray-950 text-gray-100 py-16 px-4">
@@ -84,7 +114,7 @@ export default function JoinWorkerPage() {
                   Thank you, <strong className="text-white">{formData.fullName}</strong>. Your profile request for <strong className="text-emerald-400">{formData.serviceType}</strong> in <strong className="text-white">{formData.city}</strong> has been registered. Our team will contact you at <strong className="text-white">{formData.phone}</strong> when local listings activate.
                 </p>
                 <div className="pt-4">
-                  <button
+                  <Button
                     onClick={() => {
                       setSubmitted(false);
                       setFormData({
@@ -96,111 +126,146 @@ export default function JoinWorkerPage() {
                         details: "",
                       });
                     }}
-                    className="px-6 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-semibold text-xs transition-colors"
+                    className="bg-gray-800 hover:bg-gray-700 text-white font-semibold text-xs"
                   >
                     Submit Another Worker Profile
-                  </button>
+                  </Button>
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <h2 className="text-xl font-bold text-white border-b border-gray-800 pb-3">Create Free Worker Profile</h2>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <h2 className="text-xl font-bold text-white pb-6">Create Free Worker Profile</h2>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-300">Full Name / নাম *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    placeholder="e.g. Abul Kashem Mistri"
-                    className="w-full px-4 py-3 rounded-xl bg-gray-950 border border-gray-800 text-white text-sm focus:outline-none focus:border-emerald-500"
+                <Input
+                  isRequired
+                  labelPlacement="outside"
+                  type="text"
+                  label="Full Name / নাম"
+                  placeholder="e.g. Abul Kashem Mistri"
+                  variant="bordered"
+                  value={formData.fullName}
+                  onValueChange={(val) => setFormData({ ...formData, fullName: val })}
+                  classNames={{
+                    label: "text-gray-300 font-medium text-sm",
+                    input: "text-white placeholder:text-gray-500",
+                    inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                  }}
+                />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <Input
+                    isRequired
+                    labelPlacement="outside"
+                    type="tel"
+                    label="Mobile Phone / মোবাইল নম্বর"
+                    placeholder="e.g. 01700000000"
+                    variant="bordered"
+                    value={formData.phone}
+                    onValueChange={(val) => setFormData({ ...formData, phone: val })}
+                    classNames={{
+                      label: "text-gray-300 font-medium text-sm",
+                      input: "text-white placeholder:text-gray-500",
+                      inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                    }}
                   />
+
+                  <Select
+                    isRequired
+                    labelPlacement="outside"
+                    label="Service Category / কাজের ধরন"
+                    variant="bordered"
+                    selectedKeys={[formData.serviceType]}
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0] as string;
+                      if (selected) setFormData({ ...formData, serviceType: selected });
+                    }}
+                    classNames={{
+                      label: "text-gray-300 font-medium text-sm",
+                      value: "text-white",
+                      trigger: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                      popoverContent: "bg-gray-900 border border-gray-800 text-white",
+                    }}
+                  >
+                    {serviceCategories.map((cat) => (
+                      <SelectItem key={cat.key} className="text-gray-200 hover:bg-gray-800 hover:text-emerald-400">
+                        {cat.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-gray-300">Mobile Phone Number / মোবাইল নম্বর *</label>
-                    <input
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="e.g. 01700000000"
-                      className="w-full px-4 py-3 rounded-xl bg-gray-950 border border-gray-800 text-white text-sm focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <Select
+                    isRequired
+                    labelPlacement="outside"
+                    label="City / Division"
+                    variant="bordered"
+                    selectedKeys={[formData.city]}
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0] as string;
+                      if (selected) setFormData({ ...formData, city: selected });
+                    }}
+                    classNames={{
+                      label: "text-gray-300 font-medium text-sm",
+                      value: "text-white",
+                      trigger: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                      popoverContent: "bg-gray-900 border border-gray-800 text-white",
+                    }}
+                  >
+                    {cities.map((city) => (
+                      <SelectItem key={city.key} className="text-gray-200 hover:bg-gray-800 hover:text-emerald-400">
+                        {city.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
 
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-gray-300">Service Category / কাজের ধরন *</label>
-                    <select
-                      value={formData.serviceType}
-                      onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-gray-950 border border-gray-800 text-white text-sm focus:outline-none focus:border-emerald-500"
-                    >
-                      <option value="Rajmistri">🏠 Rajmistri (রাজমিস্ত্রি)</option>
-                      <option value="Electrician">⚡ Electrician (ইলেকট্রিশিয়ান)</option>
-                      <option value="Plumber">🚰 Plumber (প্ল্যাম্বার)</option>
-                      <option value="Tiles Worker">🧱 Tiles Worker (টাইলস মিস্ত্রি)</option>
-                      <option value="Painter">🎨 Painter (রং মিস্ত্রি)</option>
-                      <option value="Carpenter">🔨 Carpenter (কাঠ মিস্ত্রি)</option>
-                      <option value="AC Technician">❄️ AC Technician (এসি টেকনিশিয়ান)</option>
-                      <option value="CCTV Installer">📹 CCTV Installer (সিসিটিভি মিস্ত্রি)</option>
-                      <option value="Other">🛠️ Other Skilled Trades</option>
-                    </select>
-                  </div>
+                  <Select
+                    isRequired
+                    labelPlacement="outside"
+                    label="Experience Level"
+                    variant="bordered"
+                    selectedKeys={[formData.experience]}
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0] as string;
+                      if (selected) setFormData({ ...formData, experience: selected });
+                    }}
+                    classNames={{
+                      label: "text-gray-300 font-medium text-sm",
+                      value: "text-white",
+                      trigger: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                      popoverContent: "bg-gray-900 border border-gray-800 text-white",
+                    }}
+                  >
+                    {experienceLevels.map((exp) => (
+                      <SelectItem key={exp.key} className="text-gray-200 hover:bg-gray-800 hover:text-emerald-400">
+                        {exp.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-gray-300">City / Division *</label>
-                    <select
-                      value={formData.city}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-gray-950 border border-gray-800 text-white text-sm focus:outline-none focus:border-emerald-500"
-                    >
-                      <option value="Dhaka">Dhaka (ঢাকা)</option>
-                      <option value="Chittagong">Chittagong (চট্টগ্রাম)</option>
-                      <option value="Mymensingh">Mymensingh (ময়মনসিংহ)</option>
-                      <option value="Sylhet">Sylhet (সিলেট)</option>
-                      <option value="Rajshahi">Rajshahi (রাজশাহী)</option>
-                      <option value="Khulna">Khulna (খুলনা)</option>
-                      <option value="Other District">Other District</option>
-                    </select>
-                  </div>
+                <Textarea
+                  labelPlacement="outside"
+                  label="Specialty / Experience Summary (Optional)"
+                  placeholder="Briefly describe your services (e.g., house wiring, industrial plumbing, floor tiling)..."
+                  variant="bordered"
+                  minRows={3}
+                  value={formData.details}
+                  onValueChange={(val) => setFormData({ ...formData, details: val })}
+                  classNames={{
+                    label: "text-gray-300 font-medium text-sm",
+                    input: "text-white placeholder:text-gray-500",
+                    inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                  }}
+                />
 
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-gray-300">Experience Level *</label>
-                    <select
-                      value={formData.experience}
-                      onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-gray-950 border border-gray-800 text-white text-sm focus:outline-none focus:border-emerald-500"
-                    >
-                      <option value="1-3 Years">1 - 3 Years</option>
-                      <option value="3-5 Years">3 - 5 Years</option>
-                      <option value="5-10 Years">5 - 10 Years</option>
-                      <option value="10+ Years">10+ Years Expert</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-300">Specialty / Experience Summary (Optional)</label>
-                  <textarea
-                    rows={3}
-                    value={formData.details}
-                    onChange={(e) => setFormData({ ...formData, details: e.target.value })}
-                    placeholder="Briefly describe your services (e.g., house wiring, industrial plumbing, floor tiling)..."
-                    className="w-full px-4 py-3 rounded-xl bg-gray-950 border border-gray-800 text-white text-sm focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-
-                <button
+                <Button
                   type="submit"
-                  className="w-full py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold text-base shadow-lg shadow-emerald-500/20 transition-all"
+                  size="lg"
+                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-gray-950 font-extrabold shadow-lg shadow-emerald-950/50 rounded-xl transition-all hover:scale-[1.01]"
                 >
                   Register Free Worker Profile
-                </button>
+                </Button>
               </form>
             )}
           </div>

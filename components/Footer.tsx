@@ -1,7 +1,12 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
+import { Plus_Jakarta_Sans } from "next/font/google";
+
+const brandFont = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["700", "800"],
+  display: "swap",
+});
 
 export default function Footer() {
   return (
@@ -14,9 +19,9 @@ export default function Footer() {
               alt="Sromojibi Logo"
               width={28}
               height={28}
-              className="w-7 h-7 object-contain"
+              className="w-7 h-7 object-contain transition-transform group-hover:scale-110 brightness-200"
             />
-            <span className="bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent">
+            <span className={`${brandFont.className} bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent font-black tracking-tight text-xl`}>
               Sromojibi
             </span>
           </div>

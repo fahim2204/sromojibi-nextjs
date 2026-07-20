@@ -13,6 +13,13 @@ import {
 } from "@nextui-org/react";
 import Link from "next/link";
 import Image from "next/image";
+import { Plus_Jakarta_Sans } from "next/font/google";
+
+const brandFont = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["700", "800"],
+  display: "swap",
+});
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -38,44 +45,47 @@ export default function Navbar() {
           className="sm:hidden text-white"
         />
         <NavbarBrand>
-          <Link href="/" className="flex items-center gap-2.5 font-extrabold text-white text-xl group">
+          <Link 
+            href="/" 
+            className="flex items-center gap-1 font-extrabold text-white text-xl group transition-all duration-300"
+          >
             <Image
               src="/icon-512.png"
               alt="Sromojibi Logo"
               width={32}
               height={32}
-              className="w-8 h-8 object-contain transition-transform group-hover:scale-110"
+              className="w-8 h-8 object-contain transition-all duration-300 group-hover:scale-110 group-hover:-rotate-6 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)] group-hover:drop-shadow-[0_0_14px_rgba(16,185,129,0.7)] brightness-200"
             />
-            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent font-black tracking-tight">
+            <span className={`${brandFont.className} bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent font-black text-2xl tracking-tight group-hover:from-emerald-300 group-hover:via-teal-200 group-hover:to-cyan-200 transition-all duration-300`}>
               Sromojibi
             </span>
           </Link>
         </NavbarBrand>
       </NavbarContent>
 
-      <NavbarContent className="hidden sm:flex gap-6" justify="center">
+      <NavbarContent className="hidden sm:flex gap-2" justify="center">
         <NavbarItem>
-          <Link href="/" className="text-gray-300 hover:text-emerald-400 text-sm font-medium transition-colors">
+          <Link href="/" className="px-3 py-1.5 rounded-lg text-gray-300 hover:text-emerald-300 hover:bg-emerald-500/10 transition-all duration-200 text-sm font-medium">
             Home
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link href="/workers" className="text-gray-300 hover:text-emerald-400 text-sm font-medium transition-colors">
+          <Link href="/workers" className="px-3 py-1.5 rounded-lg text-gray-300 hover:text-emerald-300 hover:bg-emerald-500/10 transition-all duration-200 text-sm font-medium">
             Workers
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link href="/categories" className="text-gray-300 hover:text-emerald-400 text-sm font-medium transition-colors">
+          <Link href="/categories" className="px-3 py-1.5 rounded-lg text-gray-300 hover:text-emerald-300 hover:bg-emerald-500/10 transition-all duration-200 text-sm font-medium">
             Categories
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link href="/locations" className="text-gray-300 hover:text-emerald-400 text-sm font-medium transition-colors">
+          <Link href="/locations" className="px-3 py-1.5 rounded-lg text-gray-300 hover:text-emerald-300 hover:bg-emerald-500/10 transition-all duration-200 text-sm font-medium">
             Locations
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link href="/about" className="text-gray-300 hover:text-emerald-400 text-sm font-medium transition-colors">
+          <Link href="/about" className="px-3 py-1.5 rounded-lg text-gray-300 hover:text-emerald-300 hover:bg-emerald-500/10 transition-all duration-200 text-sm font-medium">
             About
           </Link>
         </NavbarItem>

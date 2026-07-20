@@ -1,80 +1,81 @@
-import { Card, CardBody as CardContent } from "@nextui-org/react";
 import Link from "next/link";
+import { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "Terms of Service for EZCalc. Please read our terms and conditions carefully.",
+  description:
+    "Terms of Service for Sromojibi. Read the terms, conditions, and directory platform policies.",
   alternates: {
-    canonical: "https://ezcalc.xyz/terms",
-  },
-  openGraph: {
-    url: "https://ezcalc.xyz/terms",
+    canonical: "/terms",
   },
 };
 
 export default function TermsPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-12 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">Terms of Service</h1>
-          <p className="text-xl text-gray-400">Last Updated: December 15, 2025</p>
+    <main className="min-h-screen bg-gray-950 text-gray-100 py-16 px-4">
+      <div className="max-w-3xl mx-auto space-y-10">
+        <div className="space-y-3 border-b border-gray-800 pb-8">
+          <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
+            Legal & Terms
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black text-white">Terms of Service</h1>
+          <p className="text-gray-400 text-sm">
+            Last Updated: July 2026
+          </p>
         </div>
 
-        <Card className="glass-strong mb-8">
-          <CardContent className="p-8 text-gray-300 space-y-6">
-            <section>
-              <h2 className="text-2xl font-bold mb-4 text-white">1. Agreement to Terms</h2>
-              <p>
-                By accessing or using EZCalc, you agree to be bound by these Terms of Service and our Privacy Policy. 
-                If you disagree with any part of the terms, then you may not access the service.
-              </p>
-            </section>
+        <div className="space-y-8 text-gray-300">
+          <section className="space-y-3">
+            <h2 className="text-2xl font-bold text-white">1. Platform Nature (Open Directory)</h2>
+            <p className="text-base leading-relaxed">
+              <strong>Sromojibi</strong> (sromojibi.com) operates as an open local worker directory designed to help users discover independent skilled workers, mistris, and technicians in Bangladesh.
+            </p>
+            <div className="p-4 rounded-2xl bg-gray-900 border border-gray-800 text-emerald-400 text-xs sm:text-sm font-medium">
+              💡 <strong>Directory Notice:</strong> Sromojibi is not a labor marketplace, contractor, or employment agency. We do not hire, employ, or manage workers listed on the site.
+            </div>
+          </section>
 
-            <section>
-              <h2 className="text-2xl font-bold mb-4 text-white">2. Use License</h2>
-              <p>
-                Permission is granted to temporarily download one copy of the materials (information or software) on EZCalc's website 
-                for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title.
-              </p>
-            </section>
+          <section className="space-y-3 pt-6 border-t border-gray-800/80">
+            <h2 className="text-2xl font-bold text-white">2. Direct Connection & Independent Contracting</h2>
+            <p className="text-base leading-relaxed">
+              Any service agreements, work contracts, pricing, payment terms, or job specifications arranged between customers and listed workers are made directly between those parties. Sromojibi is not a party to employment contracts, service transactions, or financial exchanges.
+            </p>
+          </section>
 
-            <section>
-              <h2 className="text-2xl font-bold mb-4 text-white">3. Disclaimer</h2>
-              <p>
-                The materials on EZCalc's website are provided on an 'as is' basis. EZCalc makes no warranties, expressed or implied, 
-                and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions 
-                of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
-              </p>
-              <p className="mt-2 text-yellow-500/80">
-                <strong>Note:</strong> While we strive for accuracy, the results provided by our calculators should be used for informational purposes only. 
-                They should not be considered as professional financial, medical, or legal advice.
-              </p>
-            </section>
+          <section className="space-y-3 pt-6 border-t border-gray-800/80">
+            <h2 className="text-2xl font-bold text-white">3. Disclaimer of Warranties & Dispute Liability</h2>
+            <p className="text-base leading-relaxed">
+              Sromojibi provides directory listings on an &quot;as-is&quot; basis for discovery purposes. While we encourage accurate profiles, Sromojibi does not guarantee worker performance, trade licenses, or individual work quality. Sromojibi is not liable for payment disputes, job delays, damages, or contract disagreements.
+            </p>
+          </section>
 
-            <section>
-              <h2 className="text-2xl font-bold mb-4 text-white">4. Limitations</h2>
-              <p>
-                In no event shall EZCalc or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, 
-                or due to business interruption) arising out of the use or inability to use the materials on EZCalc's website.
-              </p>
-            </section>
+          <section className="space-y-3 pt-6 border-t border-gray-800/80">
+            <h2 className="text-2xl font-bold text-white">4. Worker Conduct & Free Profile Guidelines</h2>
+            <p className="text-base leading-relaxed">
+              Workers registering a free profile agree to provide truthful contact and service details. Sromojibi reserves the right to suspend or remove any profile that violates platform community standards, contains false information, or engages in fraudulent activity.
+            </p>
+          </section>
 
-            <section>
-              <h2 className="text-2xl font-bold mb-4 text-white">5. Governing Law</h2>
-              <p>
-                These terms and conditions are governed by and construed in accordance with the laws and you irrevocably submit to the 
-                exclusive jurisdiction of the courts in that location.
-              </p>
-            </section>
-          </CardContent>
-        </Card>
+          <section className="space-y-3 pt-6 border-t border-gray-800/80">
+            <h2 className="text-2xl font-bold text-white">5. Changes to Terms</h2>
+            <p className="text-base leading-relaxed">
+              We reserve the right to update these terms as platform capabilities expand. Continued use of Sromojibi constitutes acceptance of updated terms.
+            </p>
+          </section>
 
-        <div className="text-center">
-          <Link 
-            href="/"
-            className="text-gray-400 hover:text-white transition-colors"
-          >
+          <section className="space-y-3 pt-6 border-t border-gray-800/80">
+            <h2 className="text-2xl font-bold text-white">6. Contact Information</h2>
+            <p className="text-base leading-relaxed">
+              If you have any questions regarding our Terms of Service, please contact us at{" "}
+              <a href="mailto:contact@sromojibi.com" className="text-emerald-400 font-semibold hover:underline">
+                contact@sromojibi.com
+              </a>.
+            </p>
+          </section>
+        </div>
+
+        <div className="pt-8 border-t border-gray-800/80">
+          <Link href="/" className="text-sm font-semibold text-gray-400 hover:text-emerald-400 transition-colors">
             ← Back to Home
           </Link>
         </div>
