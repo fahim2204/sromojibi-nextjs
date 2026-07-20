@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/private/',
     },
-    sitemap: 'https://ezcalc.xyz/sitemap-main.xml',
+    sitemap: 'https://sromojibi.com/sitemap.xml',
   };
 }
