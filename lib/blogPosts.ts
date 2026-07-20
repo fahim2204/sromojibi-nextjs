@@ -12,7 +12,7 @@ export type BlogPost = {
   readingTime: string;
   category: string;
   keywords: string[];
-  relatedCalculator: {
+  relatedCategory: {
     label: string;
     href: string;
   };
@@ -26,497 +26,156 @@ export type BlogPost = {
 
 export const blogPosts: BlogPost[] = [
   {
-    slug: "how-to-calculate-age-accurately",
-    title: "How to Calculate Age Accurately in Years, Months, and Days",
+    slug: "how-to-find-reliable-electrician-in-bangladesh",
+    title: "How to Find and Hire a Reliable Electrician in Bangladesh",
     description:
-      "Learn the simple way to calculate exact age, avoid common birthday mistakes, and understand why date order matters.",
-    publishedAt: "2026-06-26",
-    updatedAt: "2026-06-26",
+      "Essential guide for homeowners in Bangladesh looking to hire safe, qualified electricians for wiring, switchboard repairs, and home electrical safety.",
+    publishedAt: "2026-07-20",
+    updatedAt: "2026-07-20",
+    readingTime: "4 min read",
+    category: "Electrical & Wiring",
+    keywords: ["electrician bangladesh", "electrician dhaka", "wiring mistri", "home electrical safety"],
+    relatedCategory: { label: "Electrician Directory", href: "/workers/electrician" },
+    intro:
+      "Finding a trustworthy electrician for short circuits, fan installations, or full building wiring is critical for household safety in Bangladesh. A quick repair by an inexperienced technician can lead to recurring power trips or electrical hazards.",
+    sections: [
+      {
+        heading: "Check Practical Experience & Specialized Skills",
+        body: [
+          "Before handing over major electrical work, ask the technician about their experience with single-phase vs three-phase wiring, circuit breaker setups, and load distribution.",
+          "Experienced electricians in Dhaka and other major cities understand local line fluctuations and will recommend proper gauge copper wiring and reliable circuit breakers.",
+        ],
+      },
+      {
+        heading: "Prioritize Safety Equipment & Grounding",
+        body: [
+          "Ensure your electrician verifies earthing (grounding) connections during home wiring upgrades. Proper earthing prevents dangerous electrical shocks during refrigerator or water heater usage.",
+          "Professional technicians inspect main distribution boards and ensure earth leakage circuit breakers (ELCBs) function properly.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: "What should I ask an electrician before hiring?",
+        answer:
+          "Ask about their trade experience, past residential projects, and estimation for labor vs material costs.",
+      },
+      {
+        question: "Why does my circuit breaker keep tripping?",
+        answer:
+          "Frequent breaker trips are usually caused by overloaded circuits, short circuits in appliances, or loose wire connections requiring an electrician's inspection.",
+      },
+    ],
+  },
+  {
+    slug: "essential-plumbing-tips-for-homeowners-in-dhaka",
+    title: "Essential Plumbing Maintenance Tips for Homeowners in Bangladesh",
+    description:
+      "Learn how to prevent clogged pipes, inspect water pumps, and choose skilled plumbers for bathroom and kitchen repairs in Bangladesh.",
+    publishedAt: "2026-07-18",
+    updatedAt: "2026-07-18",
     readingTime: "5 min read",
-    category: "Date Calculators",
-    keywords: ["age calculator", "calculate exact age", "birthday calculator", "years months days"],
-    relatedCalculator: { label: "Age Calculator", href: "/age-calculator" },
+    category: "Plumbing Services",
+    keywords: ["plumber bangladesh", "plumbing mistri", "water line repair", "bathroom pipe repair"],
+    relatedCategory: { label: "Plumber Directory", href: "/workers/plumber" },
     intro:
-      "Age sounds like a simple number until you need it for a form, school record, insurance quote, visa document, or health calculation. The safest way is to compare the birth date and target date step by step instead of only subtracting years.",
+      "Plumbing emergencies like leaking overhead tanks, broken sanitary fittings, or clogged drainage pipes can disrupt daily family life. Regular maintenance and knowing when to call a skilled plumber save time and money.",
     sections: [
       {
-        heading: "Start with the target date",
+        heading: "Maintaining Water Pumps & Overhead Tanks",
         body: [
-          "Most people calculate age as of today, but many official forms ask for age on a specific date. That small detail changes the result if the birthday has not happened yet in the target year.",
-          "Write the target date first, then the date of birth. Subtract the years, check the month, and finally check the day. If the target month and day come before the birthday month and day, subtract one year from the raw year difference.",
+          "In Bangladesh, water supply often depends on underground reservoirs and roof tanks. Inspecting pump foot valves and float switches twice a year prevents motor burnouts and dry running.",
+          "Clearing sediment built up inside water tanks ensures clean supply for drinking and sanitation.",
         ],
       },
       {
-        heading: "Why months and days are easy to get wrong",
+        heading: "Dealing with Hard Water & Mineral Clogs",
         body: [
-          "Calendar months do not all have the same length. February, leap years, and end-of-month birthdays can make a rough calculation feel right while still being off by a day or two.",
-          "For everyday use, an exact age calculator is useful because it handles these calendar rules consistently. That is especially helpful for babies, school admissions, medical history, and eligibility checks.",
-        ],
-      },
-      {
-        heading: "A quick manual example",
-        body: [
-          "If someone was born on May 20, 1995 and the target date is June 26, 2026, the raw year difference is 31. Because May 20 has already passed in 2026, the person is 31 years old.",
-          "If the target date were April 26, 2026, the birthday would still be ahead. The exact age would be 30 years, plus the remaining months and days from the last birthday.",
+          "High iron content in water across several regions can cause scale buildup inside PPR and PVC pipes. Flushing aerators and showerheads periodically maintains water pressure.",
         ],
       },
     ],
     faqs: [
       {
-        question: "What is the most accurate way to calculate age?",
+        question: "How do I find a local plumber near me?",
         answer:
-          "Use the full birth date and target date, then compare year, month, and day. This avoids mistakes around birthdays that have not occurred yet.",
-      },
-      {
-        question: "Does leap year affect age calculation?",
-        answer:
-          "Yes, it can affect the day count and some February 29 birthdays. A date-aware calculator handles leap years more reliably than a rough year subtraction.",
+          "You can search Sromojibi's worker directory by district and specialty to connect directly with nearby plumbers.",
       },
     ],
   },
   {
-    slug: "bmi-calculator-guide-for-adults",
-    title: "BMI Calculator Guide: What Your Body Mass Index Really Means",
+    slug: "guide-to-hiring-rajmistri-civil-construction",
+    title: "Complete Guide to Hiring a Rajmistri for Construction & Remodeling",
     description:
-      "A practical guide to BMI ranges, limitations, and how to use body mass index as a screening tool without overreading it.",
-    publishedAt: "2026-06-26",
-    updatedAt: "2026-06-26",
+      "Everything you need to know when hiring a head mason (Rajmistri) for bricklaying, plastering, and civil building work in Bangladesh.",
+    publishedAt: "2026-07-15",
+    updatedAt: "2026-07-15",
     readingTime: "6 min read",
-    category: "Health Calculators",
-    keywords: ["BMI calculator", "body mass index", "healthy BMI range", "BMI chart"],
-    relatedCalculator: { label: "BMI Calculator", href: "/bmi-calculator" },
+    category: "Civil Construction",
+    keywords: ["rajmistri", "rajmistri bangladesh", "masonry work", "brickwork mistri"],
+    relatedCategory: { label: "Rajmistri Directory", href: "/workers/rajmistri" },
     intro:
-      "BMI is one of the quickest ways to compare weight and height, but it is best understood as a screening number rather than a complete picture of health.",
+      "A skilled Rajmistri (head mason) leads masonry, concrete work, and structural plastering for residential homes and commercial buildings across Bangladesh. Selecting an experienced mason ensures solid quality and long-lasting durability.",
     sections: [
       {
-        heading: "How BMI is calculated",
+        heading: "Understanding the Role of a Rajmistri",
         body: [
-          "BMI divides weight in kilograms by height in meters squared. In imperial units, the formula converts pounds and inches into the same relationship.",
-          "The result is usually grouped into ranges such as underweight, healthy weight, overweight, and obesity. These ranges can be useful for population-level screening and broad personal awareness.",
+          "The Rajmistri manages brick masonry, mortar ratios, beam shuttering alignment, and floor leveling. They supervise assistant workers (jogali) to execute construction plans efficiently.",
+          "Verifying previous building projects and mortar mixing standards ensures structural safety.",
         ],
       },
       {
-        heading: "Where BMI helps",
+        heading: "Curing & Mortar Quality Standards",
         body: [
-          "BMI is fast, simple, and does not require special equipment. It can help you notice long-term weight trends and decide when a deeper health conversation may be useful.",
-          "It is also helpful when paired with other signals such as waist measurement, blood pressure, activity level, sleep, nutrition, and medical history.",
-        ],
-      },
-      {
-        heading: "Where BMI falls short",
-        body: [
-          "BMI does not know the difference between muscle, bone, water, and body fat. A muscular athlete and a sedentary person can have the same BMI while having very different health profiles.",
-          "Age, pregnancy, ethnicity, and body composition can also affect interpretation. Treat BMI as a starting point, not a verdict.",
+          "Proper water curing (tari) for at least 7 to 10 days after brickwork or plastering is essential in tropical weather conditions to achieve maximum strength.",
         ],
       },
     ],
     faqs: [
       {
-        question: "Is BMI accurate for everyone?",
+        question: "How is Rajmistri labor calculated in Bangladesh?",
         answer:
-          "No. BMI is a useful screening tool, but it does not measure body fat directly or account for muscle mass and individual health context.",
-      },
-      {
-        question: "What BMI range is usually considered healthy for adults?",
-        answer:
-          "For many adults, a BMI from 18.5 to 24.9 is commonly considered the healthy range, though personal medical context matters.",
+          "Labor is commonly calculated on a daily rate (daily hazira) or on a square foot contract basis depending on job scope.",
       },
     ],
   },
   {
-    slug: "daily-calorie-needs-explained",
-    title: "Daily Calorie Needs Explained: BMR, TDEE, and Goal Setting",
+    slug: "tiles-worker-buying-and-installation-guide",
+    title: "Tiles Worker & Flooring Installation Guide for Homeowners",
     description:
-      "Understand how calorie calculators estimate maintenance calories, weight loss targets, and weight gain plans using BMR and TDEE.",
-    publishedAt: "2026-06-26",
-    updatedAt: "2026-06-26",
-    readingTime: "6 min read",
-    category: "Health Calculators",
-    keywords: ["calorie calculator", "daily calorie needs", "BMR", "TDEE", "maintenance calories"],
-    relatedCalculator: { label: "Calorie Calculator", href: "/calorie-calculator" },
-    intro:
-      "A calorie target is easier to use when you know what it is based on. Most calculators start with your resting energy needs, then adjust for movement and goals.",
-    sections: [
-      {
-        heading: "BMR is the baseline",
-        body: [
-          "Basal metabolic rate, or BMR, estimates the energy your body uses at rest for basic functions like breathing, circulation, and temperature control.",
-          "BMR is influenced by height, weight, age, and sex. It is not a perfect measurement, but it gives a useful starting point.",
-        ],
-      },
-      {
-        heading: "TDEE adds real life",
-        body: [
-          "Total daily energy expenditure, or TDEE, adjusts BMR by activity level. A desk worker, a teacher on their feet, and a manual laborer can have very different daily needs even at the same height and weight.",
-          "Choosing an honest activity level matters. Overestimating activity is one of the most common reasons a calorie plan feels confusing.",
-        ],
-      },
-      {
-        heading: "Use targets as feedback, not law",
-        body: [
-          "For weight loss, many people start with a modest calorie deficit. For weight gain, they use a modest surplus. In both cases, two to four weeks of trend data is more useful than one day of scale movement.",
-          "Sleep, sodium, menstrual cycles, training stress, and digestion can all shift weight temporarily. The best calorie target is one you can follow consistently and adjust calmly.",
-        ],
-      },
-    ],
-    faqs: [
-      {
-        question: "What is the difference between BMR and TDEE?",
-        answer:
-          "BMR estimates calories burned at rest. TDEE estimates total daily calories after accounting for activity.",
-      },
-      {
-        question: "How often should I update my calorie target?",
-        answer:
-          "Review it after meaningful weight change, activity changes, or several weeks of consistent tracking data.",
-      },
-    ],
-  },
-  {
-    slug: "loan-payment-formula-simple-guide",
-    title: "Loan Payment Formula: A Simple Guide Before You Borrow",
-    description:
-      "Learn what affects monthly loan payments, how interest and term length interact, and why total cost matters more than the payment alone.",
-    publishedAt: "2026-06-26",
-    updatedAt: "2026-06-26",
+      "Tips on selecting ceramic or porcelain tiles and hiring expert tiles workers for level, crack-free floor and wall installations.",
+    publishedAt: "2026-07-10",
+    updatedAt: "2026-07-10",
     readingTime: "5 min read",
-    category: "Finance Calculators",
-    keywords: ["loan calculator", "monthly loan payment", "interest rate", "loan term"],
-    relatedCalculator: { label: "Loan Calculator", href: "/loan-calculator" },
+    category: "Tiles & Flooring",
+    keywords: ["tiles worker", "tiles mistri", "flooring installer bangladesh", "bathroom tile fitting"],
+    relatedCategory: { label: "Tiles Worker Directory", href: "/workers/tiles-worker" },
     intro:
-      "A loan payment is shaped by three main inputs: how much you borrow, the interest rate, and how long you take to repay it. Small changes in any one of them can change the real cost.",
+      "Tile installation requires precise leveling, accurate pattern cutting, and proper adhesive application. Hiring an experienced tiles worker ensures smooth joints and prevents hollow tiles.",
     sections: [
       {
-        heading: "The monthly payment is only part of the story",
+        heading: "Preventing Hollow Tiles & Uneven Surfaces",
         body: [
-          "A longer loan term usually lowers the monthly payment, which can make a loan feel more affordable. The tradeoff is that interest has more time to accumulate.",
-          "Before choosing a term, compare both the monthly payment and the total interest paid over the full loan.",
+          "Hollow spots occur when cement mortar or tile adhesive is unevenly spread underneath tiles. Professional tiles workers use notched trowels and tap tiles firmly into position.",
         ],
       },
       {
-        heading: "Interest rate changes compound over time",
+        heading: "Selecting Grout & Waterproofing",
         body: [
-          "A difference of one percentage point may look small on paper. Over several years, it can add hundreds or thousands to the total repayment amount.",
-          "That is why it is useful to test multiple rates in a calculator, especially if you are comparing lender offers.",
-        ],
-      },
-      {
-        heading: "Extra payments can shorten the loan",
-        body: [
-          "When allowed by the lender, extra principal payments reduce the balance faster. That can lower total interest and help you finish the loan earlier.",
-          "Check for prepayment rules before relying on this strategy. Some loans have fees or restrictions.",
+          "Bathroom floor tiles require proper slope towards the drain and waterproof grout sealing to prevent dampness in lower-level ceilings.",
         ],
       },
     ],
     faqs: [
       {
-        question: "What affects a loan payment the most?",
+        question: "How long does floor tile installation take?",
         answer:
-          "Principal, interest rate, and loan term are the main factors. Fees and repayment schedule can also affect the true cost.",
-      },
-      {
-        question: "Is a lower monthly payment always better?",
-        answer:
-          "Not always. A lower payment from a longer term may increase the total interest paid.",
-      },
-    ],
-  },
-  {
-    slug: "mortgage-payment-checklist",
-    title: "Mortgage Payment Checklist: What to Calculate Before Buying a Home",
-    description:
-      "Use this practical mortgage checklist to understand principal, interest, taxes, insurance, down payment, and affordability.",
-    publishedAt: "2026-06-26",
-    updatedAt: "2026-06-26",
-    readingTime: "6 min read",
-    category: "Finance Calculators",
-    keywords: ["mortgage calculator", "monthly mortgage payment", "home loan", "down payment"],
-    relatedCalculator: { label: "Mortgage Calculator", href: "/mortgage-calculator" },
-    intro:
-      "A home price is not the same as a monthly housing cost. A careful mortgage estimate looks at the loan payment and the surrounding costs that arrive with ownership.",
-    sections: [
-      {
-        heading: "Start with principal and interest",
-        body: [
-          "The principal is the amount borrowed. Interest is the lender's cost for letting you repay over time. Together, they make up the core mortgage payment.",
-          "The interest rate and loan term strongly shape this number. A 15-year and 30-year mortgage can feel very different month to month.",
-        ],
-      },
-      {
-        heading: "Add the costs people forget",
-        body: [
-          "Property taxes, homeowner insurance, mortgage insurance, HOA dues, and maintenance can make the real monthly cost much higher than the loan payment alone.",
-          "A more realistic budget includes routine repairs and a cushion for surprises. Houses rarely ask for money at convenient times.",
-        ],
-      },
-      {
-        heading: "Test several down payments",
-        body: [
-          "A larger down payment can reduce the loan amount and sometimes remove mortgage insurance. A smaller down payment can preserve cash for moving, repairs, and emergencies.",
-          "There is no single right answer. The goal is to understand the monthly effect and the cash-flow effect before making an offer.",
-        ],
-      },
-    ],
-    faqs: [
-      {
-        question: "What should a mortgage calculator include?",
-        answer:
-          "At minimum, it should estimate principal and interest. For a fuller budget, include taxes, insurance, fees, and maintenance.",
-      },
-      {
-        question: "Does a bigger down payment always make sense?",
-        answer:
-          "It can lower payments, but keeping emergency cash may be more important for some buyers.",
-      },
-    ],
-  },
-  {
-    slug: "percentage-calculation-everyday-examples",
-    title: "Percentage Calculation: Everyday Examples That Make It Click",
-    description:
-      "Learn how percentages work in discounts, price increases, test scores, tips, taxes, and comparison shopping.",
-    publishedAt: "2026-06-26",
-    updatedAt: "2026-06-26",
-    readingTime: "5 min read",
-    category: "Math Calculators",
-    keywords: ["percentage calculator", "calculate percentage", "percentage increase", "percentage decrease"],
-    relatedCalculator: { label: "Percentage Calculator", href: "/percentage-calculator" },
-    intro:
-      "Percentages show up everywhere: sales, grades, taxes, business reports, recipes, and bills. Once you see the pattern, most percentage problems become much less intimidating.",
-    sections: [
-      {
-        heading: "Percent means out of 100",
-        body: [
-          "A percent is a fraction with 100 as the base. Thirty percent means 30 out of 100, which is the same as 0.30 in decimal form.",
-          "To find a percentage of a number, convert the percent to a decimal and multiply. For example, 15 percent of 80 is 0.15 times 80, or 12.",
-        ],
-      },
-      {
-        heading: "Increase and decrease need a starting point",
-        body: [
-          "Percentage change compares the difference to the original value. If a price rises from 50 to 60, the increase is 10, and 10 divided by 50 equals 20 percent.",
-          "Using the wrong starting point is a common mistake. Always compare against the original value when describing increase or decrease.",
-        ],
-      },
-      {
-        heading: "Discounts are easier in two steps",
-        body: [
-          "For a 25 percent discount on 120, first calculate 25 percent of 120, which is 30. Then subtract 30 from 120 to get 90.",
-          "A calculator speeds this up, but the two-step logic helps you spot obvious errors when shopping or reviewing invoices.",
-        ],
-      },
-    ],
-    faqs: [
-      {
-        question: "How do I calculate percentage increase?",
-        answer:
-          "Subtract the old value from the new value, divide by the old value, then multiply by 100.",
-      },
-      {
-        question: "How do I find a percentage of a number?",
-        answer:
-          "Convert the percent to a decimal and multiply by the number.",
-      },
-    ],
-  },
-  {
-    slug: "tip-calculator-etiquette-and-splitting-bills",
-    title: "Tip Calculator Guide: Etiquette, Splitting Bills, and Avoiding Awkward Math",
-    description:
-      "A friendly guide to calculating tips, splitting restaurant bills, handling tax, and choosing fair gratuity.",
-    publishedAt: "2026-06-26",
-    updatedAt: "2026-06-26",
-    readingTime: "5 min read",
-    category: "Everyday Calculators",
-    keywords: ["tip calculator", "split bill calculator", "restaurant tip", "gratuity calculator"],
-    relatedCalculator: { label: "Tip Calculator", href: "/tip-calculator" },
-    intro:
-      "The end of a meal is not the best time for mental math. A tip calculator keeps the moment simple, especially when people ordered different amounts or want to split the total cleanly.",
-    sections: [
-      {
-        heading: "Choose the tip base",
-        body: [
-          "Some people tip on the pre-tax subtotal, while others tip on the final total. The difference is usually small, but it helps to be consistent.",
-          "If service charges are already included, read the bill before adding another full tip. Some restaurants list automatic gratuity for larger groups.",
-        ],
-      },
-      {
-        heading: "Splitting evenly is not always fair",
-        body: [
-          "An even split is quick when everyone ordered similarly. If one person had a small meal and another ordered several extras, a proportional split may feel better.",
-          "For casual meals, decide early if the group wants equal shares or itemized shares. That one sentence prevents a surprising amount of awkwardness.",
-        ],
-      },
-      {
-        heading: "Round with intention",
-        body: [
-          "Rounding up can make cash payments easier and is often appreciated. Rounding down to the nearest convenient number may be fine for quick service, but be mindful of the service context.",
-          "A calculator gives the exact number; your judgment decides the final amount.",
-        ],
-      },
-    ],
-    faqs: [
-      {
-        question: "Should I tip before or after tax?",
-        answer:
-          "Both habits exist. Many people calculate on the pre-tax subtotal, while others use the final total for simplicity.",
-      },
-      {
-        question: "How do I split a bill with tip?",
-        answer:
-          "Add the tip to the bill total, then divide by the number of people or split proportionally by each person's order.",
-      },
-    ],
-  },
-  {
-    slug: "gold-price-calculator-buying-guide",
-    title: "Gold Price Calculator Guide for Buyers and Sellers",
-    description:
-      "Understand gold purity, weight units, spot price, making charges, and why calculator estimates differ from shop quotes.",
-    publishedAt: "2026-06-26",
-    updatedAt: "2026-06-26",
-    readingTime: "6 min read",
-    category: "Gold Calculators",
-    keywords: ["gold price calculator", "gold purity", "gold weight", "karat gold price"],
-    relatedCalculator: { label: "Gold Price Calculator", href: "/gold-price-calculator" },
-    intro:
-      "Gold pricing feels confusing because it mixes live market value, purity, weight units, shop fees, and local buying or selling spreads. A calculator helps separate the metal value from the final quote.",
-    sections: [
-      {
-        heading: "Purity changes the metal value",
-        body: [
-          "Pure gold is often described as 24 karat. Common jewelry purities such as 22K, 18K, and 14K contain less gold by weight because they include other metals for strength or color.",
-          "When estimating value, multiply the weight by the purity ratio and then by the market price for pure gold.",
-        ],
-      },
-      {
-        heading: "Weight units must be consistent",
-        body: [
-          "Gold may be quoted in grams, ounces, vori, ana, roti, or other local units. Mixing units without conversion is one of the easiest ways to misread a price.",
-          "Before comparing offers, convert everything into one unit. Grams are often the simplest common base.",
-        ],
-      },
-      {
-        heading: "Shop quotes include more than metal",
-        body: [
-          "Jewelry prices may include making charges, design premiums, taxes, and retailer margin. Selling prices may include a buyback spread or purity testing adjustment.",
-          "That is why a calculator estimate is best used as a transparent baseline, not a promise of the exact counter price.",
-        ],
-      },
-    ],
-    faqs: [
-      {
-        question: "Why is my gold shop quote different from the calculator?",
-        answer:
-          "The quote may include making charges, taxes, margins, purity adjustments, or buyback spreads.",
-      },
-      {
-        question: "Does karat affect gold price?",
-        answer:
-          "Yes. Lower karat gold contains less pure gold per unit of weight, so the metal value is lower than 24K gold at the same weight.",
-      },
-    ],
-  },
-  {
-    slug: "gold-weight-units-vori-ana-roti-grams",
-    title: "Gold Weight Units: Vori, Ana, Roti, Point, and Grams Explained",
-    description:
-      "A clear guide to traditional gold weight units and why converting to grams helps compare gold prices accurately.",
-    publishedAt: "2026-06-26",
-    updatedAt: "2026-06-26",
-    readingTime: "5 min read",
-    category: "Gold Calculators",
-    keywords: ["gold weight converter", "vori to gram", "ana to gram", "gold unit converter"],
-    relatedCalculator: { label: "Gold Weight Converter", href: "/gold-weight-converter" },
-    intro:
-      "Traditional gold units are still common in many markets, especially for jewelry. The challenge is that price comparisons become harder when one quote uses grams and another uses local units.",
-    sections: [
-      {
-        heading: "Why grams make comparison easier",
-        body: [
-          "Grams are widely used in market pricing and digital calculators. Converting traditional units to grams gives you a shared base for comparing shops, purity levels, and making charges.",
-          "Once everything is in grams, it is easier to calculate pure gold content and estimate metal value.",
-        ],
-      },
-      {
-        heading: "Small unit errors can matter",
-        body: [
-          "Gold is valuable enough that a small weight difference can change the price noticeably. Rounding too early or using an approximate conversion can affect the final estimate.",
-          "For buying, selling, or checking a receipt, use consistent conversions and keep a few decimal places until the final answer.",
-        ],
-      },
-      {
-        heading: "Pair weight with purity",
-        body: [
-          "Weight alone does not tell the full value. Ten grams of 22K gold and ten grams of 18K gold contain different amounts of pure gold.",
-          "A good gold estimate uses both the converted weight and the karat or purity percentage.",
-        ],
-      },
-    ],
-    faqs: [
-      {
-        question: "Why convert gold units to grams?",
-        answer:
-          "Grams make it easier to compare prices, calculate purity-adjusted value, and understand market quotes.",
-      },
-      {
-        question: "Is gold weight enough to estimate value?",
-        answer:
-          "No. You also need purity, current gold price, and any fees or charges included in the quote.",
-      },
-    ],
-  },
-  {
-    slug: "land-area-calculator-units-guide",
-    title: "Land Area Calculator Guide: Convert Property Units Without Guesswork",
-    description:
-      "Learn how land area units work, why local measurement systems vary, and how to avoid mistakes when comparing property sizes.",
-    publishedAt: "2026-06-26",
-    updatedAt: "2026-06-26",
-    readingTime: "6 min read",
-    category: "Measurement Calculators",
-    keywords: ["land calculator", "area calculator", "property area converter", "land measurement"],
-    relatedCalculator: { label: "Land Calculator", href: "/land-calculator" },
-    intro:
-      "Land measurement can get messy because different regions use different units. A plot may be described in square feet, acres, decimals, kathas, bighas, square meters, or hectares depending on the market.",
-    sections: [
-      {
-        heading: "Convert before comparing",
-        body: [
-          "Two listings can look similar while using different units. Always convert both into the same unit before comparing price, size, or value per unit.",
-          "Square feet and square meters are helpful common bases because they are widely understood and easy to use in construction planning.",
-        ],
-      },
-      {
-        heading: "Local units need local context",
-        body: [
-          "Some land units vary by country or region. A bigha in one place may not match a bigha somewhere else. That is why the conversion standard matters.",
-          "When dealing with legal documents or purchases, confirm the local definition used by the seller, surveyor, or land office.",
-        ],
-      },
-      {
-        heading: "Area is not the only factor",
-        body: [
-          "A larger plot is not automatically more useful. Shape, road access, zoning, drainage, frontage, and legal status all affect practical value.",
-          "Use area conversion to understand size clearly, then evaluate the property details separately.",
-        ],
-      },
-    ],
-    faqs: [
-      {
-        question: "Why do land unit conversions vary?",
-        answer:
-          "Some traditional units have regional definitions, so the same unit name can represent different areas in different places.",
-      },
-      {
-        question: "What is the safest unit for comparing land?",
-        answer:
-          "Square feet or square meters are usually good common units for comparison, depending on the local market.",
+          "A standard room floor typically takes 1 to 2 days for tiling and 1 day for grouting and finishing.",
       },
     ],
   },
 ];
 
-export function getBlogPost(slug: string) {
+export function getBlogPost(slug: string): BlogPost | undefined {
   return blogPosts.find((post) => post.slug === slug);
 }

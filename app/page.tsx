@@ -1,62 +1,107 @@
-"use client";
-
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
+import type { Metadata } from "next";
+import NotifyForm from "@/components/NotifyForm";
+import HomeFaqAccordion from "@/components/HomeFaqAccordion";
+
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sromojibi.com";
+
+export const metadata: Metadata = {
+  title: "Sromojibi - Find Trusted Local Workers in Bangladesh",
+  description:
+    "Discover skilled electricians, plumbers, tiles mistris, rajmistris, painters, and local home service specialists across Bangladesh. Free directory for workers and customers.",
+  keywords: [
+    "worker directory bangladesh",
+    "mistri bangladesh",
+    "rajmistri bangladesh",
+    "electrician dhaka",
+    "plumber bangladesh",
+    "tiles mistri",
+    "home service bangladesh",
+    "local trade workers near me",
+    "kajer lok directory",
+    "sromojibi worker list",
+  ],
+  alternates: {
+    canonical: siteUrl,
+  },
+  openGraph: {
+    title: "Sromojibi - Find Trusted Local Workers in Bangladesh",
+    description:
+      "Discover skilled electricians, plumbers, tiles mistris, rajmistris, painters, and local home service specialists across Bangladesh.",
+    url: siteUrl,
+    siteName: "Sromojibi",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sromojibi - Find Trusted Local Workers in Bangladesh",
+    description:
+      "Discover skilled electricians, plumbers, tiles mistris, rajmistris, painters, and local home service specialists across Bangladesh.",
+  },
+};
+
+const categories = [
+  { name: "Rajmistri", icon: "🏠", slug: "rajmistri", description: "Masonry & civil construction specialists" },
+  { name: "Electrician", icon: "⚡", slug: "electrician", description: "Wiring, repairs & electrical installations" },
+  { name: "Plumber", icon: "🚰", slug: "plumber", description: "Pipe fitting, sanitary & water line repairs" },
+  { name: "Tiles Worker", icon: "🧱", slug: "tiles-worker", description: "Floor & wall tile installation mistris" },
+  { name: "Painter", icon: "🎨", slug: "painter", description: "Interior & exterior wall painting experts" },
+  { name: "Carpenter", icon: "🔨", slug: "carpenter", description: "Furniture repair, wood work & fittings" },
+  { name: "AC Technician", icon: "❄️", slug: "ac-technician", description: "Air conditioner servicing & gas refill" },
+  { name: "CCTV Installer", icon: "📹", slug: "cctv-installer", description: "Security camera setup & network wiring" },
+];
+
+const cities = [
+  { name: "Dhaka", count: "Coming Soon", slug: "dhaka", popular: true },
+  { name: "Chittagong", count: "Coming Soon", slug: "chittagong", popular: true },
+  { name: "Mymensingh", count: "Coming Soon", slug: "mymensingh", popular: true },
+  { name: "Sylhet", count: "Coming Soon", slug: "sylhet", popular: false },
+  { name: "Rajshahi", count: "Coming Soon", slug: "rajshahi", popular: false },
+  { name: "Khulna", count: "Coming Soon", slug: "khulna", popular: false },
+];
+
+const faqs = [
+  {
+    question: "What is Sromojibi?",
+    answer:
+      "Sromojibi is a worker directory platform helping people discover skilled professionals across Bangladesh. Our goal is to connect local technicians, mistris, and handymen with nearby homeowners and businesses.",
+  },
+  {
+    question: "How can workers join?",
+    answer:
+      "Workers can create a free profile and share their service information, location, experience, and contact detail so local customers can easily discover them online.",
+  },
+  {
+    question: "Is Sromojibi free?",
+    answer:
+      "Yes, worker listings will be free during the initial launch period to help build Bangladesh's largest open worker directory.",
+  },
+];
 
 export default function Home() {
-  const [notifyEmail, setNotifyEmail] = useState("");
-  const [notifySuccess, setNotifySuccess] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-  const categories = [
-    { name: "Rajmistri", icon: "🏠", slug: "rajmistri", description: "Masonry & civil construction specialists" },
-    { name: "Electrician", icon: "⚡", slug: "electrician", description: "Wiring, repairs & electrical installations" },
-    { name: "Plumber", icon: "🚰", slug: "plumber", description: "Pipe fitting, sanitary & water line repairs" },
-    { name: "Tiles Worker", icon: "🧱", slug: "tiles-worker", description: "Floor & wall tile installation mistris" },
-    { name: "Painter", icon: "🎨", slug: "painter", description: "Interior & exterior wall painting experts" },
-    { name: "Carpenter", icon: "🔨", slug: "carpenter", description: "Furniture repair, wood work & fittings" },
-    { name: "AC Technician", icon: "❄️", slug: "ac-technician", description: "Air conditioner servicing & gas refill" },
-    { name: "CCTV Installer", icon: "📹", slug: "cctv-installer", description: "Security camera setup & network wiring" },
-  ];
-
-  const cities = [
-    { name: "Dhaka", count: "Coming Soon", slug: "dhaka", popular: true },
-    { name: "Chittagong", count: "Coming Soon", slug: "chittagong", popular: true },
-    { name: "Mymensingh", count: "Coming Soon", slug: "mymensingh", popular: true },
-    { name: "Sylhet", count: "Coming Soon", slug: "sylhet", popular: false },
-    { name: "Rajshahi", count: "Coming Soon", slug: "rajshahi", popular: false },
-    { name: "Khulna", count: "Coming Soon", slug: "khulna", popular: false },
-  ];
-
-  const faqs = [
-    {
-      question: "What is Sromojibi?",
-      answer:
-        "Sromojibi is a worker directory platform helping people discover skilled professionals across Bangladesh. Our goal is to connect local technicians, mistris, and handymen with nearby homeowners and businesses.",
-    },
-    {
-      question: "How can workers join?",
-      answer:
-        "Workers can create a free profile and share their service information, location, experience, and contact detail so local customers can easily discover them online.",
-    },
-    {
-      question: "Is Sromojibi free?",
-      answer:
-        "Yes, worker listings will be free during the initial launch period to help build Bangladesh's largest open worker directory.",
-    },
-  ];
-
-  const handleNotifySubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (notifyEmail.trim()) {
-      setNotifySuccess(true);
-      setTimeout(() => setNotifySuccess(false), 5000);
-      setNotifyEmail("");
-    }
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
   };
 
   return (
     <main className="min-h-screen bg-gray-950 text-gray-100 overflow-x-hidden selection:bg-emerald-500 selection:text-gray-950">
+      {/* FAQ Structured Data for Google Rich Snippets */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+
       {/* 1. Hero Section */}
       <section className="relative py-20 lg:py-28 px-4 border-b border-gray-800/80 bg-radial-gradient">
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/20 via-gray-950 to-gray-950 pointer-events-none" />
@@ -328,28 +373,7 @@ export default function Home() {
             Get notified when directory listings go live in your district or city.
           </p>
 
-          <form onSubmit={handleNotifySubmit} className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
-            <input
-              type="email"
-              required
-              value={notifyEmail}
-              onChange={(e) => setNotifyEmail(e.target.value)}
-              placeholder="Enter your email address..."
-              className="flex-1 px-4 py-3 rounded-xl bg-gray-950 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-sm"
-            />
-            <button
-              type="submit"
-              className="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold text-sm shadow-md transition-all shrink-0"
-            >
-              Notify Me
-            </button>
-          </form>
-
-          {notifySuccess && (
-            <p className="text-emerald-400 text-xs font-semibold animate-fade-in">
-              ✓ Thank you! We will notify you as soon as directory listings launch in your area.
-            </p>
-          )}
+          <NotifyForm />
         </div>
       </section>
 
@@ -361,30 +385,7 @@ export default function Home() {
             <p className="text-gray-400 text-sm">Everything you need to know about Sromojibi worker directory</p>
           </div>
 
-          <div className="space-y-4">
-            {faqs.map((faq, index) => {
-              const isOpen = openFaq === index;
-              return (
-                <div
-                  key={index}
-                  className="rounded-2xl bg-gray-900 border border-gray-800 overflow-hidden transition-all"
-                >
-                  <button
-                    onClick={() => setOpenFaq(isOpen ? null : index)}
-                    className="w-full p-6 text-left flex items-center justify-between font-bold text-white text-base hover:text-emerald-400 transition-colors"
-                  >
-                    <span>{faq.question}</span>
-                    <span className="text-xl text-emerald-400 ml-4">{isOpen ? "−" : "+"}</span>
-                  </button>
-                  {isOpen && (
-                    <div className="px-6 pb-6 text-sm text-gray-300 leading-relaxed border-t border-gray-800/60 pt-4">
-                      {faq.answer}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+          <HomeFaqAccordion faqs={faqs} />
         </div>
       </section>
     </main>

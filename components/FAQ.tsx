@@ -25,7 +25,7 @@ export default function FAQ({ items }: FAQProps) {
           Frequently Asked Questions
         </h2>
         <p className="text-gray-400 text-lg">
-          Everything you need to know about our calculator
+          Everything you need to know about Sromojibi worker directory
         </p>
       </div>
 

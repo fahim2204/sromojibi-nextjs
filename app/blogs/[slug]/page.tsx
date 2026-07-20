@@ -9,6 +9,8 @@ type BlogPageProps = {
   };
 };
 
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sromojibi.com";
+
 export const dynamic = "force-static";
 
 export function generateStaticParams() {
@@ -26,7 +28,7 @@ export function generateMetadata({ params }: BlogPageProps): Metadata {
     };
   }
 
-  const url = `https://ezcalc.xyz/blogs/${post.slug}`;
+  const url = `${siteUrl}/blogs/${post.slug}`;
 
   return {
     title: post.title,
@@ -39,10 +41,10 @@ export function generateMetadata({ params }: BlogPageProps): Metadata {
       title: post.title,
       description: post.description,
       url,
+      siteName: "Sromojibi",
       type: "article",
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
-      authors: ["EZCalc"],
     },
     twitter: {
       card: "summary_large_image",
@@ -59,29 +61,25 @@ export default function BlogPostPage({ params }: BlogPageProps) {
     notFound();
   }
 
-  const url = `https://ezcalc.xyz/blogs/${post.slug}`;
+  const url = `${siteUrl}/blogs/${post.slug}`;
   const jsonLd = [
     {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
       headline: post.title,
       description: post.description,
-      image: "https://ezcalc.xyz/images/ezcalc.webp",
       url,
       datePublished: post.publishedAt,
       dateModified: post.updatedAt,
       author: {
         "@type": "Organization",
-        name: "EZCalc",
-        url: "https://ezcalc.xyz",
+        name: "Sromojibi",
+        url: siteUrl,
       },
       publisher: {
         "@type": "Organization",
-        name: "EZCalc",
-        logo: {
-          "@type": "ImageObject",
-          url: "https://ezcalc.xyz/icon.png",
-        },
+        name: "Sromojibi",
+        url: siteUrl,
       },
       mainEntityOfPage: {
         "@type": "WebPage",
@@ -97,13 +95,13 @@ export default function BlogPostPage({ params }: BlogPageProps) {
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: "https://ezcalc.xyz",
+          item: siteUrl,
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Blogs",
-          item: "https://ezcalc.xyz/blogs",
+          item: `${siteUrl}/blogs`,
         },
         {
           "@type": "ListItem",
@@ -128,98 +126,86 @@ export default function BlogPostPage({ params }: BlogPageProps) {
   ];
 
   return (
-    <main className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <main className="min-h-screen bg-gray-950 text-gray-100 py-16 px-4">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <article>
-        <header className="border-b border-gray-200 bg-white px-4 py-12 dark:border-gray-800 dark:bg-gray-900">
-          <div className="mx-auto max-w-3xl">
-            <Link
-              href="/blogs"
-              className="mb-5 inline-block text-sm font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              Calculator guides
-            </Link>
-            <p className="mb-3 text-sm font-medium text-gray-500 dark:text-gray-400">
-              {post.category} · {post.readingTime} · Updated {formatDate(post.updatedAt)}
-            </p>
-            <h1 className="text-4xl font-extrabold leading-tight text-gray-950 dark:text-white md:text-5xl">
-              {post.title}
-            </h1>
-            <p className="mt-5 text-lg leading-8 text-gray-600 dark:text-gray-400">
-              {post.description}
-            </p>
+      <article className="max-w-4xl mx-auto space-y-10">
+        <header className="border-b border-gray-800 pb-8 space-y-4">
+          <Link
+            href="/blogs"
+            className="inline-block text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
+          >
+            ← Back to Worker Guides
+          </Link>
+          <div className="flex items-center gap-3 text-xs text-gray-400">
+            <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold">
+              {post.category}
+            </span>
+            <span>·</span>
+            <span>{post.readingTime}</span>
           </div>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight">
+            {post.title}
+          </h1>
+          <p className="text-lg text-gray-300 leading-relaxed">{post.description}</p>
         </header>
 
-        <div className="mx-auto max-w-3xl px-4 py-10">
-          <p className="mb-8 text-lg leading-8 text-gray-700 dark:text-gray-300">
-            {post.intro}
-          </p>
+        <div className="space-y-8 text-gray-300 leading-relaxed">
+          <p className="text-lg text-gray-200">{post.intro}</p>
 
-          <div className="space-y-10">
+          <div className="space-y-8">
             {post.sections.map((section) => (
-              <section key={section.heading}>
-                <h2 className="mb-4 text-2xl font-bold text-gray-950 dark:text-white">
+              <section key={section.heading} className="space-y-4">
+                <h2 className="text-2xl font-bold text-white border-l-4 border-emerald-500 pl-4">
                   {section.heading}
                 </h2>
-                <div className="space-y-4 text-base leading-8 text-gray-700 dark:text-gray-300">
-                  {section.body.map((paragraph) => (
-                    <p key={paragraph}>{paragraph}</p>
+                <div className="space-y-3 text-base text-gray-300">
+                  {section.body.map((paragraph, idx) => (
+                    <p key={idx}>{paragraph}</p>
                   ))}
                 </div>
               </section>
             ))}
           </div>
 
-          <section className="mt-10 rounded-lg border border-blue-200 bg-blue-50 p-6 dark:border-blue-900/60 dark:bg-blue-950/30">
-            <h2 className="mb-3 text-xl font-bold text-gray-950 dark:text-white">
-              Try the calculator
-            </h2>
-            <p className="mb-4 text-gray-700 dark:text-gray-300">
-              Want to run the numbers without doing the math by hand? Open the related
-              tool and check your result in seconds.
+          <section className="p-6 rounded-2xl bg-gray-900 border border-gray-800 space-y-3">
+            <h3 className="text-lg font-bold text-white">Need a worker in this field?</h3>
+            <p className="text-sm text-gray-400">
+              Find verified trade professionals and skilled technicians in your area on Sromojibi.
             </p>
             <Link
-              href={post.relatedCalculator.href}
-              className="inline-flex rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+              href={post.relatedCategory.href}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold text-sm transition-all"
             >
-              Open {post.relatedCalculator.label}
+              Explore {post.relatedCategory.label} →
             </Link>
           </section>
 
-          <section className="mt-10">
-            <h2 className="mb-5 text-2xl font-bold text-gray-950 dark:text-white">
-              Quick answers
-            </h2>
-            <div className="space-y-4">
-              {post.faqs.map((faq) => (
-                <details
-                  key={faq.question}
-                  className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900"
-                >
-                  <summary className="cursor-pointer font-semibold text-gray-950 dark:text-white">
-                    {faq.question}
-                  </summary>
-                  <p className="mt-3 leading-7 text-gray-700 dark:text-gray-300">{faq.answer}</p>
-                </details>
-              ))}
-            </div>
-          </section>
+          {post.faqs.length > 0 && (
+            <section className="space-y-4 pt-4 border-t border-gray-800">
+              <h2 className="text-2xl font-bold text-white">Frequently Asked Questions</h2>
+              <div className="space-y-3">
+                {post.faqs.map((faq) => (
+                  <details
+                    key={faq.question}
+                    className="group p-5 rounded-2xl bg-gray-900 border border-gray-800"
+                  >
+                    <summary className="cursor-pointer font-semibold text-white group-open:text-emerald-400 transition-colors">
+                      {faq.question}
+                    </summary>
+                    <p className="mt-3 text-sm text-gray-300 leading-relaxed border-t border-gray-800 pt-3">
+                      {faq.answer}
+                    </p>
+                  </details>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       </article>
     </main>
   );
-}
-
-function formatDate(date: string) {
-  return new Intl.DateTimeFormat("en", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(date));
 }

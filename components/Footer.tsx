@@ -37,10 +37,10 @@ export default function Footer() {
               <Link href="/workers/electrician" className="hover:text-emerald-400 transition-colors">⚡ Electrician</Link>
             </li>
             <li>
-              <Link href="/workers" className="hover:text-emerald-400 transition-colors">🚰 Plumber</Link>
+              <Link href="/workers/plumber" className="hover:text-emerald-400 transition-colors">🚰 Plumber</Link>
             </li>
             <li>
-              <Link href="/workers" className="hover:text-emerald-400 transition-colors">🧱 Tiles Worker</Link>
+              <Link href="/workers/tiles-worker" className="hover:text-emerald-400 transition-colors">🧱 Tiles Worker</Link>
             </li>
             <li>
               <Link href="/categories" className="hover:text-emerald-400 transition-colors text-emerald-400 hover:underline">View All Categories →</Link>
@@ -70,7 +70,13 @@ export default function Footer() {
               <Link href="/about" className="hover:text-emerald-400 transition-colors">About Us</Link>
             </li>
             <li>
+              <Link href="/blogs" className="hover:text-emerald-400 transition-colors">Worker Guides & Blog</Link>
+            </li>
+            <li>
               <Link href="/join-worker" className="hover:text-emerald-400 transition-colors">Register as Worker</Link>
+            </li>
+            <li>
+              <Link href="/contact" className="hover:text-emerald-400 transition-colors">Contact Us</Link>
             </li>
             <li>
               <Link href="/privacy-policy" className="hover:text-emerald-400 transition-colors">Privacy Policy</Link>

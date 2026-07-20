@@ -2,20 +2,23 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { blogPosts } from "@/lib/blogPosts";
 
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sromojibi.com";
+
 export const dynamic = "force-static";
 
 export const metadata: Metadata = {
-  title: "Calculator Guides and Practical Math Articles",
+  title: "Worker Guides & Home Maintenance Articles",
   description:
-    "Helpful calculator guides for age, BMI, calories, loans, mortgages, percentages, tips, gold, and land measurements.",
+    "Helpful guides on hiring electricians, plumbers, rajmistris, tiles workers, and trade specialists in Bangladesh.",
   alternates: {
-    canonical: "https://ezcalc.xyz/blogs",
+    canonical: `${siteUrl}/blogs`,
   },
   openGraph: {
-    title: "Calculator Guides and Practical Math Articles",
+    title: "Worker Guides & Home Maintenance Articles | Sromojibi",
     description:
-      "Helpful calculator guides for everyday math, health, finance, gold, and measurement decisions.",
-    url: "https://ezcalc.xyz/blogs",
+      "Helpful guides on hiring electricians, plumbers, rajmistris, tiles workers, and trade specialists in Bangladesh.",
+    url: `${siteUrl}/blogs`,
+    siteName: "Sromojibi",
     type: "website",
   },
 };
@@ -24,71 +27,70 @@ export default function BlogsPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "EZCalc Calculator Guides",
+    name: "Sromojibi Worker & Trade Guides",
     description: metadata.description,
-    url: "https://ezcalc.xyz/blogs",
+    url: `${siteUrl}/blogs`,
     mainEntity: blogPosts.map((post) => ({
       "@type": "BlogPosting",
       headline: post.title,
       description: post.description,
-      url: `https://ezcalc.xyz/blogs/${post.slug}`,
+      url: `${siteUrl}/blogs/${post.slug}`,
       datePublished: post.publishedAt,
       dateModified: post.updatedAt,
       author: {
         "@type": "Organization",
-        name: "EZCalc",
+        name: "Sromojibi",
       },
     })),
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <main className="min-h-screen bg-gray-950 text-gray-100 py-16 px-4">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <section className="border-b border-gray-200 bg-white px-4 py-12 dark:border-gray-800 dark:bg-gray-900">
-        <div className="mx-auto max-w-5xl">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">
-            EZCalc Blog
-          </p>
-          <h1 className="max-w-3xl text-4xl font-extrabold text-gray-950 dark:text-white md:text-5xl">
-            Calculator guides for everyday decisions
-          </h1>
-          <p className="mt-4 max-w-3xl text-lg text-gray-600 dark:text-gray-400">
-            Clear, practical articles that explain the numbers behind health, finance,
-            property, gold, and daily math calculators.
-          </p>
-        </div>
+      <section className="max-w-5xl mx-auto mb-12 text-center space-y-3">
+        <span className="px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
+          Sromojibi Knowledge Base
+        </span>
+        <h1 className="text-4xl sm:text-5xl font-black text-white">
+          Worker Guides & Home Maintenance Tips
+        </h1>
+        <p className="text-gray-400 text-base max-w-2xl mx-auto">
+          Practical articles explaining how to choose, inspect, and work with skilled trade professionals across Bangladesh.
+        </p>
       </section>
 
-      <section className="mx-auto grid max-w-5xl grid-cols-1 gap-5 px-4 py-10 md:grid-cols-2">
+      <section className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
         {blogPosts.map((post) => (
           <article
             key={post.slug}
-            className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-colors hover:border-blue-400 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-500"
+            className="p-6 rounded-2xl bg-gray-900 border border-gray-800 hover:border-emerald-500/50 transition-all flex flex-col justify-between"
           >
-            <p className="mb-3 text-sm font-medium text-blue-600 dark:text-blue-400">
-              {post.category} · {post.readingTime}
-            </p>
-            <h2 className="mb-3 text-2xl font-bold text-gray-950 dark:text-white">
-              <Link href={`/blogs/${post.slug}`} className="hover:text-blue-600 dark:hover:text-blue-400">
-                {post.title}
-              </Link>
-            </h2>
-            <p className="mb-5 text-gray-600 dark:text-gray-400">{post.description}</p>
-            <div className="flex flex-wrap gap-3 text-sm">
+            <div>
+              <div className="flex items-center justify-between text-xs text-emerald-400 font-semibold mb-3">
+                <span>{post.category}</span>
+                <span>{post.readingTime}</span>
+              </div>
+              <h2 className="text-xl font-bold text-white mb-3 hover:text-emerald-400 transition-colors">
+                <Link href={`/blogs/${post.slug}`}>{post.title}</Link>
+              </h2>
+              <p className="text-sm text-gray-400 leading-relaxed mb-6">{post.description}</p>
+            </div>
+
+            <div className="flex items-center justify-between border-t border-gray-800 pt-4 text-xs font-semibold">
               <Link
                 href={`/blogs/${post.slug}`}
-                className="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                className="text-emerald-400 hover:text-emerald-300 transition-colors"
               >
-                Read guide
+                Read full article →
               </Link>
               <Link
-                href={post.relatedCalculator.href}
-                className="text-gray-600 hover:text-gray-950 dark:text-gray-400 dark:hover:text-white"
+                href={post.relatedCategory.href}
+                className="text-gray-400 hover:text-white transition-colors"
               >
-                Open {post.relatedCalculator.label}
+                {post.relatedCategory.label}
               </Link>
             </div>
           </article>
