@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { blogPosts } from '@/lib/blogPosts';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://sromojibi.com';
@@ -10,6 +11,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/locations',
     '/about',
     '/join-worker',
+    '/contact',
+    '/terms',
+    '/privacy-policy',
+    '/blogs',
     '/workers/dhaka',
     '/workers/mymensingh',
     '/workers/electrician',
@@ -22,10 +27,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/workers/cctv-installer',
   ];
 
-  return routes.map((route) => ({
+  const staticEntries: MetadataRoute.Sitemap = routes.map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: route === '' ? 'daily' : 'weekly',
     priority: route === '' ? 1.0 : 0.8,
   }));
+
+  const blogEntries: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: `${baseUrl}/blogs/${post.slug}`,
+    lastModified: new Date(post.updatedAt || post.publishedAt),
+    changeFrequency: 'weekly',
+    priority: 0.7,
+  }));
+
+  return [...staticEntries, ...blogEntries];
 }
