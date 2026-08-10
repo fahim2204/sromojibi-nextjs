@@ -57,14 +57,14 @@ export default function LocationsPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-gray-950 text-gray-100 py-16 px-4">
+    <main className="min-h-screen bg-slate-50 text-slate-900 py-16 px-4">
       <div className="max-w-6xl mx-auto space-y-12">
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
+          <div className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold uppercase tracking-wider">
             Supported Regions
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-white">Launching First in Bangladesh</h1>
-          <p className="text-gray-400 text-base md:text-lg">
+          <h1 className="text-4xl md:text-5xl font-black text-gray-900">Launching First in Bangladesh</h1>
+          <p className="text-gray-600 text-base md:text-lg">
             Sromojibi worker directory is building initial local listings across primary city centers and divisions.
           </p>
         </div>
@@ -73,26 +73,26 @@ export default function LocationsPage() {
           {cities.map((city) => (
             <div
               key={city.slug}
-              className="p-6 rounded-3xl bg-gray-900 border border-gray-800 hover:border-emerald-500/50 transition-all flex flex-col justify-between space-y-4 group"
+              className="p-6 rounded-3xl bg-white border border-gray-200 hover:border-emerald-500/50 hover:shadow-md transition-all flex flex-col justify-between space-y-4 group shadow-sm"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-3xl">🏙️</span>
-                  <span className="text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span className="text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
                     {city.status}
                   </span>
                 </div>
-                <h2 className="text-2xl font-bold text-white group-hover:text-emerald-400 transition-colors">
+                <h2 className="text-2xl font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">
                   {city.name}
                 </h2>
-                <div className="text-xs text-emerald-400/80 font-medium">{city.division}</div>
-                <p className="text-xs text-gray-400 leading-relaxed">{city.desc}</p>
+                <div className="text-xs text-emerald-700 font-medium">{city.division}</div>
+                <p className="text-xs text-gray-600 leading-relaxed">{city.desc}</p>
               </div>
 
-              <div className="pt-2 border-t border-gray-800/80">
+              <div className="pt-2 border-t border-gray-100">
                 <Link
                   href={`/workers/${city.slug}`}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:text-emerald-700"
                 >
                   <span>Explore {city.name} Workers Directory</span>
                   <span>→</span>
@@ -103,7 +103,7 @@ export default function LocationsPage() {
         </div>
 
         <div className="text-center pt-6">
-          <Link href="/workers" className="text-sm font-semibold text-gray-400 hover:text-emerald-400">
+          <Link href="/workers" className="text-sm font-semibold text-gray-600 hover:text-emerald-600">
             ← Back to All Workers Directory
           </Link>
         </div>

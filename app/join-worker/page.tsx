@@ -78,68 +78,68 @@ export default function JoinWorkerPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-gray-950 text-gray-100 py-16 px-4">
+    <main className="min-h-screen bg-slate-50 text-slate-900 py-16 px-4">
       <div className="max-w-4xl mx-auto space-y-12">
         <div className="text-center space-y-4 max-w-2xl mx-auto">
-          <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
+          <div className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold uppercase tracking-wider">
             Worker Profile Registration
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-white">
+          <h1 className="text-4xl md:text-5xl font-black text-gray-900">
             Are you a skilled worker?
           </h1>
-          <p className="text-gray-300 text-base md:text-lg">
+          <p className="text-gray-600 text-base md:text-lg">
             Create your free profile and help customers find your services online across Bangladesh.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Benefits Box */}
-          <div className="lg:col-span-1 space-y-6 bg-gray-900 border border-gray-800 rounded-3xl p-6 h-fit">
-            <h2 className="text-xl font-bold text-white border-b border-gray-800 pb-3">Why Join Sromojibi?</h2>
+          <div className="lg:col-span-1 space-y-6 bg-white border border-gray-200 rounded-3xl p-6 h-fit shadow-sm">
+            <h2 className="text-xl font-bold text-gray-900 border-b border-gray-200 pb-3">Why Join Sromojibi?</h2>
             
             <div className="space-y-4 text-sm">
               <div className="flex items-start gap-3">
-                <span className="text-emerald-400 font-bold text-lg leading-none">✓</span>
+                <span className="text-emerald-600 font-bold text-lg leading-none">✓</span>
                 <div>
-                  <h3 className="font-bold text-white">Free Listing</h3>
-                  <p className="text-xs text-gray-400">No hidden fees or commissions during launch period.</p>
+                  <h3 className="font-bold text-gray-900">Free Listing</h3>
+                  <p className="text-xs text-gray-500">No hidden fees or commissions during launch period.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <span className="text-emerald-400 font-bold text-lg leading-none">✓</span>
+                <span className="text-emerald-600 font-bold text-lg leading-none">✓</span>
                 <div>
-                  <h3 className="font-bold text-white">More Customer Reach</h3>
-                  <p className="text-xs text-gray-400">Get calls and direct discovery from nearby households.</p>
+                  <h3 className="font-bold text-gray-900">More Customer Reach</h3>
+                  <p className="text-xs text-gray-500">Get calls and direct discovery from nearby households.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <span className="text-emerald-400 font-bold text-lg leading-none">✓</span>
+                <span className="text-emerald-600 font-bold text-lg leading-none">✓</span>
                 <div>
-                  <h3 className="font-bold text-white">Build Your Reputation</h3>
-                  <p className="text-xs text-gray-400">Showcase your years of trade experience and specialties.</p>
+                  <h3 className="font-bold text-gray-900">Build Your Reputation</h3>
+                  <p className="text-xs text-gray-500">Showcase your years of trade experience and specialties.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <span className="text-emerald-400 font-bold text-lg leading-none">✓</span>
+                <span className="text-emerald-600 font-bold text-lg leading-none">✓</span>
                 <div>
-                  <h3 className="font-bold text-white">Get Discovered Locally</h3>
-                  <p className="text-xs text-gray-400">Appear in directory search results for your city, zilla, or upazila.</p>
+                  <h3 className="font-bold text-gray-900">Get Discovered Locally</h3>
+                  <p className="text-xs text-gray-500">Appear in directory search results for your city, zilla, or upazila.</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Form Box */}
-          <div className="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-3xl p-6 md:p-8 space-y-6">
+          <div className="lg:col-span-2 bg-white border border-gray-200 rounded-3xl p-6 md:p-8 space-y-6 shadow-sm">
             {submitted ? (
               <div className="py-12 text-center space-y-4">
                 <div className="text-5xl">🎉</div>
-                <h2 className="text-2xl font-bold text-white">Registration Received!</h2>
-                <p className="text-gray-300 text-sm max-w-md mx-auto">
-                  Thank you, <strong className="text-white">{formData.fullName}</strong>. Your profile request for <strong className="text-emerald-400">{formData.serviceType}</strong> in <strong className="text-white">{formData.city}</strong> has been registered. Our team will contact you at <strong className="text-white">{formData.phone}</strong> when local listings activate.
+                <h2 className="text-2xl font-bold text-gray-900">Registration Received!</h2>
+                <p className="text-gray-600 text-sm max-w-md mx-auto">
+                  Thank you, <strong className="text-gray-900">{formData.fullName}</strong>. Your profile request for <strong className="text-emerald-700">{formData.serviceType}</strong> in <strong className="text-gray-900">{formData.city}</strong> has been registered. Our team will contact you at <strong className="text-gray-900">{formData.phone}</strong> when local listings activate.
                 </p>
                 <div className="pt-4">
                   <Button
@@ -158,7 +158,7 @@ export default function JoinWorkerPage() {
                         details: "",
                       });
                     }}
-                    className="bg-gray-800 hover:bg-gray-700 text-white font-semibold text-xs"
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs rounded-xl"
                   >
                     Submit Another Worker Profile
                   </Button>
@@ -166,7 +166,7 @@ export default function JoinWorkerPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
-                <h2 className="text-xl font-bold text-white pb-6">Create Free Worker Profile</h2>
+                <h2 className="text-xl font-bold text-gray-900 pb-6">Create Free Worker Profile</h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <Input
@@ -179,9 +179,9 @@ export default function JoinWorkerPage() {
                     value={formData.fullName}
                     onValueChange={(val) => setFormData({ ...formData, fullName: val })}
                     classNames={{
-                      label: "text-gray-300 font-medium text-sm",
-                      input: "text-white placeholder:text-gray-500",
-                      inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                      label: "text-gray-700 font-medium text-sm",
+                      input: "text-gray-900 placeholder:text-gray-400",
+                      inputWrapper: "border-gray-300 hover:border-emerald-500 focus-within:!border-emerald-500 bg-white rounded-xl shadow-sm",
                     }}
                   />
 
@@ -194,9 +194,9 @@ export default function JoinWorkerPage() {
                     value={formData.email}
                     onValueChange={(val) => setFormData({ ...formData, email: val })}
                     classNames={{
-                      label: "text-gray-300 font-medium text-sm",
-                      input: "text-white placeholder:text-gray-500",
-                      inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                      label: "text-gray-700 font-medium text-sm",
+                      input: "text-gray-900 placeholder:text-gray-400",
+                      inputWrapper: "border-gray-300 hover:border-emerald-500 focus-within:!border-emerald-500 bg-white rounded-xl shadow-sm",
                     }}
                   />
                 </div>
@@ -212,31 +212,33 @@ export default function JoinWorkerPage() {
                     value={formData.phone}
                     onValueChange={(val) => setFormData({ ...formData, phone: val })}
                     classNames={{
-                      label: "text-gray-300 font-medium text-sm",
-                      input: "text-white placeholder:text-gray-500",
-                      inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                      label: "text-gray-700 font-medium text-sm",
+                      input: "text-gray-900 placeholder:text-gray-400",
+                      inputWrapper: "border-gray-300 hover:border-emerald-500 focus-within:!border-emerald-500 bg-white rounded-xl shadow-sm",
                     }}
                   />
 
                   <Select
                     isRequired
+                    aria-label="Service Category / কাজের ধরন"
                     labelPlacement="outside"
                     label="Service Category / কাজের ধরন"
                     variant="bordered"
-                    selectedKeys={[formData.serviceType]}
+                    selectedKeys={new Set([formData.serviceType])}
+                    disallowEmptySelection
                     onSelectionChange={(keys) => {
                       const selected = Array.from(keys)[0] as string;
-                      if (selected) setFormData({ ...formData, serviceType: selected });
+                      if (selected) setFormData((prev) => ({ ...prev, serviceType: selected }));
                     }}
                     classNames={{
-                      label: "text-gray-300 font-medium text-sm",
-                      value: "text-white",
-                      trigger: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
-                      popoverContent: "bg-gray-900 border border-gray-800 text-white",
+                      label: "text-gray-700 font-medium text-sm",
+                      value: "text-gray-900",
+                      trigger: "border-gray-300 hover:border-emerald-500 focus-within:!border-emerald-500 bg-white rounded-xl shadow-sm cursor-pointer",
+                      popoverContent: "bg-white border border-gray-200 text-gray-900 shadow-md z-50",
                     }}
                   >
                     {serviceCategories.map((cat) => (
-                      <SelectItem key={cat.key} className="text-gray-200 hover:bg-gray-800 hover:text-emerald-400">
+                      <SelectItem key={cat.key} textValue={cat.label} className="text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 cursor-pointer">
                         {cat.label}
                       </SelectItem>
                     ))}
@@ -246,23 +248,25 @@ export default function JoinWorkerPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <Select
                     isRequired
+                    aria-label="City / Division"
                     labelPlacement="outside"
                     label="City / Division"
                     variant="bordered"
-                    selectedKeys={[formData.city]}
+                    selectedKeys={new Set([formData.city])}
+                    disallowEmptySelection
                     onSelectionChange={(keys) => {
                       const selected = Array.from(keys)[0] as string;
-                      if (selected) setFormData({ ...formData, city: selected });
+                      if (selected) setFormData((prev) => ({ ...prev, city: selected }));
                     }}
                     classNames={{
-                      label: "text-gray-300 font-medium text-sm",
-                      value: "text-white",
-                      trigger: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
-                      popoverContent: "bg-gray-900 border border-gray-800 text-white",
+                      label: "text-gray-700 font-medium text-sm",
+                      value: "text-gray-900",
+                      trigger: "border-gray-300 hover:border-emerald-500 focus-within:!border-emerald-500 bg-white rounded-xl shadow-sm cursor-pointer",
+                      popoverContent: "bg-white border border-gray-200 text-gray-900 shadow-md z-50",
                     }}
                   >
                     {cities.map((city) => (
-                      <SelectItem key={city.key} className="text-gray-200 hover:bg-gray-800 hover:text-emerald-400">
+                      <SelectItem key={city.key} textValue={city.label} className="text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 cursor-pointer">
                         {city.label}
                       </SelectItem>
                     ))}
@@ -277,9 +281,9 @@ export default function JoinWorkerPage() {
                     value={formData.zilla}
                     onValueChange={(val) => setFormData({ ...formData, zilla: val })}
                     classNames={{
-                      label: "text-gray-300 font-medium text-sm",
-                      input: "text-white placeholder:text-gray-500",
-                      inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                      label: "text-gray-700 font-medium text-sm",
+                      input: "text-gray-900 placeholder:text-gray-400",
+                      inputWrapper: "border-gray-300 hover:border-emerald-500 focus-within:!border-emerald-500 bg-white rounded-xl shadow-sm",
                     }}
                   />
                 </div>
@@ -294,9 +298,9 @@ export default function JoinWorkerPage() {
                     value={formData.upazila}
                     onValueChange={(val) => setFormData({ ...formData, upazila: val })}
                     classNames={{
-                      label: "text-gray-300 font-medium text-sm",
-                      input: "text-white placeholder:text-gray-500",
-                      inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                      label: "text-gray-700 font-medium text-sm",
+                      input: "text-gray-900 placeholder:text-gray-400",
+                      inputWrapper: "border-gray-300 hover:border-emerald-500 focus-within:!border-emerald-500 bg-white rounded-xl shadow-sm",
                     }}
                   />
 
@@ -309,9 +313,9 @@ export default function JoinWorkerPage() {
                     value={formData.village}
                     onValueChange={(val) => setFormData({ ...formData, village: val })}
                     classNames={{
-                      label: "text-gray-300 font-medium text-sm",
-                      input: "text-white placeholder:text-gray-500",
-                      inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                      label: "text-gray-700 font-medium text-sm",
+                      input: "text-gray-900 placeholder:text-gray-400",
+                      inputWrapper: "border-gray-300 hover:border-emerald-500 focus-within:!border-emerald-500 bg-white rounded-xl shadow-sm",
                     }}
                   />
                 </div>
@@ -319,23 +323,25 @@ export default function JoinWorkerPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <Select
                     isRequired
+                    aria-label="Experience Level"
                     labelPlacement="outside"
                     label="Experience Level"
                     variant="bordered"
-                    selectedKeys={[formData.experience]}
+                    selectedKeys={new Set([formData.experience])}
+                    disallowEmptySelection
                     onSelectionChange={(keys) => {
                       const selected = Array.from(keys)[0] as string;
-                      if (selected) setFormData({ ...formData, experience: selected });
+                      if (selected) setFormData((prev) => ({ ...prev, experience: selected }));
                     }}
                     classNames={{
-                      label: "text-gray-300 font-medium text-sm",
-                      value: "text-white",
-                      trigger: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
-                      popoverContent: "bg-gray-900 border border-gray-800 text-white",
+                      label: "text-gray-700 font-medium text-sm",
+                      value: "text-gray-900",
+                      trigger: "border-gray-300 hover:border-emerald-500 focus-within:!border-emerald-500 bg-white rounded-xl shadow-sm cursor-pointer",
+                      popoverContent: "bg-white border border-gray-200 text-gray-900 shadow-md z-50",
                     }}
                   >
                     {experienceLevels.map((exp) => (
-                      <SelectItem key={exp.key} className="text-gray-200 hover:bg-gray-800 hover:text-emerald-400">
+                      <SelectItem key={exp.key} textValue={exp.label} className="text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 cursor-pointer">
                         {exp.label}
                       </SelectItem>
                     ))}
@@ -351,14 +357,14 @@ export default function JoinWorkerPage() {
                   value={formData.details}
                   onValueChange={(val) => setFormData({ ...formData, details: val })}
                   classNames={{
-                    label: "text-gray-300 font-medium text-sm",
-                    input: "text-white placeholder:text-gray-500",
-                    inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                    label: "text-gray-700 font-medium text-sm",
+                    input: "text-gray-900 placeholder:text-gray-400",
+                    inputWrapper: "border-gray-300 hover:border-emerald-500 focus-within:!border-emerald-500 bg-white rounded-xl shadow-sm",
                   }}
                 />
 
                 {errorMsg && (
-                  <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold">
+                  <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
                     {errorMsg}
                   </div>
                 )}
@@ -367,7 +373,7 @@ export default function JoinWorkerPage() {
                   type="submit"
                   size="lg"
                   isLoading={isSubmitting}
-                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-gray-950 font-extrabold shadow-lg shadow-emerald-950/50 rounded-xl transition-all hover:scale-[1.01]"
+                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold shadow-md rounded-xl transition-all hover:scale-[1.01]"
                 >
                   {isSubmitting ? "Submitting Profile..." : "Register Free Worker Profile"}
                 </Button>
@@ -377,7 +383,7 @@ export default function JoinWorkerPage() {
         </div>
 
         <div className="text-center pt-4">
-          <Link href="/" className="text-xs font-semibold text-gray-400 hover:text-emerald-400">
+          <Link href="/" className="text-xs font-semibold text-gray-600 hover:text-emerald-600">
             ← Back to Home
           </Link>
         </div>

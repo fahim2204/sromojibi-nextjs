@@ -23,17 +23,17 @@ export default async function AdminWorkersPage() {
   });
 
   return (
-    <main className="min-h-screen bg-gray-950 text-gray-100 py-16 px-4">
+    <main className="min-h-screen bg-slate-50 text-slate-900 py-16 px-4">
       <div className="max-w-6xl mx-auto space-y-10">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-800 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-6">
           <div className="space-y-2">
-            <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
+            <div className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold uppercase tracking-wider">
               Sromojibi Admin Panel
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white">
+            <h1 className="text-3xl sm:text-4xl font-black text-gray-900">
               Worker Profile Verification
             </h1>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               Review incoming worker registrations and manage active directory listings.
             </p>
           </div>
@@ -41,7 +41,7 @@ export default async function AdminWorkersPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/workers"
-              className="px-4 py-2.5 rounded-xl bg-gray-900 border border-gray-800 hover:border-emerald-500/40 text-xs font-bold text-gray-300 hover:text-emerald-400 transition-all"
+              className="px-4 py-2.5 rounded-xl bg-white border border-gray-200 hover:border-emerald-500/40 text-xs font-bold text-gray-700 hover:text-emerald-600 transition-all shadow-sm"
             >
               🌐 View Public Directory →
             </Link>

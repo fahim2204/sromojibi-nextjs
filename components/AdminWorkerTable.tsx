@@ -77,37 +77,37 @@ export default function AdminWorkerTable({ initialWorkers }: Props) {
     <div className="space-y-8">
       {/* Metric Cards Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl bg-gray-900 border border-gray-800 space-y-1">
-          <p className="text-xs text-gray-400 font-semibold uppercase">Total Profiles</p>
-          <p className="text-3xl font-black text-white">{workers.length}</p>
+        <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-1">
+          <p className="text-xs text-gray-500 font-semibold uppercase">Total Profiles</p>
+          <p className="text-3xl font-black text-gray-900">{workers.length}</p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-yellow-500/10 border border-yellow-500/30 space-y-1">
-          <p className="text-xs text-yellow-400 font-semibold uppercase">Pending Review</p>
-          <p className="text-3xl font-black text-yellow-400">{pendingCount}</p>
+        <div className="p-5 rounded-2xl bg-amber-50 border border-amber-200 shadow-sm space-y-1">
+          <p className="text-xs text-amber-800 font-semibold uppercase">Pending Review</p>
+          <p className="text-3xl font-black text-amber-700">{pendingCount}</p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-1">
-          <p className="text-xs text-emerald-400 font-semibold uppercase">Approved Profiles</p>
-          <p className="text-3xl font-black text-emerald-400">{approvedCount}</p>
+        <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 shadow-sm space-y-1">
+          <p className="text-xs text-emerald-800 font-semibold uppercase">Approved Profiles</p>
+          <p className="text-3xl font-black text-emerald-700">{approvedCount}</p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-red-500/10 border border-red-500/30 space-y-1">
-          <p className="text-xs text-red-400 font-semibold uppercase">Rejected Requests</p>
-          <p className="text-3xl font-black text-red-400">{rejectedCount}</p>
+        <div className="p-5 rounded-2xl bg-rose-50 border border-rose-200 shadow-sm space-y-1">
+          <p className="text-xs text-rose-800 font-semibold uppercase">Rejected Requests</p>
+          <p className="text-3xl font-black text-rose-700">{rejectedCount}</p>
         </div>
       </div>
 
       {/* Status Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-gray-800 pb-3 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-gray-200 pb-3 overflow-x-auto">
         {(["PENDING", "APPROVED", "REJECTED", "ALL"] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
               activeTab === tab
-                ? "bg-emerald-500 text-gray-950 shadow-md shadow-emerald-950/50"
-                : "bg-gray-900 text-gray-400 hover:text-white border border-gray-800"
+                ? "bg-emerald-600 text-white shadow-sm"
+                : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
             }`}
           >
             {tab === "PENDING" && `⏳ Pending (${pendingCount})`}
@@ -124,47 +124,47 @@ export default function AdminWorkerTable({ initialWorkers }: Props) {
           filteredWorkers.map((worker) => (
             <div
               key={worker.id}
-              className="p-6 rounded-2xl bg-gray-900 border border-gray-800 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 hover:border-gray-700 transition-all"
+              className="p-6 rounded-2xl bg-white border border-gray-200 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 hover:border-gray-300 shadow-sm transition-all"
             >
               <div className="space-y-2 max-w-2xl">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="font-bold text-white text-lg">{worker.full_name}</h3>
+                  <h3 className="font-bold text-gray-900 text-lg">{worker.full_name}</h3>
                   <a
                     href={`tel:${worker.phone}`}
-                    className="text-xs text-emerald-400 font-semibold bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/30 hover:underline"
+                    className="text-xs text-emerald-700 font-semibold bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 hover:underline"
                   >
                     📞 {worker.phone}
                   </a>
 
                   {/* Status Badge */}
                   {worker.status === "PENDING" && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 text-xs font-bold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold">
                       ⏳ Pending Approval
                     </span>
                   )}
                   {worker.status === "APPROVED" && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-bold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
                       ✓ Approved & Live
                     </span>
                   )}
                   {worker.status === "REJECTED" && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/30 text-xs font-bold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold">
                       ✕ Rejected
                     </span>
                   )}
                 </div>
 
-                <p className="text-xs text-gray-300 font-medium">
-                  {worker.category?.icon ?? "🛠️"} {worker.service_type} • Location: <strong className="text-white">{worker.city}</strong> • Experience: <strong className="text-white">{worker.experience}</strong>
+                <p className="text-xs text-gray-600 font-medium">
+                  {worker.category?.icon ?? "🛠️"} {worker.service_type} • Location: <strong className="text-gray-900">{worker.city}</strong> • Experience: <strong className="text-gray-900">{worker.experience}</strong>
                 </p>
 
                 {worker.details && (
-                  <p className="text-xs text-gray-400 bg-gray-950/60 p-3 rounded-xl border border-gray-800/80">
+                  <p className="text-xs text-gray-600 bg-slate-50 p-3 rounded-xl border border-gray-200">
                     "{worker.details}"
                   </p>
                 )}
 
-                <p className="text-[11px] text-gray-500">
+                <p className="text-[11px] text-gray-400">
                   Registered on {new Date(worker.created_at).toLocaleString()}
                 </p>
               </div>
@@ -176,7 +176,7 @@ export default function AdminWorkerTable({ initialWorkers }: Props) {
                     size="sm"
                     isLoading={updatingSlug === worker.slug}
                     onClick={() => handleUpdateStatus(worker.slug, "APPROVED", true)}
-                    className="bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold text-xs rounded-xl"
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-sm"
                   >
                     ✓ Approve Worker
                   </Button>
@@ -188,7 +188,7 @@ export default function AdminWorkerTable({ initialWorkers }: Props) {
                     variant="bordered"
                     isLoading={updatingSlug === worker.slug}
                     onClick={() => handleUpdateStatus(worker.slug, "REJECTED", false)}
-                    className="border-red-500/40 text-red-400 hover:bg-red-500/10 font-bold text-xs rounded-xl"
+                    className="border-rose-300 text-rose-600 hover:bg-rose-50 font-bold text-xs rounded-xl"
                   >
                     ✕ Reject
                   </Button>
@@ -200,7 +200,7 @@ export default function AdminWorkerTable({ initialWorkers }: Props) {
                     variant="bordered"
                     isLoading={updatingSlug === worker.slug}
                     onClick={() => handleUpdateStatus(worker.slug, "PENDING", false)}
-                    className="border-gray-800 text-gray-400 hover:text-white font-bold text-xs rounded-xl"
+                    className="border-gray-300 text-gray-600 hover:bg-gray-100 font-bold text-xs rounded-xl"
                   >
                     ⏳ Reset Pending
                   </Button>
@@ -209,10 +209,10 @@ export default function AdminWorkerTable({ initialWorkers }: Props) {
             </div>
           ))
         ) : (
-          <div className="p-12 rounded-3xl bg-gray-900 border border-gray-800 text-center space-y-3">
+          <div className="p-12 rounded-3xl bg-white border border-gray-200 text-center space-y-3 shadow-sm">
             <div className="text-3xl">📋</div>
-            <h4 className="text-base font-bold text-white">No Profiles in "{activeTab}" Status</h4>
-            <p className="text-xs text-gray-400">Select another filter tab above.</p>
+            <h4 className="text-base font-bold text-gray-900">No Profiles in "{activeTab}" Status</h4>
+            <p className="text-xs text-gray-500">Select another filter tab above.</p>
           </div>
         )}
       </div>

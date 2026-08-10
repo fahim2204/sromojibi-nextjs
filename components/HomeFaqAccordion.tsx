@@ -17,17 +17,17 @@ export default function HomeFaqAccordion({ faqs }: { faqs: FAQItem[] }) {
         return (
           <div
             key={index}
-            className="rounded-2xl bg-gray-900 border border-gray-800 overflow-hidden transition-all"
+            className="rounded-2xl bg-white border border-gray-200 overflow-hidden transition-all shadow-sm"
           >
             <button
               onClick={() => setOpenFaq(isOpen ? null : index)}
-              className="w-full p-6 text-left flex items-center justify-between font-bold text-white text-base hover:text-emerald-400 transition-colors cursor-pointer"
+              className="w-full p-6 text-left flex items-center justify-between font-bold text-gray-900 text-base hover:text-emerald-600 transition-colors cursor-pointer"
             >
               <span>{faq.question}</span>
-              <span className="text-xl text-emerald-400 ml-4">{isOpen ? "−" : "+"}</span>
+              <span className="text-xl text-emerald-600 ml-4">{isOpen ? "−" : "+"}</span>
             </button>
             {isOpen && (
-              <div className="px-6 pb-6 text-sm text-gray-300 leading-relaxed border-t border-gray-800/60 pt-4">
+              <div className="px-6 pb-6 text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-4">
                 {faq.answer}
               </div>
             )}

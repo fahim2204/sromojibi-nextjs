@@ -24,7 +24,7 @@ export default function FAQ({ items }: FAQProps) {
         <h2 className="text-4xl font-bold gradient-text mb-3">
           Frequently Asked Questions
         </h2>
-        <p className="text-gray-400 text-lg">
+        <p className="text-gray-600 text-lg">
           Everything you need to know about Sromojibi worker directory
         </p>
       </div>
@@ -35,11 +35,11 @@ export default function FAQ({ items }: FAQProps) {
             key={index}
             aria-label={faq.question}
             title={faq.question}
-            className="glass border border-purple-500/20 rounded-lg overflow-hidden"
+            className="glass border border-gray-200 rounded-lg overflow-hidden shadow-sm"
             classNames={{
-              title: "text-lg font-semibold text-white",
-              trigger: "py-6 px-6 hover:bg-purple-500/10",
-              content: "text-gray-300 pb-6 px-6",
+              title: "text-lg font-semibold text-gray-900",
+              trigger: "py-6 px-6 hover:bg-emerald-50/50",
+              content: "text-gray-600 pb-6 px-6",
             }}
           >
             {faq.answer}

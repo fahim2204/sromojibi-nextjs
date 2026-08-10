@@ -66,19 +66,19 @@ export default function WorkerReviewSection({ workerSlug, initialReviews }: Prop
   };
 
   return (
-    <div className="space-y-8 pt-6 border-t border-gray-800">
+    <div className="space-y-8 pt-6 border-t border-gray-200">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-white">Customer Reviews & Feedback</h3>
-        <span className="text-xs text-emerald-400 font-semibold">{reviews.length} Total Feedback</span>
+        <h3 className="text-xl font-bold text-gray-900">Customer Reviews & Feedback</h3>
+        <span className="text-xs text-emerald-600 font-semibold">{reviews.length} Total Feedback</span>
       </div>
 
       {/* Review Submission Form */}
-      <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-gray-950/70 border border-gray-800 space-y-5">
-        <h4 className="font-bold text-white text-sm">Write a Customer Review</h4>
+      <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-white border border-gray-200 space-y-5 shadow-sm">
+        <h4 className="font-bold text-gray-900 text-sm">Write a Customer Review</h4>
 
         {/* Rating Selector */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-300">Your Rating (1 - 5 Stars)</label>
+          <label className="text-xs font-semibold text-gray-700">Your Rating (1 - 5 Stars)</label>
           <div className="flex items-center gap-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
@@ -87,14 +87,14 @@ export default function WorkerReviewSection({ workerSlug, initialReviews }: Prop
                 onClick={() => setRating(star)}
                 onMouseEnter={() => setHoverRating(star)}
                 onMouseLeave={() => setHoverRating(0)}
-                className="text-2xl transition-transform hover:scale-125 focus:outline-none"
+                className="text-2xl transition-transform hover:scale-125 focus:outline-none cursor-pointer"
               >
-                <span className={(hoverRating || rating) >= star ? "text-yellow-400" : "text-gray-700"}>
+                <span className={(hoverRating || rating) >= star ? "text-amber-500" : "text-gray-300"}>
                   ★
                 </span>
               </button>
             ))}
-            <span className="text-xs font-bold text-yellow-400 ml-2">{rating} / 5 Stars</span>
+            <span className="text-xs font-bold text-amber-600 ml-2">{rating} / 5 Stars</span>
           </div>
         </div>
 
@@ -109,9 +109,9 @@ export default function WorkerReviewSection({ workerSlug, initialReviews }: Prop
             value={reviewerName}
             onValueChange={setReviewerName}
             classNames={{
-              label: "text-gray-300 text-xs font-medium",
-              input: "text-white text-sm placeholder:text-gray-600",
-              inputWrapper: "border-gray-800 hover:border-emerald-500 bg-gray-900 rounded-xl",
+              label: "text-gray-700 text-xs font-medium",
+              input: "text-gray-900 text-sm placeholder:text-gray-400",
+              inputWrapper: "border-gray-300 hover:border-emerald-500 bg-slate-50 rounded-xl",
             }}
           />
 
@@ -124,9 +124,9 @@ export default function WorkerReviewSection({ workerSlug, initialReviews }: Prop
             value={reviewerPhone}
             onValueChange={setReviewerPhone}
             classNames={{
-              label: "text-gray-300 text-xs font-medium",
-              input: "text-white text-sm placeholder:text-gray-600",
-              inputWrapper: "border-gray-800 hover:border-emerald-500 bg-gray-900 rounded-xl",
+              label: "text-gray-700 text-xs font-medium",
+              input: "text-gray-900 text-sm placeholder:text-gray-400",
+              inputWrapper: "border-gray-300 hover:border-emerald-500 bg-slate-50 rounded-xl",
             }}
           />
         </div>
@@ -140,20 +140,20 @@ export default function WorkerReviewSection({ workerSlug, initialReviews }: Prop
           value={comment}
           onValueChange={setComment}
           classNames={{
-            label: "text-gray-300 text-xs font-medium",
-            input: "text-white text-sm placeholder:text-gray-600",
-            inputWrapper: "border-gray-800 hover:border-emerald-500 bg-gray-900 rounded-xl",
+            label: "text-gray-700 text-xs font-medium",
+            input: "text-gray-900 text-sm placeholder:text-gray-400",
+            inputWrapper: "border-gray-300 hover:border-emerald-500 bg-slate-50 rounded-xl",
           }}
         />
 
         {errorMsg && (
-          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold">
+          <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
             {errorMsg}
           </div>
         )}
 
         {successMsg && (
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
             {successMsg}
           </div>
         )}
@@ -161,7 +161,7 @@ export default function WorkerReviewSection({ workerSlug, initialReviews }: Prop
         <Button
           type="submit"
           isLoading={isSubmitting}
-          className="bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-extrabold text-xs px-6 rounded-xl transition-all"
+          className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs px-6 rounded-xl transition-all shadow-sm"
         >
           Submit Review
         </Button>
@@ -171,11 +171,11 @@ export default function WorkerReviewSection({ workerSlug, initialReviews }: Prop
       <div className="space-y-4">
         {reviews.length > 0 ? (
           reviews.map((rev) => (
-            <div key={rev.id} className="p-4 rounded-2xl bg-gray-950/40 border border-gray-800 space-y-2">
+            <div key={rev.id} className="p-4 rounded-2xl bg-white border border-gray-200 space-y-2 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <h5 className="font-bold text-white text-sm">{rev.reviewer_name}</h5>
-                  <div className="flex items-center gap-1 text-xs text-yellow-400">
+                  <h5 className="font-bold text-gray-900 text-sm">{rev.reviewer_name}</h5>
+                  <div className="flex items-center gap-1 text-xs text-amber-500">
                     {"★".repeat(rev.rating)}
                     {"☆".repeat(5 - rev.rating)}
                     <span className="text-gray-400 text-[11px] ml-1">
@@ -186,7 +186,7 @@ export default function WorkerReviewSection({ workerSlug, initialReviews }: Prop
               </div>
 
               {rev.comment && (
-                <p className="text-xs text-gray-300 leading-relaxed pt-1">
+                <p className="text-xs text-gray-600 leading-relaxed pt-1">
                   "{rev.comment}"
                 </p>
               )}

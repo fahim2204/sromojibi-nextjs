@@ -126,43 +126,43 @@ export default function BlogPostPage({ params }: BlogPageProps) {
   ];
 
   return (
-    <main className="min-h-screen bg-gray-950 text-gray-100 py-16 px-4">
+    <main className="min-h-screen bg-slate-50 text-slate-900 py-16 px-4">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
       <article className="max-w-4xl mx-auto space-y-10">
-        <header className="border-b border-gray-800 pb-8 space-y-4">
+        <header className="border-b border-gray-200 pb-8 space-y-4">
           <Link
             href="/blogs"
-            className="inline-block text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
+            className="inline-block text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
           >
             ← Back to Worker Guides
           </Link>
-          <div className="flex items-center gap-3 text-xs text-gray-400">
-            <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold">
+          <div className="flex items-center gap-3 text-xs text-gray-500">
+            <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold">
               {post.category}
             </span>
             <span>·</span>
             <span>{post.readingTime}</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 leading-tight">
             {post.title}
           </h1>
-          <p className="text-lg text-gray-300 leading-relaxed">{post.description}</p>
+          <p className="text-lg text-gray-600 leading-relaxed">{post.description}</p>
         </header>
 
-        <div className="space-y-8 text-gray-300 leading-relaxed">
-          <p className="text-lg text-gray-200">{post.intro}</p>
+        <div className="space-y-8 text-gray-700 leading-relaxed">
+          <p className="text-lg text-gray-800">{post.intro}</p>
 
           <div className="space-y-8">
             {post.sections.map((section) => (
               <section key={section.heading} className="space-y-4">
-                <h2 className="text-2xl font-bold text-white border-l-4 border-emerald-500 pl-4">
+                <h2 className="text-2xl font-bold text-gray-900 border-l-4 border-emerald-500 pl-4">
                   {section.heading}
                 </h2>
-                <div className="space-y-3 text-base text-gray-300">
+                <div className="space-y-3 text-base text-gray-700">
                   {section.body.map((paragraph, idx) => (
                     <p key={idx}>{paragraph}</p>
                   ))}
@@ -171,32 +171,32 @@ export default function BlogPostPage({ params }: BlogPageProps) {
             ))}
           </div>
 
-          <section className="p-6 rounded-2xl bg-gray-900 border border-gray-800 space-y-3">
-            <h3 className="text-lg font-bold text-white">Need a worker in this field?</h3>
-            <p className="text-sm text-gray-400">
+          <section className="p-6 rounded-2xl bg-white border border-gray-200 space-y-3 shadow-sm">
+            <h3 className="text-lg font-bold text-gray-900">Need a worker in this field?</h3>
+            <p className="text-sm text-gray-600">
               Find verified trade professionals and skilled technicians in your area on Sromojibi.
             </p>
             <Link
               href={post.relatedCategory.href}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold text-sm transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-md transition-all"
             >
               Explore {post.relatedCategory.label} →
             </Link>
           </section>
 
           {post.faqs.length > 0 && (
-            <section className="space-y-4 pt-4 border-t border-gray-800">
-              <h2 className="text-2xl font-bold text-white">Frequently Asked Questions</h2>
+            <section className="space-y-4 pt-4 border-t border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900">Frequently Asked Questions</h2>
               <div className="space-y-3">
                 {post.faqs.map((faq) => (
                   <details
                     key={faq.question}
-                    className="group p-5 rounded-2xl bg-gray-900 border border-gray-800"
+                    className="group p-5 rounded-2xl bg-white border border-gray-200 shadow-sm"
                   >
-                    <summary className="cursor-pointer font-semibold text-white group-open:text-emerald-400 transition-colors">
+                    <summary className="cursor-pointer font-semibold text-gray-900 group-open:text-emerald-600 transition-colors">
                       {faq.question}
                     </summary>
-                    <p className="mt-3 text-sm text-gray-300 leading-relaxed border-t border-gray-800 pt-3">
+                    <p className="mt-3 text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-3">
                       {faq.answer}
                     </p>
                   </details>

@@ -45,19 +45,19 @@ export default function BlogsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-950 text-gray-100 py-16 px-4">
+    <main className="min-h-screen bg-slate-50 text-slate-900 py-16 px-4">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <section className="max-w-5xl mx-auto mb-12 text-center space-y-3">
-        <span className="px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
+        <span className="px-3.5 py-1.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-semibold uppercase tracking-wider">
           Sromojibi Knowledge Base
         </span>
-        <h1 className="text-4xl sm:text-5xl font-black text-white">
+        <h1 className="text-4xl sm:text-5xl font-black text-gray-900">
           Worker Guides & Home Maintenance Tips
         </h1>
-        <p className="text-gray-400 text-base max-w-2xl mx-auto">
+        <p className="text-gray-600 text-base max-w-2xl mx-auto">
           Practical articles explaining how to choose, inspect, and work with skilled trade professionals across Bangladesh.
         </p>
       </section>
@@ -66,29 +66,29 @@ export default function BlogsPage() {
         {blogPosts.map((post) => (
           <article
             key={post.slug}
-            className="p-6 rounded-2xl bg-gray-900 border border-gray-800 hover:border-emerald-500/50 transition-all flex flex-col justify-between"
+            className="p-6 rounded-2xl bg-white border border-gray-200 hover:border-emerald-500/50 hover:shadow-md transition-all flex flex-col justify-between shadow-sm"
           >
             <div>
-              <div className="flex items-center justify-between text-xs text-emerald-400 font-semibold mb-3">
+              <div className="flex items-center justify-between text-xs text-emerald-700 font-semibold mb-3">
                 <span>{post.category}</span>
                 <span>{post.readingTime}</span>
               </div>
-              <h2 className="text-xl font-bold text-white mb-3 hover:text-emerald-400 transition-colors">
+              <h2 className="text-xl font-bold text-gray-900 mb-3 hover:text-emerald-600 transition-colors">
                 <Link href={`/blogs/${post.slug}`}>{post.title}</Link>
               </h2>
-              <p className="text-sm text-gray-400 leading-relaxed mb-6">{post.description}</p>
+              <p className="text-sm text-gray-600 leading-relaxed mb-6">{post.description}</p>
             </div>
 
-            <div className="flex items-center justify-between border-t border-gray-800 pt-4 text-xs font-semibold">
+            <div className="flex items-center justify-between border-t border-gray-100 pt-4 text-xs font-semibold">
               <Link
                 href={`/blogs/${post.slug}`}
-                className="text-emerald-400 hover:text-emerald-300 transition-colors"
+                className="text-emerald-600 hover:text-emerald-700 transition-colors"
               >
                 Read full article →
               </Link>
               <Link
                 href={post.relatedCategory.href}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-500 hover:text-gray-900 transition-colors"
               >
                 {post.relatedCategory.label}
               </Link>
