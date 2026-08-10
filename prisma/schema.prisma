@@ -1,0 +1,247 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum WorkerStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum OAuthProvider {
+  GOOGLE
+  FACEBOOK
+}
+
+enum UserRole {
+  USER
+  WORKER
+  ADMIN
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  password       String?
+  last_login     DateTime?
+  is_superuser   Boolean   @default(false)
+  username       String    @unique
+  first_name     String?
+  last_name      String?
+  email          String    @unique
+  is_staff       Boolean   @default(false)
+  is_active      Boolean   @default(true)
+  date_joined    DateTime  @default(now())
+
+  // Profile Fields
+  full_name      String?
+  phone          String?   @unique
+  image          String?
+  cover_image    String?
+  bio            String?
+  city           String?
+  role           UserRole  @default(USER)
+
+  // Account Status
+  status         UserStatus @default(ACTIVE)
+  email_verified Boolean    @default(false)
+  phone_verified Boolean    @default(false)
+
+  created_at     DateTime  @default(now())
+  modified_at    DateTime  @updatedAt
+
+  // Relations
+  sessions       UserSession[]
+  oauth_accounts UserOAuthAccount[]
+  email_otps     EmailVerificationOtp[]
+  activities     ActivityLog[]
+  worker_profile WorkerProfile?
+  reviews        WorkerReview[]
+
+  @@index([status])
+  @@map("user")
+}
+
+model UserSession {
+  id                 Int       @id @default(autoincrement())
+  fk_user_id         Int?
+  session_id         String?   @unique
+  refresh_token_hash String?
+  user_agent         String
+  device_fingerprint String?
+  ip                 String?
+  device_type        String?
+  os                 String?
+  browser            String?
+  login_method       String
+  latitude           Decimal?
+  longitude          Decimal?
+  login_success      Boolean   @default(true)
+  error_reason       String?
+  created_at         DateTime  @default(now())
+  last_seen_at       DateTime?
+  revoked_at         DateTime?
+
+  user       User?         @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
+  activities ActivityLog[]
+
+  @@index([fk_user_id])
+  @@index([session_id])
+  @@index([created_at])
+  @@index([last_seen_at])
+  @@map("user_session")
+}
+
+model UserOAuthAccount {
+  id               Int           @id @default(autoincrement())
+  fk_user_id       Int
+  provider         OAuthProvider
+  provider_user_id String
+  email            String?
+  email_verified   Boolean       @default(false)
+  avatar_url       String?
+  raw_profile      Json?
+  created_at       DateTime      @default(now())
+  modified_at      DateTime      @updatedAt
+
+  user User @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
+
+  @@unique([provider, provider_user_id])
+  @@index([fk_user_id])
+  @@index([email])
+  @@map("user_oauth_account")
+}
+
+model EmailVerificationOtp {
+  id          Int       @id @default(autoincrement())
+  fk_user_id  Int
+  otp_hash    String
+  expires_at  DateTime
+  consumed_at DateTime?
+  attempts    Int       @default(0)
+  created_at  DateTime  @default(now())
+
+  user User @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
+
+  @@index([fk_user_id])
+  @@index([expires_at])
+  @@map("email_verification_otp")
+}
+
+model ActivityLog {
+  id            Int          @id @default(autoincrement())
+  fk_user_id    Int
+  fk_session_id Int?
+  type          String
+  action        String
+  details       Json?
+  ip            String?
+  created_at    DateTime     @default(now())
+
+  user    User         @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
+  session UserSession? @relation(fields: [fk_session_id], references: [id])
+
+  @@index([fk_user_id, created_at])
+  @@index([fk_session_id])
+  @@index([type])
+  @@index([created_at])
+  @@map("activity_log")
+}
+
+model Category {
+  id          Int             @id @default(autoincrement())
+  name        String
+  name_bn     String?
+  slug        String          @unique
+  icon        String?
+  description String?
+  is_active   Boolean         @default(true)
+  created_at  DateTime        @default(now())
+  updated_at  DateTime        @updatedAt
+
+  workers     WorkerProfile[]
+
+  @@map("category")
+}
+
+model Location {
+  id          Int             @id @default(autoincrement())
+  name        String
+  name_bn     String?
+  slug        String          @unique
+  division    String?
+  description String?
+  is_active   Boolean         @default(true)
+  created_at  DateTime        @default(now())
+  updated_at  DateTime        @updatedAt
+
+  workers     WorkerProfile[]
+
+  @@map("location")
+}
+
+model WorkerProfile {
+  id             Int            @id @default(autoincrement())
+  fk_user_id     Int?           @unique
+  full_name      String
+  phone          String
+  slug           String         @unique
+  service_type   String
+  fk_category_id Int?
+  city           String
+  fk_location_id Int?
+  experience     String
+  details        String?        @db.Text
+  status         WorkerStatus   @default(PENDING)
+  is_verified    Boolean        @default(false)
+  rating         Decimal?       @default(0.00) @db.Decimal(3, 2)
+  review_count   Int            @default(0)
+  avatar_url     String?
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
+
+  user     User?         @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
+  category Category?     @relation(fields: [fk_category_id], references: [id], onDelete: SetNull)
+  location Location?     @relation(fields: [fk_location_id], references: [id], onDelete: SetNull)
+  reviews  WorkerReview[]
+
+  @@index([fk_user_id])
+  @@index([fk_category_id])
+  @@index([fk_location_id])
+  @@index([status])
+  @@index([city])
+  @@index([service_type])
+  @@map("worker_profile")
+}
+
+model WorkerReview {
+  id             Int           @id @default(autoincrement())
+  fk_worker_id   Int
+  fk_user_id     Int?
+  reviewer_name  String
+  reviewer_phone String?
+  rating         Int
+  comment        String?       @db.Text
+  created_at     DateTime      @default(now())
+
+  worker WorkerProfile @relation(fields: [fk_worker_id], references: [id], onDelete: Cascade)
+  user   User?         @relation(fields: [fk_user_id], references: [id], onDelete: SetNull)
+
+  @@index([fk_worker_id])
+  @@index([fk_user_id])
+  @@map("worker_review")
+}
