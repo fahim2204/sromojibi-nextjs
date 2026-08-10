@@ -1,5 +1,9 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { prisma } from "@/lib/prisma";
+import WorkerSearchFilter from "@/components/WorkerSearchFilter";
+
+export const revalidate = 60; // Revalidate static data every 60 seconds
 
 export const metadata: Metadata = {
   title: "Workers Directory - Discover Local Mistris & Technicians",
@@ -10,26 +14,38 @@ export const metadata: Metadata = {
   },
 };
 
-export default function WorkersDirectoryPage() {
-  const categories = [
-    { name: "Electrician", icon: "⚡", slug: "electrician", count: "Directory Listing" },
-    { name: "Plumber", icon: "🚰", slug: "plumber", count: "Directory Listing" },
-    { name: "Rajmistri", icon: "🏠", slug: "rajmistri", count: "Directory Listing" },
-    { name: "Tiles Worker", icon: "🧱", slug: "tiles-worker", count: "Directory Listing" },
-    { name: "Painter", icon: "🎨", slug: "painter", count: "Directory Listing" },
-    { name: "Carpenter", icon: "🔨", slug: "carpenter", count: "Directory Listing" },
-    { name: "AC Technician", icon: "❄️", slug: "ac-technician", count: "Directory Listing" },
-    { name: "CCTV Installer", icon: "📹", slug: "cctv-installer", count: "Directory Listing" },
-  ];
+export default async function WorkersDirectoryPage() {
+  // Fetch active categories with worker count from DB
+  const categories = await prisma.category.findMany({
+    where: { is_active: true },
+    orderBy: { name: "asc" },
+    include: {
+      _count: {
+        select: { workers: true },
+      },
+    },
+  });
 
-  const locations = [
-    { name: "Dhaka", slug: "dhaka", desc: "Capital Division & Metropolitan Area" },
-    { name: "Mymensingh", slug: "mymensingh", desc: "Mymensingh Division & Districts" },
-    { name: "Chittagong", slug: "chittagong", desc: "Chittagong Division & Coastal Belt" },
-    { name: "Sylhet", slug: "sylhet", desc: "Sylhet Division & Surrounding Districts" },
-    { name: "Rajshahi", slug: "rajshahi", desc: "Rajshahi Division & Northern Region" },
-    { name: "Khulna", slug: "khulna", desc: "Khulna Division & Southwestern Region" },
-  ];
+  // Fetch active locations with worker count from DB
+  const locations = await prisma.location.findMany({
+    where: { is_active: true },
+    orderBy: { name: "asc" },
+    include: {
+      _count: {
+        select: { workers: true },
+      },
+    },
+  });
+
+  // Fetch all approved worker profiles for live client-side searching & filtering
+  const allApprovedWorkers = await prisma.workerProfile.findMany({
+    where: { status: "APPROVED" },
+    orderBy: { created_at: "desc" },
+    include: {
+      category: { select: { icon: true, name: true } },
+      location: { select: { name: true } },
+    },
+  });
 
   return (
     <main className="min-h-screen bg-gray-950 text-gray-100 py-16 px-4">
@@ -42,7 +58,7 @@ export default function WorkersDirectoryPage() {
             Discover Skilled Local Workers
           </h1>
           <p className="text-gray-400 text-base md:text-lg">
-            Sromojibi helps customers discover electrician, plumber, rajmistri, and tiles mistri profiles across Bangladesh.
+            Sromojibi connects house owners with electricians, plumbers, rajmistris, and technicians across Bangladesh.
           </p>
         </div>
 
@@ -62,12 +78,18 @@ export default function WorkersDirectoryPage() {
                 href={`/workers/${cat.slug}`}
                 className="p-5 rounded-2xl bg-gray-900 border border-gray-800 hover:border-emerald-500/50 hover:bg-gray-800/80 transition-all flex items-center gap-4 group"
               >
-                <div className="text-3xl shrink-0 group-hover:scale-110 transition-transform">{cat.icon}</div>
+                <div className="text-3xl shrink-0 group-hover:scale-110 transition-transform">
+                  {cat.icon ?? "🛠️"}
+                </div>
                 <div>
                   <h3 className="font-bold text-white group-hover:text-emerald-400 transition-colors">
                     {cat.name}
                   </h3>
-                  <p className="text-xs text-gray-400">{cat.count}</p>
+                  <p className="text-xs text-gray-400">
+                    {cat._count.workers > 0
+                      ? `${cat._count.workers} Listed Worker${cat._count.workers > 1 ? "s" : ""}`
+                      : "Directory Listing"}
+                  </p>
                 </div>
               </Link>
             ))}
@@ -94,14 +116,21 @@ export default function WorkersDirectoryPage() {
                 <h3 className="font-bold text-white text-lg group-hover:text-emerald-400 transition-colors">
                   {loc.name} Workers
                 </h3>
-                <p className="text-xs text-gray-400">{loc.desc}</p>
+                <p className="text-xs text-gray-400">{loc.description ?? `${loc.name} Division`}</p>
                 <div className="text-xs font-semibold text-emerald-400 pt-1 group-hover:translate-x-1 transition-transform">
-                  View {loc.name} Listings →
+                  View {loc._count.workers > 0 ? `${loc._count.workers} ` : ""}{loc.name} Listings →
                 </div>
               </Link>
             ))}
           </div>
         </div>
+
+        {/* Live Search & Filterable Worker Showcase */}
+        <WorkerSearchFilter
+          initialWorkers={allApprovedWorkers}
+          categories={categories}
+          locations={locations}
+        />
 
         {/* Worker CTA Banner */}
         <div className="p-8 rounded-3xl bg-gradient-to-r from-emerald-950/40 via-gray-900 to-teal-950/40 border border-emerald-500/30 flex flex-col md:flex-row items-center justify-between gap-6">

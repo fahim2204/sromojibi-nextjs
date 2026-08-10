@@ -6,7 +6,6 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
     unoptimized: true,
   },
-  output: 'export',
   trailingSlash: false,
   // Optimize JavaScript bundles
   webpack: (config, { dev, isServer }) => {

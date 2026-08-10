@@ -198,11 +198,15 @@ model WorkerProfile {
   id             Int            @id @default(autoincrement())
   fk_user_id     Int?           @unique
   full_name      String
+  email          String?
   phone          String
   slug           String         @unique
   service_type   String
   fk_category_id Int?
   city           String
+  zilla          String?
+  upazila        String?
+  village        String?
   fk_location_id Int?
   experience     String
   details        String?        @db.Text
@@ -224,6 +228,8 @@ model WorkerProfile {
   @@index([fk_location_id])
   @@index([status])
   @@index([city])
+  @@index([zilla])
+  @@index([upazila])
   @@index([service_type])
   @@map("worker_profile")
 }

@@ -3,21 +3,49 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Input, Select, SelectItem, Textarea, Button } from "@nextui-org/react";
+import { APP_API } from "@/constants/api";
 
 export default function JoinWorkerPage() {
   const [formData, setFormData] = useState({
     fullName: "",
+    email: "",
     phone: "",
     serviceType: "Electrician",
     city: "Dhaka",
+    zilla: "",
+    upazila: "",
+    village: "",
     experience: "1-3 Years",
     details: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setIsSubmitting(true);
+    setErrorMsg(null);
+
+    try {
+      const res = await fetch(APP_API.WORKERS.BASE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        throw new Error(json.error?.message ?? "Registration failed. Please try again.");
+      }
+
+      setSubmitted(true);
+    } catch (err: any) {
+      setErrorMsg(err.message ?? "An unexpected error occurred.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const serviceCategories = [
@@ -98,7 +126,7 @@ export default function JoinWorkerPage() {
                 <span className="text-emerald-400 font-bold text-lg leading-none">✓</span>
                 <div>
                   <h3 className="font-bold text-white">Get Discovered Locally</h3>
-                  <p className="text-xs text-gray-400">Appear in directory search results for your city or district.</p>
+                  <p className="text-xs text-gray-400">Appear in directory search results for your city, zilla, or upazila.</p>
                 </div>
               </div>
             </div>
@@ -119,9 +147,13 @@ export default function JoinWorkerPage() {
                       setSubmitted(false);
                       setFormData({
                         fullName: "",
+                        email: "",
                         phone: "",
                         serviceType: "Electrician",
                         city: "Dhaka",
+                        zilla: "",
+                        upazila: "",
+                        village: "",
                         experience: "1-3 Years",
                         details: "",
                       });
@@ -136,21 +168,38 @@ export default function JoinWorkerPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <h2 className="text-xl font-bold text-white pb-6">Create Free Worker Profile</h2>
 
-                <Input
-                  isRequired
-                  labelPlacement="outside"
-                  type="text"
-                  label="Full Name / নাম"
-                  placeholder="e.g. Abul Kashem Mistri"
-                  variant="bordered"
-                  value={formData.fullName}
-                  onValueChange={(val) => setFormData({ ...formData, fullName: val })}
-                  classNames={{
-                    label: "text-gray-300 font-medium text-sm",
-                    input: "text-white placeholder:text-gray-500",
-                    inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
-                  }}
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <Input
+                    isRequired
+                    labelPlacement="outside"
+                    type="text"
+                    label="Full Name / নাম"
+                    placeholder="e.g. Abul Kashem Mistri"
+                    variant="bordered"
+                    value={formData.fullName}
+                    onValueChange={(val) => setFormData({ ...formData, fullName: val })}
+                    classNames={{
+                      label: "text-gray-300 font-medium text-sm",
+                      input: "text-white placeholder:text-gray-500",
+                      inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                    }}
+                  />
+
+                  <Input
+                    labelPlacement="outside"
+                    type="email"
+                    label="Email Address (Optional) / ইমেইল"
+                    placeholder="e.g. mistri@example.com"
+                    variant="bordered"
+                    value={formData.email}
+                    onValueChange={(val) => setFormData({ ...formData, email: val })}
+                    classNames={{
+                      label: "text-gray-300 font-medium text-sm",
+                      input: "text-white placeholder:text-gray-500",
+                      inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                    }}
+                  />
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <Input
@@ -219,6 +268,55 @@ export default function JoinWorkerPage() {
                     ))}
                   </Select>
 
+                  <Input
+                    labelPlacement="outside"
+                    type="text"
+                    label="District (Zilla / জেলা)"
+                    placeholder="e.g. Mymensingh, Bogra, Comilla..."
+                    variant="bordered"
+                    value={formData.zilla}
+                    onValueChange={(val) => setFormData({ ...formData, zilla: val })}
+                    classNames={{
+                      label: "text-gray-300 font-medium text-sm",
+                      input: "text-white placeholder:text-gray-500",
+                      inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                    }}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <Input
+                    labelPlacement="outside"
+                    type="text"
+                    label="Upazila / Thana (উপজেলা / থানা)"
+                    placeholder="e.g. Mirpur, Sadar, Savar..."
+                    variant="bordered"
+                    value={formData.upazila}
+                    onValueChange={(val) => setFormData({ ...formData, upazila: val })}
+                    classNames={{
+                      label: "text-gray-300 font-medium text-sm",
+                      input: "text-white placeholder:text-gray-500",
+                      inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                    }}
+                  />
+
+                  <Input
+                    labelPlacement="outside"
+                    type="text"
+                    label="Village / Area (গ্রাম / ইউনিয়ন / এলাকা)"
+                    placeholder="e.g. Ward 4, Rampura, Postogola..."
+                    variant="bordered"
+                    value={formData.village}
+                    onValueChange={(val) => setFormData({ ...formData, village: val })}
+                    classNames={{
+                      label: "text-gray-300 font-medium text-sm",
+                      input: "text-white placeholder:text-gray-500",
+                      inputWrapper: "border-gray-800 hover:border-emerald-500 focus-within:!border-emerald-500 bg-gray-950/80 rounded-xl",
+                    }}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <Select
                     isRequired
                     labelPlacement="outside"
@@ -259,12 +357,19 @@ export default function JoinWorkerPage() {
                   }}
                 />
 
+                {errorMsg && (
+                  <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold">
+                    {errorMsg}
+                  </div>
+                )}
+
                 <Button
                   type="submit"
                   size="lg"
+                  isLoading={isSubmitting}
                   className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-gray-950 font-extrabold shadow-lg shadow-emerald-950/50 rounded-xl transition-all hover:scale-[1.01]"
                 >
-                  Register Free Worker Profile
+                  {isSubmitting ? "Submitting Profile..." : "Register Free Worker Profile"}
                 </Button>
               </form>
             )}
