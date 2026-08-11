@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import WorkerSearchFilter from "@/components/WorkerSearchFilter";
@@ -20,20 +21,84 @@ function formatSlug(slug: string): string {
     .join(" ");
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const upazilaName = formatSlug(params.upazila);
-  const districtName = formatSlug(params.district);
+function toSlug(name: string | null): string {
+  if (!name) return "";
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
-  const dbUpazila = await prisma.upazila.findFirst({
+async function getUpazilaAndDistrict(districtParam: string, upazilaParam: string) {
+  const decodedDistrict = decodeURIComponent(districtParam).toLowerCase().trim();
+  const decodedUpazila = decodeURIComponent(upazilaParam).toLowerCase().trim();
+
+  const formattedDistrict = formatSlug(decodedDistrict);
+  const formattedUpazila = formatSlug(decodedUpazila);
+
+  // 1. Direct query matching upazila and district
+  let dbUpazila = await prisma.upazila.findFirst({
     where: {
       OR: [
-        { title_en: { equals: upazilaName, mode: "insensitive" } },
-        { title_bn: { contains: upazilaName } },
+        { title_en: { equals: formattedUpazila, mode: "insensitive" } },
+        { title_bn: { equals: decodedUpazila } },
+        { title_bn: { contains: formattedUpazila } },
       ],
+      district: {
+        OR: [
+          { title_en: { equals: formattedDistrict, mode: "insensitive" } },
+          { title: { equals: formattedDistrict, mode: "insensitive" } },
+          { title_bn: { equals: decodedDistrict } },
+          { title_bn: { contains: formattedDistrict } },
+        ],
+      },
+    },
+    include: {
+      district: {
+        include: { division: true },
+      },
     },
   });
 
-  const bnTitle = dbUpazila?.title_bn ? ` (${dbUpazila.title_bn})` : "";
+  if (dbUpazila) return dbUpazila;
+
+  // 2. Fallback: match via toSlug
+  const allUpazilas = await prisma.upazila.findMany({
+    include: {
+      district: {
+        include: { division: true },
+      },
+    },
+  });
+
+  return (
+    allUpazilas.find((u) => {
+      const uSlugMatch =
+        toSlug(u.title_en) === decodedUpazila ||
+        toSlug(u.title_bn) === decodedUpazila;
+      const dSlugMatch =
+        toSlug(u.district?.title_en) === decodedDistrict ||
+        toSlug(u.district?.title_bn) === decodedDistrict ||
+        toSlug(u.district?.title) === decodedDistrict;
+      return uSlugMatch && dSlugMatch;
+    }) || null
+  );
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const dbUpazila = await getUpazilaAndDistrict(params.district, params.upazila);
+
+  if (!dbUpazila) {
+    return {
+      title: "Location Not Found | Sromojibi",
+      description: "The requested upazila or location could not be found.",
+    };
+  }
+
+  const upazilaName = dbUpazila.title_en || formatSlug(params.upazila);
+  const districtName = dbUpazila.district?.title_en || formatSlug(params.district);
+  const bnTitle = dbUpazila.title_bn ? ` (${dbUpazila.title_bn})` : "";
 
   return {
     title: `Local Workers in ${upazilaName}${bnTitle}, ${districtName} | Sromojibi`,
@@ -45,27 +110,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function UpazilaLocationPage({ params }: Props) {
-  const upazilaName = formatSlug(params.upazila);
-  const districtName = formatSlug(params.district);
+  const dbUpazila = await getUpazilaAndDistrict(params.district, params.upazila);
 
-  // Query database for Upazila, District, and Division Bengali titles
-  const dbUpazila = await prisma.upazila.findFirst({
-    where: {
-      OR: [
-        { title_en: { equals: upazilaName, mode: "insensitive" } },
-        { title_bn: { contains: upazilaName } },
-      ],
-    },
-    include: {
-      district: {
-        include: { division: true },
-      },
-    },
-  });
+  if (!dbUpazila) {
+    notFound();
+  }
 
-  const upazilaNameBn = dbUpazila?.title_bn || upazilaName;
-  const districtNameBn = dbUpazila?.district?.title_bn || districtName;
-  const divisionNameBn = dbUpazila?.district?.division?.title_bn || "";
+  const upazilaName = dbUpazila.title_en || formatSlug(params.upazila);
+  const districtName = dbUpazila.district?.title_en || formatSlug(params.district);
+
+  const upazilaNameBn = dbUpazila.title_bn || upazilaName;
+  const districtNameBn = dbUpazila.district?.title_bn || districtName;
+  const divisionNameBn = dbUpazila.district?.division?.title_bn || "";
 
   // Fetch active categories & locations for filter dropdowns
   const categories = await prisma.category.findMany({
@@ -89,6 +145,7 @@ export default async function UpazilaLocationPage({ params }: Props) {
     where: {
       status: "APPROVED",
       OR: [
+        { fk_upazila_id: dbUpazila.id },
         { upazila: { contains: upazilaName, mode: "insensitive" } },
         { upazila: { contains: upazilaNameBn } },
         { zilla: { contains: districtName, mode: "insensitive" } },

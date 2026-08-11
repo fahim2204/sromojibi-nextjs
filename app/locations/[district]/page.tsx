@@ -21,20 +21,71 @@ function formatSlug(slug: string): string {
     .join(" ");
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const districtName = formatSlug(params.district);
+function toSlug(name: string | null): string {
+  if (!name) return "";
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
+async function getDistrictBySlug(slugParam: string) {
+  const decoded = decodeURIComponent(slugParam).toLowerCase().trim();
+  const districtName = formatSlug(decoded);
+
+  // 1. Direct query matching title_en, title_bn, or title
   const dbDistrict = await prisma.district.findFirst({
     where: {
       OR: [
         { title_en: { equals: districtName, mode: "insensitive" } },
-        { title_bn: { contains: districtName } },
         { title: { equals: districtName, mode: "insensitive" } },
+        { title_bn: { equals: decoded } },
+        { title_bn: { contains: districtName } },
       ],
+    },
+    include: {
+      division: true,
+      upazilas: {
+        orderBy: { title_en: "asc" },
+      },
     },
   });
 
-  const bnTitle = dbDistrict?.title_bn ? ` (${dbDistrict.title_bn})` : "";
+  if (dbDistrict) return dbDistrict;
+
+  // 2. Fallback: fetch districts and match via toSlug
+  const allDistricts = await prisma.district.findMany({
+    include: {
+      division: true,
+      upazilas: {
+        orderBy: { title_en: "asc" },
+      },
+    },
+  });
+
+  return (
+    allDistricts.find(
+      (d) =>
+        toSlug(d.title_en) === decoded ||
+        toSlug(d.title_bn) === decoded ||
+        toSlug(d.title) === decoded
+    ) || null
+  );
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const dbDistrict = await getDistrictBySlug(params.district);
+
+  if (!dbDistrict) {
+    return {
+      title: "Location Not Found | Sromojibi",
+      description: "The requested location could not be found.",
+    };
+  }
+
+  const districtName = dbDistrict.title_en || formatSlug(params.district);
+  const bnTitle = dbDistrict.title_bn ? ` (${dbDistrict.title_bn})` : "";
 
   return {
     title: `Local Workers in ${districtName}${bnTitle} District | Sromojibi`,
@@ -46,27 +97,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function DistrictLocationPage({ params }: Props) {
-  const districtName = formatSlug(params.district);
+  const dbDistrict = await getDistrictBySlug(params.district);
 
-  // Fetch district info from DB
-  const dbDistrict = await prisma.district.findFirst({
-    where: {
-      OR: [
-        { title_en: { equals: districtName, mode: "insensitive" } },
-        { title_bn: { contains: districtName } },
-        { title: { equals: districtName, mode: "insensitive" } },
-      ],
-    },
-    include: {
-      division: true,
-      upazilas: {
-        orderBy: { title_en: "asc" },
-      },
-    },
-  });
+  if (!dbDistrict) {
+    notFound();
+  }
 
-  const districtNameBn = dbDistrict?.title_bn || districtName;
-  const divisionNameBn = dbDistrict?.division?.title_bn || "";
+  const districtName = dbDistrict.title_en || formatSlug(params.district);
+  const districtNameBn = dbDistrict.title_bn || districtName;
+  const divisionNameBn = dbDistrict.division?.title_bn || "";
 
   // Fetch active categories & locations for filter dropdowns
   const categories = await prisma.category.findMany({
@@ -90,6 +129,7 @@ export default async function DistrictLocationPage({ params }: Props) {
     where: {
       status: "APPROVED",
       OR: [
+        { fk_district_id: dbDistrict.id },
         { zilla: { contains: districtName, mode: "insensitive" } },
         { zilla: { contains: districtNameBn } },
         { city: { contains: districtName, mode: "insensitive" } },
