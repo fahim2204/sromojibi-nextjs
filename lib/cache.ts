@@ -17,6 +17,7 @@ export const CACHE_TTL = {
 export const CACHE_KEYS = {
   categories: () => "categories:all",
   locations: () => "locations:all",
+  addressHierarchy: (divId?: string, distId?: string) => `locations:hierarchy:${divId || "all"}:${distId || "all"}`,
   workersList: (category?: string, city?: string, status?: string) =>
     `workers:cat:${category ?? "all"}:city:${city ?? "all"}:status:${status ?? "all"}`,
   workerBySlug: (slug: string) => `worker:slug:${slug}`,

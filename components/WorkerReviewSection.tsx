@@ -6,7 +6,7 @@ import { APP_API } from "@/constants/api";
 
 type ReviewItem = {
   id: number;
-  reviewer_name: string;
+  reviewer_name?: string | null;
   rating: number;
   comment?: string | null;
   created_at: string | Date;

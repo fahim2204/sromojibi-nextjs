@@ -58,65 +58,50 @@ model User {
 
   // Account Status
   status         UserStatus @default(ACTIVE)
-  email_verified Boolean    @default(false)
-  phone_verified Boolean    @default(false)
 
+  // System Fields
+  is_deleted     Boolean   @default(false)
   created_at     DateTime  @default(now())
-  modified_at    DateTime  @updatedAt
+  updated_at     DateTime  @updatedAt
 
   // Relations
-  sessions       UserSession[]
   oauth_accounts UserOAuthAccount[]
-  email_otps     EmailVerificationOtp[]
-  activities     ActivityLog[]
+  sessions       UserSession[]
+  activity_logs  ActivityLog[]
   worker_profile WorkerProfile?
+  otps           EmailVerificationOtp[]
   reviews        WorkerReview[]
 
-  @@index([status])
   @@map("user")
 }
 
 model UserSession {
-  id                 Int       @id @default(autoincrement())
-  fk_user_id         Int?
-  session_id         String?   @unique
-  refresh_token_hash String?
-  user_agent         String
-  device_fingerprint String?
-  ip                 String?
-  device_type        String?
-  os                 String?
-  browser            String?
-  login_method       String
-  latitude           Decimal?
-  longitude          Decimal?
-  login_success      Boolean   @default(true)
-  error_reason       String?
-  created_at         DateTime  @default(now())
-  last_seen_at       DateTime?
-  revoked_at         DateTime?
+  id            Int       @id @default(autoincrement())
+  fk_user_id    Int
+  session_token String    @unique
+  ip_address    String?
+  user_agent    String?
+  expires_at    DateTime
+  created_at    DateTime  @default(now())
 
-  user       User?         @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
-  activities ActivityLog[]
+  user          User          @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
+  activity_logs ActivityLog[]
 
   @@index([fk_user_id])
-  @@index([session_id])
-  @@index([created_at])
-  @@index([last_seen_at])
+  @@index([expires_at])
   @@map("user_session")
 }
 
 model UserOAuthAccount {
-  id               Int           @id @default(autoincrement())
-  fk_user_id       Int
-  provider         OAuthProvider
-  provider_user_id String
-  email            String?
-  email_verified   Boolean       @default(false)
-  avatar_url       String?
-  raw_profile      Json?
-  created_at       DateTime      @default(now())
-  modified_at      DateTime      @updatedAt
+  id                 Int           @id @default(autoincrement())
+  fk_user_id         Int
+  provider           OAuthProvider
+  provider_user_id   String
+  email              String?
+  access_token       String?       @db.Text
+  refresh_token      String?       @db.Text
+  expires_at         DateTime?
+  created_at         DateTime      @default(now())
 
   user User @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
 
@@ -203,11 +188,18 @@ model WorkerProfile {
   slug           String         @unique
   service_type   String
   fk_category_id Int?
+  fk_location_id Int?
+
   city           String
   zilla          String?
   upazila        String?
   village        String?
-  fk_location_id Int?
+
+  fk_division_id String?
+  fk_district_id String?
+  fk_upazila_id  String?
+  fk_union_id    String?
+
   experience     String
   details        String?        @db.Text
   status         WorkerStatus   @default(PENDING)
@@ -218,14 +210,22 @@ model WorkerProfile {
   created_at     DateTime       @default(now())
   updated_at     DateTime       @updatedAt
 
-  user     User?         @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
-  category Category?     @relation(fields: [fk_category_id], references: [id], onDelete: SetNull)
-  location Location?     @relation(fields: [fk_location_id], references: [id], onDelete: SetNull)
-  reviews  WorkerReview[]
+  user         User?         @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
+  category     Category?     @relation(fields: [fk_category_id], references: [id], onDelete: SetNull)
+  location     Location?     @relation(fields: [fk_location_id], references: [id], onDelete: SetNull)
+  divisionRef  Division?     @relation(fields: [fk_division_id], references: [id], onDelete: SetNull)
+  districtRef  District?     @relation(fields: [fk_district_id], references: [id], onDelete: SetNull)
+  upazilaRef   Upazila?      @relation(fields: [fk_upazila_id], references: [id], onDelete: SetNull)
+  unionRef     Union?        @relation(fields: [fk_union_id], references: [id], onDelete: SetNull)
+  reviews      WorkerReview[]
 
   @@index([fk_user_id])
   @@index([fk_category_id])
   @@index([fk_location_id])
+  @@index([fk_division_id])
+  @@index([fk_district_id])
+  @@index([fk_upazila_id])
+  @@index([fk_union_id])
   @@index([status])
   @@index([city])
   @@index([zilla])
@@ -238,16 +238,82 @@ model WorkerReview {
   id             Int           @id @default(autoincrement())
   fk_worker_id   Int
   fk_user_id     Int?
-  reviewer_name  String
+  reviewer_name  String?
   reviewer_phone String?
   rating         Int
   comment        String?       @db.Text
   created_at     DateTime      @default(now())
 
-  worker WorkerProfile @relation(fields: [fk_worker_id], references: [id], onDelete: Cascade)
-  user   User?         @relation(fields: [fk_user_id], references: [id], onDelete: SetNull)
+  worker         WorkerProfile @relation(fields: [fk_worker_id], references: [id], onDelete: Cascade)
+  user           User?         @relation(fields: [fk_user_id], references: [id], onDelete: SetNull)
 
   @@index([fk_worker_id])
   @@index([fk_user_id])
   @@map("worker_review")
+}
+
+model Division {
+  id         String          @id
+  bbs_code   Int?
+  title      String
+  title_bn   String?
+  title_en   String?
+  row_status Int             @default(1)
+  districts  District[]
+  workers    WorkerProfile[]
+
+  @@map("division")
+}
+
+model District {
+  id              String          @id
+  bbs_code        Int?
+  loc_division_id String
+  title           String
+  title_bn        String?
+  title_en        String?
+  url             String?
+  row_status      Int             @default(1)
+  division        Division        @relation(fields: [loc_division_id], references: [id], onDelete: Cascade)
+  upazilas        Upazila[]
+  workers         WorkerProfile[]
+
+  @@index([loc_division_id])
+  @@map("district")
+}
+
+model Upazila {
+  id              String          @id
+  bbs_code        String?
+  loc_district_id String
+  loc_division_id String
+  title_bn        String?
+  title_en        String?
+  url             String?
+  row_status      Int             @default(1)
+  district        District        @relation(fields: [loc_district_id], references: [id], onDelete: Cascade)
+  unions          Union[]
+  workers         WorkerProfile[]
+
+  @@index([loc_district_id])
+  @@index([loc_division_id])
+  @@map("upazila")
+}
+
+model Union {
+  id              String          @id
+  bbs_code        String?
+  loc_district_id String
+  loc_division_id String
+  loc_upazila_id  String
+  title_bn        String?
+  title_en        String?
+  row_status      Int             @default(1)
+  upazila         Upazila         @relation(fields: [loc_upazila_id], references: [id], onDelete: Cascade)
+  workers         WorkerProfile[]
+
+  @@index([loc_upazila_id])
+  @@index([loc_district_id])
+  @@index([loc_division_id])
+  @@map("union")
 }

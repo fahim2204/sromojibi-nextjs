@@ -14,6 +14,10 @@ const createWorkerSchema = z.object({
   zilla: z.string().optional().or(z.literal("")),
   upazila: z.string().optional().or(z.literal("")),
   village: z.string().optional().or(z.literal("")),
+  divisionId: z.string().optional().or(z.literal("")),
+  districtId: z.string().optional().or(z.literal("")),
+  upazilaId: z.string().optional().or(z.literal("")),
+  unionId: z.string().optional().or(z.literal("")),
   experience: z.string().min(1, "Please select your experience level"),
   details: z.string().optional(),
 });
@@ -62,6 +66,10 @@ export async function GET(request: Request) {
           location: {
             select: { name: true, name_bn: true, slug: true },
           },
+          divisionRef: { select: { id: true, title_bn: true, title_en: true } },
+          districtRef: { select: { id: true, title_bn: true, title_en: true } },
+          upazilaRef: { select: { id: true, title_bn: true, title_en: true } },
+          unionRef: { select: { id: true, title_bn: true, title_en: true } },
         },
       });
     });
@@ -92,7 +100,6 @@ export async function POST(request: Request) {
       attempts++;
     }
 
-    // Try linking existing Category and Location if matching slug exists
     const categorySlug = payload.serviceType.toLowerCase().replace(/\s+/g, "-");
     const locationSlug = payload.city.toLowerCase().replace(/\s+/g, "-");
 
@@ -103,6 +110,20 @@ export async function POST(request: Request) {
     const locationRecord = await prisma.location.findUnique({
       where: { slug: locationSlug },
     });
+
+    // Verify location FKs before assigning to avoid FK violation crash
+    const validDivision = payload.divisionId
+      ? await prisma.division.findUnique({ where: { id: payload.divisionId }, select: { id: true } })
+      : null;
+    const validDistrict = payload.districtId
+      ? await prisma.district.findUnique({ where: { id: payload.districtId }, select: { id: true } })
+      : null;
+    const validUpazila = payload.upazilaId
+      ? await prisma.upazila.findUnique({ where: { id: payload.upazilaId }, select: { id: true } })
+      : null;
+    const validUnion = payload.unionId
+      ? await prisma.union.findUnique({ where: { id: payload.unionId }, select: { id: true } })
+      : null;
 
     const worker = await prisma.workerProfile.create({
       data: {
@@ -115,11 +136,21 @@ export async function POST(request: Request) {
         zilla: payload.zilla || null,
         upazila: payload.upazila || null,
         village: payload.village || null,
+        fk_division_id: validDivision?.id ?? null,
+        fk_district_id: validDistrict?.id ?? null,
+        fk_upazila_id: validUpazila?.id ?? null,
+        fk_union_id: validUnion?.id ?? null,
         experience: payload.experience,
         details: payload.details ?? null,
         status: "PENDING",
         fk_category_id: categoryRecord?.id ?? null,
         fk_location_id: locationRecord?.id ?? null,
+      },
+      include: {
+        divisionRef: true,
+        districtRef: true,
+        upazilaRef: true,
+        unionRef: true,
       },
     });
 
@@ -141,12 +172,9 @@ export async function POST(request: Request) {
       );
     }
 
-    if (error instanceof SyntaxError) {
-      return apiError("INVALID_INPUT", "Invalid JSON request body", { status: 400 });
-    }
-
     console.error("POST /api/v1/workers error:", error);
-    return apiError("INTERNAL_SERVER_ERROR", "Failed to register worker profile", {
+    const detailMsg = error instanceof Error ? error.message : "Failed to create worker profile";
+    return apiError("INTERNAL_SERVER_ERROR", detailMsg, {
       status: 500,
     });
   }
