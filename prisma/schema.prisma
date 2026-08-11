@@ -317,3 +317,15 @@ model Union {
   @@index([loc_division_id])
   @@map("union")
 }
+
+model NewsletterSubscriber {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  source     String   @default("homepage")
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@map("newsletter_subscriber")
+}
+

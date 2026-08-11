@@ -182,7 +182,7 @@ export default async function CategoriesPage() {
 
               <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                 <Link
-                  href={`/workers/${cat.slug}`}
+                  href={`/categories/${cat.slug}`}
                   className="inline-flex items-center gap-1.5 text-xs font-extrabold text-emerald-600 hover:text-emerald-700 transition-colors group-hover:translate-x-0.5 transition-transform"
                 >
                   <span>ওয়ার্কার তালিকা দেখুন ({cat.name})</span>

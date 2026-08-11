@@ -34,13 +34,13 @@ export default function Footer() {
           <h3 className="text-gray-900 font-semibold mb-3 text-sm">Popular Categories</h3>
           <ul className="space-y-2 text-xs">
             <li>
-              <Link href="/workers/electrician" className="hover:text-emerald-600 transition-colors">⚡ Electrician</Link>
+              <Link href="/categories/electrician" className="hover:text-emerald-600 transition-colors">⚡ Electrician</Link>
             </li>
             <li>
-              <Link href="/workers/plumber" className="hover:text-emerald-600 transition-colors">🚰 Plumber</Link>
+              <Link href="/categories/plumber" className="hover:text-emerald-600 transition-colors">🚰 Plumber</Link>
             </li>
             <li>
-              <Link href="/workers/tiles-worker" className="hover:text-emerald-600 transition-colors">🧱 Tiles Worker</Link>
+              <Link href="/categories/tiles-worker" className="hover:text-emerald-600 transition-colors">🧱 Tiles Worker</Link>
             </li>
             <li>
               <Link href="/categories" className="hover:text-emerald-600 transition-colors text-emerald-600 hover:underline">View All Categories →</Link>
@@ -52,10 +52,10 @@ export default function Footer() {
           <h3 className="text-gray-900 font-semibold mb-3 text-sm">Launch Areas</h3>
           <ul className="space-y-2 text-xs">
             <li>
-              <Link href="/workers/division/dhaka" className="hover:text-emerald-600 transition-colors">Dhaka Division</Link>
+              <Link href="/locations/dhaka" className="hover:text-emerald-600 transition-colors">Dhaka Division</Link>
             </li>
             <li>
-              <Link href="/workers/division/mymensingh" className="hover:text-emerald-600 transition-colors">Mymensingh Division</Link>
+              <Link href="/locations/mymensingh" className="hover:text-emerald-600 transition-colors">Mymensingh Division</Link>
             </li>
             <li>
               <Link href="/locations" className="hover:text-emerald-600 transition-colors text-emerald-600 hover:underline">View All Cities →</Link>

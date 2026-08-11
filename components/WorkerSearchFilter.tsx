@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Link from "next/link";
 import { Input, Select, SelectItem, Button } from "@nextui-org/react";
 
 type WorkerItem = {
@@ -206,14 +207,16 @@ export default function WorkerSearchFilter({
                 <div className="space-y-3">
                   <div className="flex items-start justify-between">
                     <div>
-                      <div className="flex items-center gap-1.5">
-                        <h4 className="font-bold text-gray-900 text-lg">{worker.full_name}</h4>
+                      <Link href={`/workers/${worker.slug}`} className="group flex items-center gap-1.5">
+                        <h4 className="font-bold text-gray-900 text-lg group-hover:text-emerald-600 transition-colors">
+                          {worker.full_name}
+                        </h4>
                         {worker.is_verified && (
-                          <span className="text-emerald-600 text-xs" title="Verified Worker">
+                          <span className="text-emerald-600 text-xs font-bold" title="Verified Worker">
                             ✓
                           </span>
                         )}
-                      </div>
+                      </Link>
                       <p className="text-xs text-emerald-700 font-medium">
                         {worker.category?.icon ?? "🛠️"} {worker.service_type} • {worker.city}
                       </p>
@@ -230,13 +233,16 @@ export default function WorkerSearchFilter({
                   )}
                 </div>
 
-                <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
-                  <span className="text-xs text-amber-600 font-bold">
-                    ★ {Number(worker.rating ?? 5.0).toFixed(1)} ({worker.review_count} reviews)
-                  </span>
+                <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+                  <Link
+                    href={`/workers/${worker.slug}`}
+                    className="text-xs text-emerald-600 hover:underline font-bold"
+                  >
+                    প্রোফাইল দেখুন →
+                  </Link>
                   <a
                     href={`tel:${worker.phone}`}
-                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs transition-all shadow-sm"
+                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs transition-all shadow-sm shrink-0"
                   >
                     📞 Call Mistri
                   </a>

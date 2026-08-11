@@ -477,7 +477,7 @@ export default function AddressHierarchyExplorer() {
                               </div>
                               <Button
                                 as={Link}
-                                href={`/workers/${toSlug(dist.title_en || dist.title_bn)}`}
+                                href={`/locations/${toSlug(dist.title_en || dist.title_bn)}`}
                                 size="sm"
                                 variant="flat"
                                 color="success"
@@ -518,7 +518,7 @@ export default function AddressHierarchyExplorer() {
                               </div>
                               <Button
                                 as={Link}
-                                href={`/workers/${toSlug(upz.distNameEn)}/${toSlug(upz.title_en || upz.title_bn)}`}
+                                href={`/locations/${toSlug(upz.distNameEn)}/${toSlug(upz.title_en || upz.title_bn)}`}
                                 size="sm"
                                 variant="flat"
                                 color="primary"
@@ -680,14 +680,14 @@ export default function AddressHierarchyExplorer() {
 
                   <Button
                     as={Link}
-                    href={`/workers/${toSlug(
+                    href={`/locations/${toSlug(
                       activeDistrictSummary.title_en || activeDistrictSummary.title_bn
                     )}`}
                     color="primary"
                     size="sm"
                     radius="full"
                     className="bg-slate-900 text-white font-bold text-xs"
-                    endContent={<Sparkles className="w-3.5 h-3.5 text-emerald-400" />}
+                    endContent={<Sparkles className="w-3 h-3 text-emerald-400" />}
                   >
                     View Workers in {activeDistrictSummary.title_bn}
                   </Button>
@@ -734,7 +734,7 @@ export default function AddressHierarchyExplorer() {
 
                           <Button
                             as={Link}
-                            href={`/workers/${toSlug(
+                            href={`/locations/${toSlug(
                               activeDistrictSummary.title_en || activeDistrictSummary.title_bn
                             )}/${toSlug(upazila.title_en || upazila.title_bn)}`}
                             size="sm"

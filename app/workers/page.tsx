@@ -75,7 +75,7 @@ export default async function WorkersDirectoryPage() {
             {categories.map((cat) => (
               <Link
                 key={cat.slug}
-                href={`/workers/${cat.slug}`}
+                href={`/categories/${cat.slug}`}
                 className="p-5 rounded-2xl bg-white border border-gray-200 hover:border-emerald-500/50 hover:shadow-md transition-all flex items-center gap-4 group shadow-sm"
               >
                 <div className="text-3xl shrink-0 group-hover:scale-110 transition-transform">
@@ -109,7 +109,7 @@ export default async function WorkersDirectoryPage() {
             {locations.map((loc) => (
               <Link
                 key={loc.slug}
-                href={`/workers/${loc.slug}`}
+                href={`/locations/${loc.slug}`}
                 className="p-6 rounded-2xl bg-white border border-gray-200 hover:border-emerald-500/50 hover:shadow-md transition-all space-y-2 group shadow-sm"
               >
                 <div className="text-2xl">🏙️</div>

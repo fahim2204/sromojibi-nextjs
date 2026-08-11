@@ -59,20 +59,35 @@ export async function GET(
     );
 
     try {
-      const divisions = await prisma.division.findMany({
-        select: { title_en: true, title_bn: true },
+      const categories = await prisma.category.findMany({
+        where: { is_active: true },
+        select: { slug: true },
       });
 
       entries.push(
-        ...divisions.map((div) => ({
-          url: `${baseUrl}/workers/division/${toSlug(div.title_en || div.title_bn)}`,
+        ...categories.map((cat) => ({
+          url: `${baseUrl}/categories/${cat.slug}`,
           lastmod: LAST_MODIFIED,
           changefreq: "weekly",
           priority: "0.8",
         }))
       );
+
+      const approvedWorkers = await prisma.workerProfile.findMany({
+        where: { status: "APPROVED" },
+        select: { slug: true, updated_at: true },
+      });
+
+      entries.push(
+        ...approvedWorkers.map((w) => ({
+          url: `${baseUrl}/workers/${w.slug}`,
+          lastmod: new Date(w.updated_at).toISOString(),
+          changefreq: "weekly",
+          priority: "0.9",
+        }))
+      );
     } catch (err) {
-      console.error("Error fetching divisions for main sitemap:", err);
+      console.error("Error fetching categories and workers for main sitemap:", err);
     }
   } else {
     // Extract district slug (e.g. "barguna-10" -> "barguna", "coxs-bazar-23" -> "coxs-bazar")
@@ -92,18 +107,18 @@ export async function GET(
       if (matchingDistrict) {
         const distSlug = toSlug(matchingDistrict.title_en || matchingDistrict.title_bn);
 
-        // District URL: /workers/[district]
+        // District URL: /locations/[district]
         entries.push({
-          url: `${baseUrl}/workers/${distSlug}`,
+          url: `${baseUrl}/locations/${distSlug}`,
           lastmod: LAST_MODIFIED,
           changefreq: "weekly",
           priority: "0.8",
         });
 
-        // Upazila URLs: /workers/[district]/[upazila]
+        // Upazila URLs: /locations/[district]/[upazila]
         entries.push(
           ...matchingDistrict.upazilas.map((upz) => ({
-            url: `${baseUrl}/workers/${distSlug}/${toSlug(upz.title_en || upz.title_bn)}`,
+            url: `${baseUrl}/locations/${distSlug}/${toSlug(upz.title_en || upz.title_bn)}`,
             lastmod: LAST_MODIFIED,
             changefreq: "weekly",
             priority: "0.7",
