@@ -52,10 +52,10 @@ export default function Footer() {
           <h3 className="text-gray-900 font-semibold mb-3 text-sm">Launch Areas</h3>
           <ul className="space-y-2 text-xs">
             <li>
-              <Link href="/workers/dhaka" className="hover:text-emerald-600 transition-colors">Dhaka Division</Link>
+              <Link href="/workers/division/dhaka" className="hover:text-emerald-600 transition-colors">Dhaka Division</Link>
             </li>
             <li>
-              <Link href="/workers/mymensingh" className="hover:text-emerald-600 transition-colors">Mymensingh Division</Link>
+              <Link href="/workers/division/mymensingh" className="hover:text-emerald-600 transition-colors">Mymensingh Division</Link>
             </li>
             <li>
               <Link href="/locations" className="hover:text-emerald-600 transition-colors text-emerald-600 hover:underline">View All Cities →</Link>
@@ -70,7 +70,7 @@ export default function Footer() {
               <Link href="/about" className="hover:text-emerald-600 transition-colors">About Us</Link>
             </li>
             <li>
-              <Link href="/blogs" className="hover:text-emerald-600 transition-colors">Worker Guides & Blog</Link>
+              <Link href="/guides" className="hover:text-emerald-600 transition-colors">Worker Guides</Link>
             </li>
             <li>
               <Link href="/join-worker" className="hover:text-emerald-600 transition-colors">Register as Worker</Link>

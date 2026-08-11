@@ -29,7 +29,7 @@ export default function Navbar() {
     { name: "Find Workers", href: "/workers" },
     { name: "Categories", href: "/categories" },
     { name: "Locations", href: "/locations" },
-    { name: "Guides", href: "/blogs" },
+    { name: "Guides", href: "/guides" },
     { name: "About Us", href: "/about" },
     { name: "Contact", href: "/contact" },
     { name: "Join as Worker", href: "/join-worker" },
@@ -87,7 +87,7 @@ export default function Navbar() {
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link href="/blogs" className="px-3 py-1.5 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 text-sm font-medium">
+          <Link href="/guides" className="px-3 py-1.5 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 text-sm font-medium">
             Guides
           </Link>
         </NavbarItem>

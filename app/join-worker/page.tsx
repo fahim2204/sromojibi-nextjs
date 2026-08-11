@@ -52,6 +52,8 @@ export default function JoinWorkerPage() {
   const [unionsList, setUnionsList] = useState<LocationItem[]>([]);
   const [loadingUnions, setLoadingUnions] = useState(false);
 
+  const [selectedTrades, setSelectedTrades] = useState<string[]>(["Electrician"]);
+
   // Form Data State
   const [formData, setFormData] = useState({
     fullName: "",
@@ -266,7 +268,7 @@ export default function JoinWorkerPage() {
             আপনি কি দক্ষ মিস্ত্রি বা কারিগর?
           </h1>
           <p className="text-slate-600 text-xs sm:text-base leading-relaxed">
-            শ্রশ্রমজীবী প্ল্যাটফর্মে ফ্রি প্রোফাইল তৈরি করুন। আপনার বিভাগ, জেলা, উপজেলা ও ইউনিয়ন সিলেক্ট করে কাস্টমারদের কাছ থেকে সরাসরি ফোন কলের সুবিধা নিন।
+            শ্রমজীবী প্ল্যাটফর্মে ফ্রি প্রোফাইল তৈরি করুন। আপনার বিভাগ, জেলা, উপজেলা ও ইউনিয়ন সিলেক্ট করে কাস্টমারদের কাছ থেকে সরাসরি ফোন কলের সুবিধা নিন।
           </p>
         </div>
 
@@ -346,12 +348,13 @@ export default function JoinWorkerPage() {
 
                 <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Button
-                    onClick={() => {
+                    onPress={() => {
                       setSubmitted(false);
                       setSelectedDivisionId("");
                       setSelectedDistrictId("");
                       setSelectedUpazilaId("");
                       setSelectedUnionId("");
+                      setSelectedTrades(["Electrician"]);
                       setFormData({
                         fullName: "",
                         email: "",
@@ -389,13 +392,13 @@ export default function JoinWorkerPage() {
                 </div>
 
                 {/* Step 1: Personal & Contact Details */}
-                <div className="space-y-4">
-                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <div className="space-y-7 sm:space-y-8">
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 pb-1">
                     <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px]">1</span>
                     <span>ব্যক্তিগত তথ্য (Personal Info)</span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <Input
                       isRequired
                       labelPlacement="outside"
@@ -406,9 +409,9 @@ export default function JoinWorkerPage() {
                       value={formData.fullName}
                       onValueChange={(val) => setFormData({ ...formData, fullName: val })}
                       classNames={{
-                        label: "text-slate-700 font-semibold text-xs",
+                        label: "text-slate-700 font-semibold text-xs mb-1.5",
                         input: "text-slate-900 text-sm placeholder:text-slate-400",
-                        inputWrapper: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs",
+                        inputWrapper: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs h-11",
                       }}
                     />
 
@@ -422,77 +425,97 @@ export default function JoinWorkerPage() {
                       value={formData.phone}
                       onValueChange={(val) => setFormData({ ...formData, phone: val })}
                       classNames={{
-                        label: "text-slate-700 font-semibold text-xs",
+                        label: "text-slate-700 font-semibold text-xs mb-1.5",
                         input: "text-slate-900 text-sm placeholder:text-slate-400",
-                        inputWrapper: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs",
+                        inputWrapper: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs h-11",
                       }}
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Select
-                      isRequired
-                      aria-label="Service Category / কাজের ধরন"
-                      labelPlacement="outside"
-                      label="Service Trade / কাজের ধরন"
-                      variant="bordered"
-                      selectedKeys={new Set([formData.serviceType])}
-                      disallowEmptySelection
-                      onSelectionChange={(keys) => {
-                        const selected = Array.from(keys)[0] as string;
-                        if (selected) setFormData((prev) => ({ ...prev, serviceType: selected }));
-                      }}
-                      classNames={{
-                        label: "text-slate-700 font-semibold text-xs",
-                        value: "text-slate-900 text-sm",
-                        trigger: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs cursor-pointer",
-                        popoverContent: "bg-white border border-slate-200 text-slate-900 shadow-xl z-50",
-                      }}
-                    >
-                      {serviceCategories.map((cat) => (
-                        <SelectItem key={cat.key} textValue={cat.label} className="text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 cursor-pointer text-xs">
-                          {cat.label}
-                        </SelectItem>
-                      ))}
-                    </Select>
+                  {/* Full-width Service Trade Multi-Select */}
+                  <Select
+                    isRequired
+                    selectionMode="multiple"
+                    aria-label="Service Category / কাজের ধরন"
+                    labelPlacement="outside"
+                    label={`Service Trade / কাজের ধরন (Up to 3 Trades / সর্বোচ্চ ৩ টি - Selected: ${selectedTrades.length}/3)`}
+                    placeholder="Select up to 3 trades"
+                    variant="bordered"
+                    selectedKeys={new Set(selectedTrades)}
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys) as string[];
+                      if (selected.length > 0 && selected.length <= 3) {
+                        setSelectedTrades(selected);
+                        setFormData((prev) => ({
+                          ...prev,
+                          serviceType: selected.join(", "),
+                        }));
+                      }
+                    }}
+                    classNames={{
+                      label: "text-slate-700 font-semibold text-xs mb-1.5",
+                      value: "text-slate-900 text-sm",
+                      trigger: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs cursor-pointer min-h-11 py-1 w-full",
+                      popoverContent: "bg-white border border-slate-200 text-slate-900 shadow-xl z-50",
+                    }}
+                    renderValue={(items) => (
+                      <div className="flex flex-wrap gap-1.5 py-0.5">
+                        {items.map((item) => (
+                          <Chip key={item.key} size="sm" variant="flat" color="success" className="text-[10px] font-bold">
+                            {item.textValue || item.key}
+                          </Chip>
+                        ))}
+                      </div>
+                    )}
+                  >
+                    {serviceCategories.map((cat) => (
+                      <SelectItem
+                        key={cat.key}
+                        textValue={cat.label}
+                        isDisabled={selectedTrades.length >= 3 && !selectedTrades.includes(cat.key)}
+                        className="text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 cursor-pointer text-xs"
+                      >
+                        {cat.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
 
-                    <Select
-                      isRequired
-                      aria-label="Experience Level"
-                      labelPlacement="outside"
-                      label="Experience / কাজের অভিজ্ঞতা"
-                      variant="bordered"
-                      selectedKeys={new Set([formData.experience])}
-                      disallowEmptySelection
-                      onSelectionChange={(keys) => {
-                        const selected = Array.from(keys)[0] as string;
-                        if (selected) setFormData((prev) => ({ ...prev, experience: selected }));
-                      }}
-                      classNames={{
-                        label: "text-slate-700 font-semibold text-xs",
-                        value: "text-slate-900 text-sm",
-                        trigger: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs cursor-pointer",
-                        popoverContent: "bg-white border border-slate-200 text-slate-900 shadow-xl z-50",
-                      }}
-                    >
-                      {experienceLevels.map((exp) => (
-                        <SelectItem key={exp.key} textValue={exp.label} className="text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 cursor-pointer text-xs">
-                          {exp.label}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                  </div>
+                  <Select
+                    isRequired
+                    aria-label="Experience Level"
+                    labelPlacement="outside"
+                    label="Experience / কাজের অভিজ্ঞতা"
+                    variant="bordered"
+                    selectedKeys={new Set([formData.experience])}
+                    disallowEmptySelection
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0] as string;
+                      if (selected) setFormData((prev) => ({ ...prev, experience: selected }));
+                    }}
+                    classNames={{
+                      label: "text-slate-700 font-semibold text-xs mb-1.5",
+                      value: "text-slate-900 text-sm",
+                      trigger: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs cursor-pointer h-11",
+                      popoverContent: "bg-white border border-slate-200 text-slate-900 shadow-xl z-50",
+                    }}
+                  >
+                    {experienceLevels.map((exp) => (
+                      <SelectItem key={exp.key} textValue={exp.label} className="text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 cursor-pointer text-xs">
+                        {exp.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
                 </div>
 
                 {/* Step 2: Cascading Address Hierarchy up to Union */}
-                <div className="space-y-4 pt-2">
+                <div className="space-y-7 sm:space-y-8 pt-6">
                   <div className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                     <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px]">2</span>
                     <span>ঠিকানা নির্বাচন করুন (Cascading Address up to Union)</span>
                   </div>
 
                   {/* Division & District Select */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <Select
                       isRequired
                       aria-label="Division / বিভাগ"
@@ -507,9 +530,9 @@ export default function JoinWorkerPage() {
                       }}
                       isLoading={loadingDivisions}
                       classNames={{
-                        label: "text-slate-700 font-semibold text-xs",
+                        label: "text-slate-700 font-semibold text-xs mb-1.5",
                         value: "text-slate-900 text-sm",
-                        trigger: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs cursor-pointer",
+                        trigger: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs cursor-pointer h-11",
                         popoverContent: "bg-white border border-slate-200 text-slate-900 shadow-xl z-50 max-h-60",
                       }}
                     >
@@ -534,9 +557,9 @@ export default function JoinWorkerPage() {
                         if (selected) handleDistrictChange(selected);
                       }}
                       classNames={{
-                        label: "text-slate-700 font-semibold text-xs",
+                        label: "text-slate-700 font-semibold text-xs mb-1.5",
                         value: "text-slate-900 text-sm",
-                        trigger: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs cursor-pointer",
+                        trigger: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs cursor-pointer h-11",
                         popoverContent: "bg-white border border-slate-200 text-slate-900 shadow-xl z-50 max-h-60",
                       }}
                     >
@@ -549,7 +572,7 @@ export default function JoinWorkerPage() {
                   </div>
 
                   {/* Upazila & Union Select */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <Select
                       isRequired
                       isDisabled={!selectedDistrictId || loadingUpazilas}
@@ -571,9 +594,9 @@ export default function JoinWorkerPage() {
                       }}
                       isLoading={loadingUpazilas}
                       classNames={{
-                        label: "text-slate-700 font-semibold text-xs",
+                        label: "text-slate-700 font-semibold text-xs mb-1.5",
                         value: "text-slate-900 text-sm",
-                        trigger: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs cursor-pointer",
+                        trigger: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs cursor-pointer h-11",
                         popoverContent: "bg-white border border-slate-200 text-slate-900 shadow-xl z-50 max-h-60",
                       }}
                     >
@@ -606,9 +629,9 @@ export default function JoinWorkerPage() {
                       }}
                       isLoading={loadingUnions}
                       classNames={{
-                        label: "text-slate-700 font-semibold text-xs",
+                        label: "text-slate-700 font-semibold text-xs mb-1.5",
                         value: "text-slate-900 text-sm",
-                        trigger: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs cursor-pointer",
+                        trigger: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs cursor-pointer h-11",
                         popoverContent: "bg-white border border-slate-200 text-slate-900 shadow-xl z-50 max-h-60",
                       }}
                     >

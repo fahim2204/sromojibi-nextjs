@@ -28,7 +28,7 @@ export function generateMetadata({ params }: BlogPageProps): Metadata {
     };
   }
 
-  const url = `${siteUrl}/blogs/${post.slug}`;
+  const url = `${siteUrl}/guides/${post.slug}`;
 
   return {
     title: post.title,
@@ -61,7 +61,7 @@ export default function BlogPostPage({ params }: BlogPageProps) {
     notFound();
   }
 
-  const url = `${siteUrl}/blogs/${post.slug}`;
+  const url = `${siteUrl}/guides/${post.slug}`;
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -135,7 +135,7 @@ export default function BlogPostPage({ params }: BlogPageProps) {
       <article className="max-w-4xl mx-auto space-y-10">
         <header className="border-b border-gray-200 pb-8 space-y-4">
           <Link
-            href="/blogs"
+            href="/guides"
             className="inline-block text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
           >
             ← Back to Worker Guides

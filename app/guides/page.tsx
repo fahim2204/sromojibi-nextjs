@@ -11,30 +11,30 @@ export const metadata: Metadata = {
   description:
     "Helpful guides on hiring electricians, plumbers, rajmistris, tiles workers, and trade specialists in Bangladesh.",
   alternates: {
-    canonical: `${siteUrl}/blogs`,
+    canonical: `${siteUrl}/guides`,
   },
   openGraph: {
     title: "Worker Guides & Home Maintenance Articles | Sromojibi",
     description:
       "Helpful guides on hiring electricians, plumbers, rajmistris, tiles workers, and trade specialists in Bangladesh.",
-    url: `${siteUrl}/blogs`,
+    url: `${siteUrl}/guides`,
     siteName: "Sromojibi",
     type: "website",
   },
 };
 
-export default function BlogsPage() {
+export default function GuidesPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "Sromojibi Worker & Trade Guides",
     description: metadata.description,
-    url: `${siteUrl}/blogs`,
+    url: `${siteUrl}/guides`,
     mainEntity: blogPosts.map((post) => ({
       "@type": "BlogPosting",
       headline: post.title,
       description: post.description,
-      url: `${siteUrl}/blogs/${post.slug}`,
+      url: `${siteUrl}/guides/${post.slug}`,
       datePublished: post.publishedAt,
       dateModified: post.updatedAt,
       author: {
@@ -74,23 +74,23 @@ export default function BlogsPage() {
                 <span>{post.readingTime}</span>
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-3 hover:text-emerald-600 transition-colors">
-                <Link href={`/blogs/${post.slug}`}>{post.title}</Link>
+                <Link href={`/guides/${post.slug}`}>{post.title}</Link>
               </h2>
               <p className="text-sm text-gray-600 leading-relaxed mb-6">{post.description}</p>
             </div>
 
             <div className="flex items-center justify-between border-t border-gray-100 pt-4 text-xs font-semibold">
               <Link
-                href={`/blogs/${post.slug}`}
+                href={`/guides/${post.slug}`}
                 className="text-emerald-600 hover:text-emerald-700 transition-colors"
               >
                 Read full article →
               </Link>
               <Link
                 href={post.relatedCategory.href}
-                className="text-gray-500 hover:text-gray-900 transition-colors"
+                className="text-gray-500 hover:text-emerald-600 transition-colors"
               >
-                {post.relatedCategory.label}
+                Explore {post.relatedCategory.label} →
               </Link>
             </div>
           </article>

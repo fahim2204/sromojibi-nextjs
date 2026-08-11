@@ -37,7 +37,7 @@ export async function GET(
       "/about",
       "/join-worker",
       "/contact",
-      "/blogs",
+      "/guides",
     ];
 
     entries.push(
@@ -51,7 +51,7 @@ export async function GET(
 
     entries.push(
       ...blogPosts.map((post) => ({
-        url: `${baseUrl}/blogs/${post.slug}`,
+        url: `${baseUrl}/guides/${post.slug}`,
         lastmod: new Date(post.updatedAt || post.publishedAt).toISOString(),
         changefreq: "weekly",
         priority: "0.7",
