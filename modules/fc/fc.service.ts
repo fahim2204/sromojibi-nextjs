@@ -17,20 +17,21 @@ export class FcServiceError extends Error {
 export async function ensureDefaultCollectors() {
   const count = await prisma.fcAdminUser.count();
   if (count === 0) {
-    const defaultPassword = await hashSecret("Collector@12345");
+    const collectorPassword = await hashSecret("Collector@12345");
+    const adminPassword = await hashSecret("Mniff@22");
     await prisma.fcAdminUser.createMany({
       data: [
         {
           username: "collector1",
-          password_hash: defaultPassword,
+          password_hash: collectorPassword,
           full_name: "Field Collector 01",
           phone: "01700000001",
           role: "COLLECTOR",
         },
         {
           username: "admin",
-          password_hash: defaultPassword,
-          full_name: "FC Admin",
+          password_hash: adminPassword,
+          full_name: "Admin",
           phone: "01700000000",
           role: "ADMIN",
         },
