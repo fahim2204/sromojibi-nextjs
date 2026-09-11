@@ -330,3 +330,127 @@ model NewsletterSubscriber {
   @@map("newsletter_subscriber")
 }
 
+// ==========================================
+// FIELD COLLECTOR ENGINE & ADMIN (fcadmin_* & fc_*)
+// ==========================================
+
+enum FcAdminRole {
+  COLLECTOR
+  LEAD
+  ADMIN
+}
+
+enum FcRecordStatus {
+  DRAFT
+  PENDING_REVIEW
+  VERIFIED
+  MERGED
+  REJECTED
+}
+
+model FcAdminUser {
+  id            Int             @id @default(autoincrement())
+  username      String          @unique
+  password_hash String
+  full_name     String
+  phone         String?
+  role          FcAdminRole     @default(COLLECTOR)
+  is_active     Boolean         @default(true)
+  last_login    DateTime?
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+
+  sessions      FcAdminSession[]
+  logs          FcAdminLog[]
+  sessions_run  FcCollectionSession[]
+
+  @@map("fcadmin_user")
+}
+
+model FcAdminSession {
+  id          Int         @id @default(autoincrement())
+  fk_user_id  Int
+  token       String      @unique
+  device_info String?
+  expires_at  DateTime
+  created_at  DateTime    @default(now())
+
+  user        FcAdminUser @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
+
+  @@index([fk_user_id])
+  @@index([expires_at])
+  @@map("fcadmin_session")
+}
+
+model FcAdminLog {
+  id         Int          @id @default(autoincrement())
+  fk_user_id Int
+  action     String
+  details    Json?
+  ip_address String?
+  created_at DateTime     @default(now())
+
+  user       FcAdminUser  @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
+
+  @@index([fk_user_id, created_at])
+  @@map("fcadmin_log")
+}
+
+model FcCollectionSession {
+  id                 String              @id
+  fk_collector_id    Int?
+  collector_username String
+  location_name      String
+  area               String?
+  division_id        String?
+  district_id        String?
+  upazila_id         String?
+  latitude           Decimal?            @db.Decimal(10, 7)
+  longitude          Decimal?            @db.Decimal(10, 7)
+  accuracy           Decimal?            @db.Decimal(6, 2)
+  started_at         DateTime
+  ended_at           DateTime?
+  total_collected    Int                 @default(0)
+  notes              String?             @db.Text
+  created_at         DateTime            @default(now())
+  updated_at         DateTime            @updatedAt
+
+  collector          FcAdminUser?        @relation(fields: [fk_collector_id], references: [id], onDelete: SetNull)
+  collected_workers  FcCollectedWorker[]
+
+  @@index([collector_username])
+  @@index([created_at])
+  @@map("fc_collection_session")
+}
+
+model FcCollectedWorker {
+  id              String              @id
+  session_id      String
+  full_name       String
+  phone           String
+  service_type    String
+  category_id     Int?
+  division_id     String?
+  district_id     String?
+  upazila_id      String?
+  village         String?
+  experience      String?
+  details         String?             @db.Text
+  status          FcRecordStatus      @default(DRAFT)
+  is_duplicate    Boolean             @default(false)
+  duplicate_notes String?
+  photos          Json?
+  raw_metadata    Json?
+  created_at      DateTime            @default(now())
+  updated_at      DateTime            @updatedAt
+
+  session         FcCollectionSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
+
+  @@index([session_id])
+  @@index([phone])
+  @@index([status])
+  @@index([created_at])
+  @@map("fc_collected_worker")
+}
+
+

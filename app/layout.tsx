@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Providers from "./providers";
+import { RootProvider } from "@/app/providers/RootProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -76,7 +76,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="light">
+    <html lang="en" className="light" suppressHydrationWarning>
       <body className={`${inter.className} bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased`}>
         {/* Structured Data for Search Engine Optimization */}
         <Script
@@ -106,11 +106,11 @@ export default function RootLayout({
           }}
         />
 
-        <Providers>
+        <RootProvider>
           <Navbar />
           <div className="flex-1">{children}</div>
           <Footer />
-        </Providers>
+        </RootProvider>
       </body>
     </html>
   );

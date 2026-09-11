@@ -26,8 +26,11 @@ function createPrismaClient() {
   });
 }
 
+const existingPrisma = globalForPrisma.prisma;
+const isValidInstance = existingPrisma && "fcAdminUser" in existingPrisma;
+
 export const prisma =
-  globalForPrisma.prisma ?? createPrismaClient();
+  isValidInstance ? existingPrisma : createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
