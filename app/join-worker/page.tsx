@@ -19,8 +19,14 @@ import {
   ShieldCheck,
   Zap,
   ArrowRight,
+  Lock,
+  UserCheck,
+  Sparkles,
+  User,
 } from "lucide-react";
 import { APP_API } from "@/constants/api";
+import { useAuth } from "@/hooks/useAuth";
+import GoogleAuthButton from "@/app/(auth)/_components/GoogleAuthButton";
 
 interface LocationItem {
   id: string;
@@ -71,6 +77,19 @@ export default function JoinWorkerPage() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  // Auto-fill user information if logged in
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        fullName: prev.fullName || user.fullName || "",
+        email: prev.email || user.email || "",
+      }));
+    }
+  }, [user]);
 
   // 1. Initial Load: Fetch Divisions & Districts
   useEffect(() => {
@@ -194,13 +213,27 @@ export default function JoinWorkerPage() {
   // Form Submit Handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      setErrorMsg("প্রোফাইল নিবন্ধন করতে অনুগ্রহ করে প্রথমে আপনার অ্যাকাউন্টে লগইন করুন।");
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMsg(null);
 
     try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("@sromojibi_token") : null;
+
+      if (!token) {
+        throw new Error("আপনার সেশন পাওয়া যায়নি। অনুগ্রহ করে পুনরায় লগইন করুন।");
+      }
+
       const res = await fetch(APP_API.WORKERS.BASE, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           ...formData,
           divisionId: selectedDivisionId,
@@ -213,7 +246,7 @@ export default function JoinWorkerPage() {
       const json = await res.json();
 
       if (!res.ok) {
-        throw new Error(json.error?.message ?? "Registration failed. Please try again.");
+        throw new Error(json.error?.message || json.message || "Registration failed. Please try again.");
       }
 
       setSubmitted(true);
@@ -382,8 +415,162 @@ export default function JoinWorkerPage() {
                   </Button>
                 </div>
               </div>
+            ) : isLoading ? (
+              <div className="py-20 text-center space-y-4">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent mx-auto" />
+                <p className="text-xs font-semibold text-slate-500">লোড হচ্ছে... (Checking account status)</p>
+              </div>
+            ) : !isAuthenticated ? (
+              <div className="space-y-8">
+                {/* Auth Gate Header */}
+                <div className="text-center space-y-3 max-w-xl mx-auto">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold">
+                    <Lock className="w-3.5 h-3.5 text-amber-600" />
+                    <span>লগইন আবশ্যক • Account Required</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                    মিস্ত্রি প্রোফাইল রেজিস্টার করতে সাইন-ইন করুন
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    শ্রমজীবী প্ল্যাটফর্মে আপনার প্রোফাইল তৈরি ও ভবিষ্যৎ পরিচালনার জন্য একটি ভেরিফাইড অ্যাকাউন্ট থাকা আবশ্যক। মাত্র ১ মিনিটে ফ্রি অ্যাকাউন্ট খুলে বা সরাসরি গুগল দিয়ে সাইন-ইন করে প্রোফাইল সম্পন্ন করুন।
+                  </p>
+                </div>
+
+                {/* Authentication Action Box */}
+                <div className="max-w-md mx-auto bg-slate-50/80 border border-slate-200 rounded-2xl p-6 sm:p-7 space-y-4">
+                  <div className="space-y-3">
+                    <GoogleAuthButton label="গুগল দিয়ে সরাসরি এগিয়ে যান" redirect="/join-worker" />
+
+                    <div className="relative flex items-center justify-center my-2">
+                      <div className="border-t border-slate-200 w-full" />
+                      <span className="bg-slate-50 px-2.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 absolute">
+                        অথবা ইমেইল
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <Button
+                        as={Link}
+                        href="/sign-in?redirect=/join-worker"
+                        variant="bordered"
+                        className="w-full bg-white border border-slate-300 hover:border-slate-400 hover:bg-slate-100 text-slate-800 font-bold text-xs rounded-xl h-10 transition-colors"
+                      >
+                        লগইন করুন (Sign In)
+                      </Button>
+                      <Button
+                        as={Link}
+                        href="/sign-up?redirect=/join-worker"
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl h-10 transition-colors"
+                      >
+                        নতুন অ্যাকাউন্ট (Sign Up)
+                      </Button>
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-center text-slate-500">
+                    লগইন বা রেজিস্ট্রেশন সম্পূর্ণ হলে আপনি সরাসরি এই পাতায় ফিরে এসে মিস্ত্রি প্রোফাইল ফর্মটি পূরণ করতে পারবেন।
+                  </p>
+                </div>
+
+                {/* 3 Value Pillars */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                  <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    <h3 className="font-bold text-xs sm:text-sm text-slate-900">ভেরিফাইড প্রোফাইল ও নিরাপত্তা</h3>
+                    <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed">
+                      অন্য কেউ আপনার ফোন নম্বর বা নাম দিয়ে ভুয়া প্রোফাইল খুলতে পারবে না। অ্যাকাউন্টের মাধ্যমে আপনি আপনার তথ্যের একমাত্র মালিক।
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
+                    <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
+                      <UserCheck className="w-4 h-4" />
+                    </div>
+                    <h3 className="font-bold text-xs sm:text-sm text-slate-900">যে কোনো সময় তথ্য আপডেট</h3>
+                    <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed">
+                      মোবাইল নম্বর, কাজের এলাকা (বিভাগ/জেলা/উপজেলা/ইউনিয়ন) বা কাজের ধরন পরিবর্তন হলে যখন খুশি এডিট করতে পারবেন।
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
+                    <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center">
+                      <CheckCircle2 className="w-4 h-4" />
+                    </div>
+                    <h3 className="font-bold text-xs sm:text-sm text-slate-900">সরাসরি কাজ পাওয়ার সুযোগ</h3>
+                    <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed">
+                      আপনার ইউনিয়নের গ্রাহক ও ঠিকাদাররা সরাসরি গুগল সার্চ ও শ্রমজীবী থেকে আপনার ফোনে কল দিয়ে কাজের চুক্তি করবে।
+                    </p>
+                  </div>
+                </div>
+
+                {/* 3 Step Registration Flow Preview for SEO & Transparency */}
+                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                      মিস্ত্রি নিবন্ধনের ৩টি সহজ ধাপ (How Worker Registration Works)
+                    </h3>
+                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                      সময় লাগবে: ২ মিনিট
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                    <div className="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                      <div className="font-bold text-slate-800 flex items-center gap-1.5">
+                        <span className="w-4 h-4 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px]">১</span>
+                        ব্যক্তিগত তথ্য ও ফোন
+                      </div>
+                      <p className="text-slate-500 text-[11px] leading-relaxed">
+                        আপনার পূর্ণ নাম ও সচল ১১ ডিজিট মোবাইল নম্বর দিন, যাতে কাস্টমাররা সরাসরি ফোনে কথা বলতে পারে।
+                      </p>
+                    </div>
+
+                    <div className="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                      <div className="font-bold text-slate-800 flex items-center gap-1.5">
+                        <span className="w-4 h-4 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px]">২</span>
+                        ক্যাসকেডিং পূর্ণ ঠিকানা
+                      </div>
+                      <p className="text-slate-500 text-[11px] leading-relaxed">
+                        বিভাগ, জেলা, উপজেলা এবং ইউনিয়ন সিলেক্ট করুন। আপনার এলাকার কাস্টমাররা সহজেই আপনার প্রোফাইল পাবে।
+                      </p>
+                    </div>
+
+                    <div className="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                      <div className="font-bold text-slate-800 flex items-center gap-1.5">
+                        <span className="w-4 h-4 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px]">৩</span>
+                        কাজের ট্রেড ও অভিজ্ঞতা
+                      </div>
+                      <p className="text-slate-500 text-[11px] leading-relaxed">
+                        ইলেকট্রিশিয়ান, প্লাম্বার, রাজমিস্ত্রি সহ কাজের ধরন ও অভিজ্ঞতার বছর নির্বাচন করুন।
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Active user status banner */}
+                <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
+                      {(user?.fullName || user?.username || "U").charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <div className="font-bold text-slate-900 text-sm">
+                        {user?.fullName || user?.username}
+                      </div>
+                      <div className="text-slate-500 text-xs">
+                        {user?.email} • <span className="text-emerald-700 font-semibold">লগইন করা আছে ({user?.role})</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Chip size="sm" variant="flat" color="success" className="font-bold text-[11px]">
+                    ভেরিফাইড অ্যাকাউন্ট
+                  </Chip>
+                </div>
+
                 <div className="border-b border-slate-100 pb-4">
                   <h2 className="text-xl font-extrabold text-slate-900">ফ্রি প্রোফাইল তথ্য পূরণ করুন</h2>
                   <p className="text-xs text-slate-400 mt-0.5">
@@ -708,7 +895,7 @@ export default function JoinWorkerPage() {
                   type="submit"
                   size="lg"
                   isLoading={isSubmitting}
-                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm shadow-md rounded-xl transition-all hover:scale-[1.005]"
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-xs rounded-xl transition-colors h-12"
                   endContent={!isSubmitting && <ArrowRight className="w-4 h-4" />}
                 >
                   {isSubmitting ? "Submitting Profile..." : "ফ্রি প্রোফাইল সাবমিট করুন (Register Free Profile)"}

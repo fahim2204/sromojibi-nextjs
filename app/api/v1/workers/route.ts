@@ -2,6 +2,7 @@ import { z, ZodError } from "zod";
 import { apiError, apiSuccess } from "@/lib/api-response";
 import { CACHE_KEYS, CACHE_TTL, clearCache, getCached } from "@/lib/cache";
 import { prisma } from "@/lib/prisma";
+import { getSessionUser } from "@/modules/auth";
 
 export const runtime = "nodejs";
 
@@ -87,6 +88,25 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const authHeader = request.headers.get("authorization");
+    const sessionUser = await getSessionUser(authHeader);
+
+    if (!sessionUser) {
+      return apiError("UNAUTHORIZED", "Please sign in to register your worker profile", {
+        status: 401,
+      });
+    }
+
+    // Check if this user already has a worker profile
+    const existingUserWorker = await prisma.workerProfile.findUnique({
+      where: { fk_user_id: sessionUser.id },
+    });
+    if (existingUserWorker) {
+      return apiError("CONFLICT", "You already have a registered worker profile under this account", {
+        status: 409,
+      });
+    }
+
     const body = await request.json();
     const payload = createWorkerSchema.parse(body);
 
@@ -127,8 +147,9 @@ export async function POST(request: Request) {
 
     const worker = await prisma.workerProfile.create({
       data: {
+        fk_user_id: sessionUser.id,
         full_name: payload.fullName,
-        email: payload.email || null,
+        email: payload.email || sessionUser.email,
         phone: payload.phone,
         slug,
         service_type: payload.serviceType,
@@ -153,6 +174,14 @@ export async function POST(request: Request) {
         unionRef: true,
       },
     });
+
+    // Update user role to WORKER if currently USER
+    if (sessionUser.role === "USER") {
+      await prisma.user.update({
+        where: { id: sessionUser.id },
+        data: { role: "WORKER" },
+      });
+    }
 
     // Invalidate worker list cache
     clearCache();

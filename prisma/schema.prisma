@@ -58,6 +58,7 @@ model User {
 
   // Account Status
   status         UserStatus @default(ACTIVE)
+  email_verified Boolean    @default(false)
 
   // System Fields
   is_deleted     Boolean   @default(false)

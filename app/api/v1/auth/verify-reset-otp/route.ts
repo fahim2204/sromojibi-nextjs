@@ -1,24 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { AuthServiceError, registerUser, registerUserSchema } from "@/modules/auth";
+import { AuthServiceError, verifyEmailOtpSchema, verifyResetOtp } from "@/modules/auth";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const validatedInput = registerUserSchema.parse(body);
+    const validatedInput = verifyEmailOtpSchema.parse(body);
 
-    const result = await registerUser(validatedInput);
+    const result = await verifyResetOtp(validatedInput);
 
     return NextResponse.json(
       {
         data: result,
         error: null,
         meta: {
-          message: "Registration successful. Please verify your email with the 6-digit verification code.",
+          message: "Code verified successfully",
         },
       },
-      { status: 201 }
+      { status: 200 }
     );
   } catch (error) {
     if (error instanceof AuthServiceError) {
@@ -41,20 +41,20 @@ export async function POST(req: NextRequest) {
           data: null,
           error: {
             code: "VALIDATION_ERROR",
-            message: zodError.issues[0]?.message ?? "Invalid registration form data",
+            message: zodError.issues[0]?.message ?? "Invalid verification code",
           },
         },
         { status: 400 }
       );
     }
 
-    console.error("Register error:", error);
+    console.error("Verify reset OTP error:", error);
     return NextResponse.json(
       {
         data: null,
         error: {
           code: "INTERNAL_SERVER_ERROR",
-          message: "An unexpected error occurred during registration",
+          message: "An unexpected error occurred",
         },
       },
       { status: 500 }

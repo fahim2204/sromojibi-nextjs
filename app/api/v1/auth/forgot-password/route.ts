@@ -1,24 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { AuthServiceError, registerUser, registerUserSchema } from "@/modules/auth";
+import { AuthServiceError, forgotPasswordSchema, requestPasswordReset } from "@/modules/auth";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const validatedInput = registerUserSchema.parse(body);
+    const validatedInput = forgotPasswordSchema.parse(body);
 
-    const result = await registerUser(validatedInput);
+    const result = await requestPasswordReset(validatedInput.email);
 
     return NextResponse.json(
       {
         data: result,
         error: null,
         meta: {
-          message: "Registration successful. Please verify your email with the 6-digit verification code.",
+          message: "If an account exists with that email, a password reset code has been sent.",
         },
       },
-      { status: 201 }
+      { status: 200 }
     );
   } catch (error) {
     if (error instanceof AuthServiceError) {
@@ -41,20 +41,20 @@ export async function POST(req: NextRequest) {
           data: null,
           error: {
             code: "VALIDATION_ERROR",
-            message: zodError.issues[0]?.message ?? "Invalid registration form data",
+            message: zodError.issues[0]?.message ?? "Invalid input",
           },
         },
         { status: 400 }
       );
     }
 
-    console.error("Register error:", error);
+    console.error("Forgot password error:", error);
     return NextResponse.json(
       {
         data: null,
         error: {
           code: "INTERNAL_SERVER_ERROR",
-          message: "An unexpected error occurred during registration",
+          message: "An unexpected error occurred",
         },
       },
       { status: 500 }
