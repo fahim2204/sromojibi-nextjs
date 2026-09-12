@@ -19,6 +19,8 @@ const createWorkerSchema = z.object({
   districtId: z.string().optional().or(z.literal("")),
   upazilaId: z.string().optional().or(z.literal("")),
   unionId: z.string().optional().or(z.literal("")),
+  cityAreaId: z.string().optional().or(z.literal("")),
+  coverageScope: z.enum(["SPECIFIC_AREA", "ALL_UPAZILA", "ALL_DISTRICT", "ALL_DIVISION", "NATIONWIDE"]).optional(),
   experience: z.string().min(1, "Please select your experience level"),
   details: z.string().optional(),
 });
@@ -64,13 +66,11 @@ export async function GET(request: Request) {
           category: {
             select: { name: true, name_bn: true, slug: true, icon: true },
           },
-          location: {
-            select: { name: true, name_bn: true, slug: true },
-          },
           divisionRef: { select: { id: true, title_bn: true, title_en: true } },
           districtRef: { select: { id: true, title_bn: true, title_en: true } },
           upazilaRef: { select: { id: true, title_bn: true, title_en: true } },
           unionRef: { select: { id: true, title_bn: true, title_en: true } },
+          cityAreaRef: { select: { id: true, title_bn: true, title_en: true, parent_thana: true } },
         },
       });
     });
@@ -127,10 +127,6 @@ export async function POST(request: Request) {
       where: { slug: categorySlug },
     });
 
-    const locationRecord = await prisma.location.findUnique({
-      where: { slug: locationSlug },
-    });
-
     // Verify location FKs before assigning to avoid FK violation crash
     const validDivision = payload.divisionId
       ? await prisma.division.findUnique({ where: { id: payload.divisionId }, select: { id: true } })
@@ -143,6 +139,9 @@ export async function POST(request: Request) {
       : null;
     const validUnion = payload.unionId
       ? await prisma.union.findUnique({ where: { id: payload.unionId }, select: { id: true } })
+      : null;
+    const validCityArea = payload.cityAreaId
+      ? await prisma.cityArea.findUnique({ where: { id: payload.cityAreaId }, select: { id: true } })
       : null;
 
     const worker = await prisma.workerProfile.create({
@@ -161,17 +160,19 @@ export async function POST(request: Request) {
         fk_district_id: validDistrict?.id ?? null,
         fk_upazila_id: validUpazila?.id ?? null,
         fk_union_id: validUnion?.id ?? null,
+        fk_city_area_id: validCityArea?.id ?? null,
+        coverage_scope: payload.coverageScope ?? "SPECIFIC_AREA",
         experience: payload.experience,
         details: payload.details ?? null,
         status: "PENDING",
         fk_category_id: categoryRecord?.id ?? null,
-        fk_location_id: locationRecord?.id ?? null,
       },
       include: {
         divisionRef: true,
         districtRef: true,
         upazilaRef: true,
         unionRef: true,
+        cityAreaRef: true,
       },
     });
 

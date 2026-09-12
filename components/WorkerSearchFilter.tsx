@@ -11,13 +11,15 @@ type WorkerItem = {
   slug: string;
   service_type: string;
   city: string;
+  zilla?: string | null;
+  upazila?: string | null;
+  coverage_scope?: string | null;
   experience: string;
   details?: string | null;
   is_verified: boolean;
   rating?: number | any;
   review_count: number;
   category?: { icon?: string | null; name: string } | null;
-  location?: { name: string } | null;
 };
 
 type CategoryItem = {
@@ -28,9 +30,9 @@ type CategoryItem = {
 };
 
 type LocationItem = {
-  id: number;
+  id: string | number;
   name: string;
-  slug: string;
+  slug?: string;
 };
 
 type Props = {
@@ -218,8 +220,18 @@ export default function WorkerSearchFilter({
                         )}
                       </Link>
                       <p className="text-xs text-emerald-700 font-medium">
-                        {worker.category?.icon ?? "🛠️"} {worker.service_type} • {worker.city}
+                        {worker.category?.icon ?? "🛠️"} {worker.service_type} • {worker.upazila ? `${worker.upazila}, ` : ""}{worker.city}
                       </p>
+                      {worker.coverage_scope === "ALL_DISTRICT" && (
+                        <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[10px] font-semibold border border-blue-200/60">
+                          🌐 পুরো জেলা সার্ভিস
+                        </span>
+                      )}
+                      {worker.coverage_scope === "ALL_UPAZILA" && (
+                        <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-semibold border border-emerald-200/60">
+                          🌐 পুরো উপজেলা সার্ভিস
+                        </span>
+                      )}
                     </div>
                     <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold shrink-0">
                       {worker.experience}

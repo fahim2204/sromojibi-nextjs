@@ -67,13 +67,15 @@ export default async function CategoryPage({ params }: Props) {
     },
   });
 
-  const locations = await prisma.location.findMany({
-    where: { is_active: true },
-    orderBy: { name: "asc" },
-    include: {
-      _count: { select: { workers: true } },
-    },
+  const divisions = await prisma.division.findMany({
+    orderBy: { title_en: "asc" },
+    select: { id: true, title_en: true, title_bn: true },
   });
+
+  const locations = divisions.map((d) => ({
+    id: d.id,
+    name: d.title_en || d.title_bn || "",
+  }));
 
   // Fetch workers matching this category
   const categoryWorkers = await prisma.workerProfile.findMany({
@@ -87,9 +89,13 @@ export default async function CategoryPage({ params }: Props) {
     orderBy: { created_at: "desc" },
     include: {
       category: { select: { icon: true, name: true } },
-      location: { select: { name: true } },
     },
   });
+
+  const serializedWorkers = categoryWorkers.map((w) => ({
+    ...w,
+    rating: Number(w.rating),
+  }));
 
   const categoryNameBn = category.name_bn || category.name;
   const iconEmoji = category.icon || "🛠️";
@@ -154,7 +160,7 @@ export default async function CategoryPage({ params }: Props) {
         {/* Worker Search & Filter Section */}
         <section aria-labelledby="category-workers-heading" className="space-y-6">
           <WorkerSearchFilter
-            initialWorkers={categoryWorkers}
+            initialWorkers={serializedWorkers}
             categories={categories}
             locations={locations}
           />

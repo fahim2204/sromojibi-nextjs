@@ -10,15 +10,22 @@ export async function GET() {
       CACHE_KEYS.locations(),
       CACHE_TTL.FIFTEEN_MINUTES,
       async () => {
-        return await prisma.location.findMany({
-          where: { is_active: true },
-          orderBy: { name: "asc" },
+        const divs = await prisma.division.findMany({
+          where: { row_status: 1 },
+          orderBy: { title_en: "asc" },
           include: {
             _count: {
               select: { workers: true },
             },
           },
         });
+        return divs.map((d) => ({
+          id: d.id,
+          name: d.title_en || d.title,
+          name_bn: d.title_bn,
+          slug: (d.title_en || d.title).toLowerCase().replace(/\s+/g, "-"),
+          _count: d._count,
+        }));
       }
     );
 

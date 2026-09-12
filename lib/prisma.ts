@@ -6,6 +6,7 @@ const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
 };
 
+// Reloaded after schema migration for coverage_scope & city_area
 const databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {
@@ -27,7 +28,10 @@ function createPrismaClient() {
 }
 
 const existingPrisma = globalForPrisma.prisma;
-const isValidInstance = existingPrisma && "fcAdminUser" in existingPrisma;
+const isValidInstance =
+  existingPrisma &&
+  "fcAdminUser" in existingPrisma &&
+  "cityArea" in existingPrisma;
 
 export const prisma =
   isValidInstance ? existingPrisma : createPrismaClient();

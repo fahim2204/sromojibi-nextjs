@@ -6,6 +6,7 @@ import {
   Input,
   Select,
   SelectItem,
+  SelectSection,
   Textarea,
   Button,
   Card,
@@ -23,6 +24,8 @@ import {
   UserCheck,
   Sparkles,
   User,
+  Building2,
+  Navigation,
 } from "lucide-react";
 import { APP_API } from "@/constants/api";
 import { useAuth } from "@/hooks/useAuth";
@@ -42,6 +45,8 @@ interface DivisionItem extends LocationItem {
   districts: DistrictItem[];
 }
 
+
+
 export default function JoinWorkerPage() {
   // Cascading Address State
   const [divisions, setDivisions] = useState<DivisionItem[]>([]);
@@ -56,9 +61,11 @@ export default function JoinWorkerPage() {
   const [loadingUpazilas, setLoadingUpazilas] = useState(false);
 
   const [unionsList, setUnionsList] = useState<LocationItem[]>([]);
+  const [cityAreasList, setCityAreasList] = useState<LocationItem[]>([]);
   const [loadingUnions, setLoadingUnions] = useState(false);
 
   const [selectedTrades, setSelectedTrades] = useState<string[]>(["Electrician"]);
+  const [coverageScope, setCoverageScope] = useState<"SPECIFIC_AREA" | "ALL_UPAZILA" | "ALL_DISTRICT" | "ALL_DIVISION" | "NATIONWIDE">("SPECIFIC_AREA");
 
   // Form Data State
   const [formData, setFormData] = useState({
@@ -68,8 +75,8 @@ export default function JoinWorkerPage() {
     serviceType: "Electrician",
     city: "", // Division title
     zilla: "", // District title
-    upazila: "", // Upazila title
-    village: "", // Union title
+    upazila: "", // Upazila / Metro Thana title
+    village: "", // Union title (for rural upazilas)
     experience: "3 Years",
     details: "",
   });
@@ -111,13 +118,56 @@ export default function JoinWorkerPage() {
     fetchHierarchy();
   }, []);
 
+  // Adaptive Hierarchy: "urban" (City Corp / Thana ➔ City Area) vs "rural" (Upazila ➔ Union)
+  const [addressType, setAddressType] = useState<"urban" | "rural">("urban");
+
+  // Categorize Upazilas into City Areas (from DB) vs District Upazilas
+  const categorizedUpazilas = useMemo(() => {
+    // 1. If DB has City Areas for this District:
+    if (cityAreasList.length > 0) {
+      return {
+        hasCityCorp: true,
+        citySectionTitle: "🏙️ সিটি এলাকা / মেট্রো থানা",
+        cityItems: cityAreasList,
+        upazilaSectionTitle: "🌾 অন্যান্য উপজেলাসমূহ",
+        upazilaItems: upazilasList,
+      };
+    }
+
+    // 2. Fallback: check if any upazila is a Sadar/Paurashava
+    const sadarMatch = upazilasList.find((u) => {
+      const title = (u.title_en || u.title_bn || "").toLowerCase();
+      return title.includes("sadar") || title.includes("সদর");
+    });
+
+    if (sadarMatch) {
+      return {
+        hasCityCorp: true,
+        citySectionTitle: `🏙️ ${sadarMatch.title_bn || sadarMatch.title_en} (পৌরসভা / সদর)`,
+        cityItems: [sadarMatch],
+        upazilaSectionTitle: `🌾 অন্যান্য উপজেলাসমূহ`,
+        upazilaItems: upazilasList.filter((u) => u.id !== sadarMatch.id),
+      };
+    }
+
+    return {
+      hasCityCorp: false,
+      citySectionTitle: "",
+      cityItems: [],
+      upazilaSectionTitle: "উপজেলাসমূহ (Upazilas)",
+      upazilaItems: upazilasList,
+    };
+  }, [cityAreasList, upazilasList]);
+
   // 2. Division Selection Handler
   const handleDivisionChange = (divisionId: string) => {
     setSelectedDivisionId(divisionId);
     setSelectedDistrictId("");
     setSelectedUpazilaId("");
     setSelectedUnionId("");
+    setCoverageScope("SPECIFIC_AREA");
     setUpazilasList([]);
+    setCityAreasList([]);
     setUnionsList([]);
 
     const divObj = divisions.find((d) => d.id === divisionId);
@@ -132,11 +182,14 @@ export default function JoinWorkerPage() {
     }));
   };
 
-  // 3. District Selection Handler: Fetch Upazilas
+  // 3. District Selection Handler: Fetch Upazilas and City Areas from DB
   const handleDistrictChange = async (districtId: string) => {
     setSelectedDistrictId(districtId);
     setSelectedUpazilaId("");
     setSelectedUnionId("");
+    setCoverageScope("SPECIFIC_AREA");
+    setUpazilasList([]);
+    setCityAreasList([]);
     setUnionsList([]);
 
     const activeDiv = divisions.find((d) => d.id === selectedDivisionId);
@@ -157,8 +210,9 @@ export default function JoinWorkerPage() {
       const res = await fetch(`/api/v1/locations/hierarchy?district_id=${districtId}`);
       if (!res.ok) throw new Error("Failed to load upazilas");
       const json = await res.json();
-      if (json.data && json.data.upazilas) {
-        setUpazilasList(json.data.upazilas);
+      if (json.data) {
+        setUpazilasList(json.data.upazilas || []);
+        setCityAreasList(json.data.city_areas || []);
       }
     } catch (err) {
       console.error("Error fetching upazilas:", err);
@@ -167,21 +221,50 @@ export default function JoinWorkerPage() {
     }
   };
 
-  // 4. Upazila Selection Handler: Fetch Unions
+  // 4. Upazila / Thana Selection Handler
   const handleUpazilaChange = async (upazilaId: string) => {
     setSelectedUpazilaId(upazilaId);
     setSelectedUnionId("");
 
-    const upzObj = upazilasList.find((u) => u.id === upazilaId);
+    // Option: All Over District (পুরো জেলা জুড়ে)
+    if (upazilaId === "scope_all_district") {
+      setCoverageScope("ALL_DISTRICT");
+      setFormData((prev) => ({
+        ...prev,
+        upazila: `পুরো ${prev.zilla || "জেলা"} জুড়ে`,
+        village: "",
+      }));
+      setUnionsList([]);
+      return;
+    }
+
+    setCoverageScope("SPECIFIC_AREA");
+    const allItems = [...categorizedUpazilas.cityItems, ...categorizedUpazilas.upazilaItems];
+    const upzObj = allItems.find((u) => u.id === upazilaId) || upazilasList.find((u) => u.id === upazilaId);
     const upzName = upzObj?.title_en || upzObj?.title_bn || "";
+
+    const isSelectedCityArea = cityAreasList.some((c) => c.id === upazilaId);
+    const isCity =
+      isSelectedCityArea ||
+      upzName.toLowerCase().includes("sadar") ||
+      upzName.includes("সদর");
 
     setFormData((prev) => ({
       ...prev,
       upazila: upzName,
-      village: "",
+      village: isCity ? upzName : "",
     }));
 
     if (!upazilaId) return;
+
+    // For city thanas/areas or sadar, stop right here - no unions needed!
+    if (isCity) {
+      setAddressType("urban");
+      setUnionsList([]);
+      return;
+    }
+
+    setAddressType("rural");
 
     try {
       setLoadingUnions(true);
@@ -198,9 +281,21 @@ export default function JoinWorkerPage() {
     }
   };
 
-  // 5. Union Selection Handler
+  // 5. Union Selection Handler (For Rural Upazilas)
   const handleUnionChange = (unionId: string) => {
     setSelectedUnionId(unionId);
+
+    // Option: All Over Upazila (পুরো উপজেলা জুড়ে)
+    if (unionId === "scope_all_upazila") {
+      setCoverageScope("ALL_UPAZILA");
+      setFormData((prev) => ({
+        ...prev,
+        village: `পুরো ${prev.upazila || "উপজেলা"} জুড়ে`,
+      }));
+      return;
+    }
+
+    setCoverageScope("SPECIFIC_AREA");
     const unionObj = unionsList.find((u) => u.id === unionId);
     const unionName = unionObj?.title_bn || unionObj?.title_en || "";
 
@@ -209,6 +304,20 @@ export default function JoinWorkerPage() {
       village: unionName,
     }));
   };
+
+  // Detect if current selection is a City Thana or District-Wide Scope
+  const isCityThana = useMemo(() => {
+    if (!selectedUpazilaId) return false;
+    if (selectedUpazilaId === "scope_all_district") return true;
+    if (cityAreasList.some((c) => c.id === selectedUpazilaId)) return true;
+    const upzLower = (formData.upazila || "").toLowerCase();
+    return (
+      upzLower.includes("sadar") ||
+      upzLower.includes("সদর") ||
+      upzLower.includes("city") ||
+      upzLower.includes("সিটি")
+    );
+  }, [selectedUpazilaId, formData.upazila, cityAreasList]);
 
   // Form Submit Handler
   const handleSubmit = async (e: React.FormEvent) => {
@@ -228,6 +337,17 @@ export default function JoinWorkerPage() {
         throw new Error("আপনার সেশন পাওয়া যায়নি। অনুগ্রহ করে পুনরায় লগইন করুন।");
       }
 
+      const isSelectedCityArea = cityAreasList.some((c) => c.id === selectedUpazilaId);
+
+      const isRealUpazila =
+        selectedUpazilaId &&
+        !isSelectedCityArea &&
+        selectedUpazilaId !== "scope_all_district";
+
+      const isRealUnion =
+        selectedUnionId &&
+        selectedUnionId !== "scope_all_upazila";
+
       const res = await fetch(APP_API.WORKERS.BASE, {
         method: "POST",
         headers: {
@@ -236,10 +356,13 @@ export default function JoinWorkerPage() {
         },
         body: JSON.stringify({
           ...formData,
-          divisionId: selectedDivisionId,
-          districtId: selectedDistrictId,
-          upazilaId: selectedUpazilaId,
-          unionId: selectedUnionId,
+          coverageScope,
+          details: formData.details || undefined,
+          divisionId: selectedDivisionId || undefined,
+          districtId: selectedDistrictId || undefined,
+          upazilaId: isRealUpazila ? selectedUpazilaId : undefined,
+          cityAreaId: isSelectedCityArea ? selectedUpazilaId : undefined,
+          unionId: isRealUnion ? selectedUnionId : undefined,
         }),
       });
 
@@ -367,10 +490,10 @@ export default function JoinWorkerPage() {
                     )}
                     {formData.upazila && (
                       <span>
-                        <strong className="text-blue-700">{formData.upazila}</strong> উপজেলার{" "}
+                        <strong className="text-blue-700">{formData.upazila}</strong> {isCityThana ? "এলাকার " : "উপজেলার "}
                       </span>
                     )}
-                    {formData.village && (
+                    {formData.village && !isCityThana && (
                       <span>
                         <strong className="text-purple-700">{formData.village}</strong> ইউনিয়নে{" "}
                       </span>
@@ -387,6 +510,7 @@ export default function JoinWorkerPage() {
                       setSelectedDistrictId("");
                       setSelectedUpazilaId("");
                       setSelectedUnionId("");
+                      setCoverageScope("SPECIFIC_AREA");
                       setSelectedTrades(["Electrician"]);
                       setFormData({
                         fullName: "",
@@ -694,20 +818,35 @@ export default function JoinWorkerPage() {
                   </Select>
                 </div>
 
-                {/* Step 2: Cascading Address Hierarchy up to Union */}
-                <div className="space-y-7 sm:space-y-8 pt-6">
-                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                    <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px]">2</span>
-                    <span>ঠিকানা নির্বাচন করুন (Cascading Address up to Union)</span>
+                {/* Step 2: Cascading Address Hierarchy (City Corp / Thana / Upazila ➔ Area / Union) */}
+                <div className="space-y-6 pt-6">
+                  {/* Step Header */}
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-200">
+                    <span className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
+                      2
+                    </span>
+                    <div>
+                      <h3 className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2">
+                        ঠিকানা ও কর্মক্ষেত্র নির্বাচন (Location & Service Coverage)
+                        <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                          {addressType === "urban" ? "🏙️ সিটি কর্পোরেশন / মেট্রো এলাকা" : "🌾 জেলা ও উপজেলা পরিষদ"}
+                        </span>
+                      </h3>
+                      <p className="text-[11px] text-slate-500 font-medium">
+                        {addressType === "urban"
+                          ? "বিভাগ ➔ জেলা ➔ মেট্রো থানা ➔ শহরের প্রধান এলাকা ও পয়েন্ট"
+                          : "বিভাগ ➔ জেলা ➔ উপজেলা ➔ ইউনিয়ন পরিষদ"}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Division & District Select */}
+                  {/* Level 1 & Level 2: Division & District */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <Select
                       isRequired
-                      aria-label="Division / বিভাগ"
+                      aria-label="Level 1: Division / বিভাগ"
                       labelPlacement="outside"
-                      label="Division / বিভাগ"
+                      label="১. Division / বিভাগ"
                       placeholder={loadingDivisions ? "Loading Divisions..." : "Select Division"}
                       variant="bordered"
                       selectedKeys={selectedDivisionId ? new Set([selectedDivisionId]) : new Set()}
@@ -733,9 +872,9 @@ export default function JoinWorkerPage() {
                     <Select
                       isRequired
                       isDisabled={!selectedDivisionId}
-                      aria-label="District / জেলা"
+                      aria-label="Level 2: District / জেলা"
                       labelPlacement="outside"
-                      label="District / জেলা"
+                      label="২. District / জেলা"
                       placeholder={!selectedDivisionId ? "Select Division First" : "Select District"}
                       variant="bordered"
                       selectedKeys={selectedDistrictId ? new Set([selectedDistrictId]) : new Set()}
@@ -758,20 +897,20 @@ export default function JoinWorkerPage() {
                     </Select>
                   </div>
 
-                  {/* Upazila & Union Select */}
+                  {/* Level 3 & Level 4: Thana/Upazila & Area/Union */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <Select
                       isRequired
                       isDisabled={!selectedDistrictId || loadingUpazilas}
-                      aria-label="Upazila / উপজেলা"
+                      aria-label="City Corporation Thana or Upazila"
                       labelPlacement="outside"
-                      label="Upazila / উপজেলা (থানা)"
+                      label="৩. City Corporation / Upazila (সিটি কর্পোরেশন / থানা / উপজেলা)"
                       placeholder={
                         !selectedDistrictId
                           ? "Select District First"
                           : loadingUpazilas
-                          ? "Loading Upazilas..."
-                          : "Select Upazila"
+                          ? "Loading Thanas/Upazilas..."
+                          : "Select Thana or Upazila"
                       }
                       variant="bordered"
                       selectedKeys={selectedUpazilaId ? new Set([selectedUpazilaId]) : new Set()}
@@ -784,64 +923,159 @@ export default function JoinWorkerPage() {
                         label: "text-slate-700 font-semibold text-xs mb-1.5",
                         value: "text-slate-900 text-sm",
                         trigger: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs cursor-pointer h-11",
-                        popoverContent: "bg-white border border-slate-200 text-slate-900 shadow-xl z-50 max-h-60",
+                        popoverContent: "bg-white border border-slate-200 text-slate-900 shadow-xl z-50 max-h-72",
                       }}
                     >
-                      {upazilasList.map((upz) => (
-                        <SelectItem key={upz.id} textValue={upz.title_bn || upz.title_en || ""} className="text-slate-800 text-xs">
-                          {upz.title_bn} {upz.title_en ? `(${upz.title_en})` : ""}
+                      <SelectSection
+                        title="🌐 কর্মক্ষেত্রের আওতা (Large Coverage Scope)"
+                        classNames={{
+                          heading: "text-[11px] font-bold text-emerald-800 uppercase bg-emerald-50/80 px-2.5 py-1 rounded",
+                        }}
+                      >
+                        <SelectItem
+                          key="scope_all_district"
+                          textValue={`পুরো ${formData.zilla || "জেলা"} জুড়ে`}
+                          className="text-emerald-800 font-bold text-xs py-1.5 cursor-pointer"
+                        >
+                          🌐 পুরো {formData.zilla || "জেলা"} জুড়ে কাজ করি (All Over District)
                         </SelectItem>
-                      ))}
+                      </SelectSection>
+
+                      {categorizedUpazilas.hasCityCorp && categorizedUpazilas.cityItems.length > 0 ? (
+                        <SelectSection
+                          title={categorizedUpazilas.citySectionTitle}
+                          classNames={{
+                            heading: "text-[11px] font-bold text-emerald-800 uppercase bg-emerald-50/80 px-2.5 py-1 rounded",
+                          }}
+                        >
+                          {categorizedUpazilas.cityItems.map((upz) => (
+                            <SelectItem key={upz.id} textValue={upz.title_bn || upz.title_en || ""} className="text-slate-800 text-xs py-1.5 cursor-pointer">
+                              🏙️ {upz.title_bn} {upz.title_en ? `(${upz.title_en})` : ""}
+                            </SelectItem>
+                          ))}
+                        </SelectSection>
+                      ) : null}
+
+                      {categorizedUpazilas.hasCityCorp && categorizedUpazilas.upazilaItems.length > 0 ? (
+                        <SelectSection
+                          title={categorizedUpazilas.upazilaSectionTitle}
+                          classNames={{
+                            heading: "text-[11px] font-bold text-slate-600 uppercase bg-slate-100 px-2.5 py-1 rounded",
+                          }}
+                        >
+                          {categorizedUpazilas.upazilaItems.map((upz) => (
+                            <SelectItem key={upz.id} textValue={upz.title_bn || upz.title_en || ""} className="text-slate-800 text-xs py-1.5 cursor-pointer">
+                              🌾 {upz.title_bn} {upz.title_en ? `(${upz.title_en})` : ""}
+                            </SelectItem>
+                          ))}
+                        </SelectSection>
+                      ) : null}
+
+                      {!categorizedUpazilas.hasCityCorp ? (
+                        <SelectSection title="উপজেলাসমূহ (Upazilas)">
+                          {upazilasList.map((upz) => (
+                            <SelectItem key={upz.id} textValue={upz.title_bn || upz.title_en || ""} className="text-slate-800 text-xs">
+                              {upz.title_bn} {upz.title_en ? `(${upz.title_en})` : ""}
+                            </SelectItem>
+                          ))}
+                        </SelectSection>
+                      ) : null}
                     </Select>
 
-                    <Select
-                      isDisabled={!selectedUpazilaId || loadingUnions}
-                      aria-label="Union / ইউনিয়ন"
-                      labelPlacement="outside"
-                      label="Union / ইউনিয়ন (ওয়ার্ড/এলাকা)"
-                      placeholder={
-                        !selectedUpazilaId
-                          ? "Select Upazila First"
-                          : loadingUnions
-                          ? "Loading Unions..."
-                          : unionsList.length === 0
-                          ? "No Unions Found"
-                          : "Select Union"
-                      }
-                      variant="bordered"
-                      selectedKeys={selectedUnionId ? new Set([selectedUnionId]) : new Set()}
-                      onSelectionChange={(keys) => {
-                        const selected = Array.from(keys)[0] as string;
-                        if (selected) handleUnionChange(selected);
-                      }}
-                      isLoading={loadingUnions}
-                      classNames={{
-                        label: "text-slate-700 font-semibold text-xs mb-1.5",
-                        value: "text-slate-900 text-sm",
-                        trigger: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs cursor-pointer h-11",
-                        popoverContent: "bg-white border border-slate-200 text-slate-900 shadow-xl z-50 max-h-60",
-                      }}
-                    >
-                      {unionsList.map((union) => (
-                        <SelectItem key={union.id} textValue={union.title_bn || union.title_en || ""} className="text-slate-800 text-xs">
-                          {union.title_bn} {union.title_en ? `(${union.title_en})` : ""}
-                        </SelectItem>
-                      ))}
-                    </Select>
+                    {/* Only show Union Select for Rural / District Upazila (Stops cleanly for Metro Thanas or District-Wide Scope) */}
+                    {!isCityThana && (
+                      <Select
+                        isRequired
+                        isDisabled={!selectedUpazilaId || loadingUnions}
+                        aria-label="Union"
+                        labelPlacement="outside"
+                        label="৪. Union (ইউনিয়ন)"
+                        placeholder={
+                          !selectedDistrictId
+                            ? "Select District First"
+                            : !selectedUpazilaId
+                            ? "Select Upazila First"
+                            : loadingUnions
+                            ? "Loading Unions..."
+                            : unionsList.length === 0
+                            ? "No Unions Found"
+                            : "Select Union"
+                        }
+                        variant="bordered"
+                        selectedKeys={selectedUnionId ? new Set([selectedUnionId]) : new Set()}
+                        onSelectionChange={(keys) => {
+                          const selected = Array.from(keys)[0] as string;
+                          if (selected) handleUnionChange(selected);
+                        }}
+                        isLoading={loadingUnions}
+                        classNames={{
+                          label: "text-slate-700 font-semibold text-xs mb-1.5",
+                          value: "text-slate-900 text-sm",
+                          trigger: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs cursor-pointer h-11",
+                          popoverContent: "bg-white border border-slate-200 text-slate-900 shadow-xl z-50 max-h-72",
+                        }}
+                      >
+                        <SelectSection
+                          title="🌐 কর্মক্ষেত্রের আওতা (Large Coverage Scope)"
+                          classNames={{
+                            heading: "text-[11px] font-bold text-emerald-800 uppercase bg-emerald-50/80 px-2.5 py-1 rounded",
+                          }}
+                        >
+                          <SelectItem
+                            key="scope_all_upazila"
+                            textValue={`পুরো ${formData.upazila || "উপজেলা"} জুড়ে`}
+                            className="text-emerald-800 font-bold text-xs py-1.5 cursor-pointer"
+                          >
+                            🌐 পুরো {formData.upazila || "উপজেলা"} জুড়ে কাজ করি (All Over Upazila)
+                          </SelectItem>
+                        </SelectSection>
+
+                        <SelectSection title="ইউনিয়ন (Union)">
+                          {unionsList.map((union) => (
+                            <SelectItem
+                              key={union.id}
+                              textValue={union.title_bn || union.title_en || ""}
+                              className="text-slate-800 text-xs py-1.5 cursor-pointer"
+                            >
+                              {union.title_bn} {union.title_en ? `(${union.title_en})` : ""}
+                            </SelectItem>
+                          ))}
+                        </SelectSection>
+                      </Select>
+                    )}
                   </div>
 
-                  {/* Selected Location Summary Badge */}
-                  {(formData.city || formData.zilla || formData.upazila || formData.village) && (
-                    <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 text-xs text-emerald-900 space-y-1.5">
-                      <div className="font-bold flex items-center gap-1.5 text-emerald-800">
-                        <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-                        নির্বাচিত পূর্ণাঙ্গ ঠিকানা (Selected Address Summary):
+                  {/* Selected Location Summary Badge (Hierarchical Breadcrumb) */}
+                  {(formData.city || formData.zilla || formData.upazila) && (
+                    <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 text-xs text-emerald-900 space-y-2">
+                      <div className="font-bold flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-emerald-800">
+                          <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>নির্বাচিত কর্মক্ষেত্র (Selected Coverage Location):</span>
+                        </div>
+                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                          {coverageScope === "ALL_DISTRICT"
+                            ? "🌐 জেলা-ব্যাপী কর্মক্ষেত্র"
+                            : coverageScope === "ALL_UPAZILA"
+                            ? "🌐 উপজেলা-ব্যাপী কর্মক্ষেত্র"
+                            : isCityThana
+                            ? "🏙️ সিটি কর্পোরেশন এলাকা"
+                            : "🌾 জেলা ও উপজেলা পরিষদ"}
+                        </span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5 font-medium pt-0.5">
+                      <div className="flex flex-wrap items-center gap-1.5 font-medium pt-0.5">
                         {formData.city && <Chip size="sm" variant="flat" color="default" className="text-[10px]">{formData.city} বিভাগ</Chip>}
                         {formData.zilla && <Chip size="sm" variant="flat" color="success" className="text-[10px]">{formData.zilla} জেলা</Chip>}
-                        {formData.upazila && <Chip size="sm" variant="flat" color="primary" className="text-[10px]">{formData.upazila} উপজেলা</Chip>}
-                        {formData.village && <Chip size="sm" variant="flat" color="warning" className="text-[10px]">{formData.village} ইউনিয়ন</Chip>}
+                        {formData.upazila && (
+                          <Chip size="sm" variant="flat" color="primary" className="text-[10px]">
+                            {formData.upazila} {coverageScope === "ALL_DISTRICT" ? "" : isCityThana ? "মেট্রো থানা" : "উপজেলা"}
+                          </Chip>
+                        )}
+                        {!isCityThana && formData.village && (
+                          <Chip size="sm" variant="flat" color="secondary" className="text-[10px] font-semibold">
+                            {formData.village} {coverageScope === "ALL_UPAZILA" ? "" : "ইউনিয়ন"}
+                          </Chip>
+                        )}
                       </div>
                     </div>
                   )}

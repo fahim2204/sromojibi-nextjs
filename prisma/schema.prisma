@@ -23,6 +23,14 @@ enum WorkerStatus {
   SUSPENDED
 }
 
+enum CoverageScope {
+  SPECIFIC_AREA
+  ALL_UPAZILA
+  ALL_DISTRICT
+  ALL_DIVISION
+  NATIONWIDE
+}
+
 enum OAuthProvider {
   GOOGLE
   FACEBOOK
@@ -164,22 +172,6 @@ model Category {
   @@map("category")
 }
 
-model Location {
-  id          Int             @id @default(autoincrement())
-  name        String
-  name_bn     String?
-  slug        String          @unique
-  division    String?
-  description String?
-  is_active   Boolean         @default(true)
-  created_at  DateTime        @default(now())
-  updated_at  DateTime        @updatedAt
-
-  workers     WorkerProfile[]
-
-  @@map("location")
-}
-
 model WorkerProfile {
   id             Int            @id @default(autoincrement())
   fk_user_id     Int?           @unique
@@ -189,7 +181,6 @@ model WorkerProfile {
   slug           String         @unique
   service_type   String
   fk_category_id Int?
-  fk_location_id Int?
 
   city           String
   zilla          String?
@@ -200,6 +191,8 @@ model WorkerProfile {
   fk_district_id String?
   fk_upazila_id  String?
   fk_union_id    String?
+  fk_city_area_id String?
+  coverage_scope CoverageScope  @default(SPECIFIC_AREA)
 
   experience     String
   details        String?        @db.Text
@@ -213,20 +206,21 @@ model WorkerProfile {
 
   user         User?         @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
   category     Category?     @relation(fields: [fk_category_id], references: [id], onDelete: SetNull)
-  location     Location?     @relation(fields: [fk_location_id], references: [id], onDelete: SetNull)
   divisionRef  Division?     @relation(fields: [fk_division_id], references: [id], onDelete: SetNull)
   districtRef  District?     @relation(fields: [fk_district_id], references: [id], onDelete: SetNull)
   upazilaRef   Upazila?      @relation(fields: [fk_upazila_id], references: [id], onDelete: SetNull)
   unionRef     Union?        @relation(fields: [fk_union_id], references: [id], onDelete: SetNull)
+  cityAreaRef  CityArea?     @relation(fields: [fk_city_area_id], references: [id], onDelete: SetNull)
   reviews      WorkerReview[]
 
   @@index([fk_user_id])
   @@index([fk_category_id])
-  @@index([fk_location_id])
   @@index([fk_division_id])
   @@index([fk_district_id])
   @@index([fk_upazila_id])
   @@index([fk_union_id])
+  @@index([fk_city_area_id])
+  @@index([coverage_scope])
   @@index([status])
   @@index([city])
   @@index([zilla])
@@ -261,6 +255,7 @@ model Division {
   title_en   String?
   row_status Int             @default(1)
   districts  District[]
+  city_areas CityArea[]
   workers    WorkerProfile[]
 
   @@map("division")
@@ -277,6 +272,7 @@ model District {
   row_status      Int             @default(1)
   division        Division        @relation(fields: [loc_division_id], references: [id], onDelete: Cascade)
   upazilas        Upazila[]
+  city_areas      CityArea[]
   workers         WorkerProfile[]
 
   @@index([loc_division_id])
@@ -294,6 +290,7 @@ model Upazila {
   row_status      Int             @default(1)
   district        District        @relation(fields: [loc_district_id], references: [id], onDelete: Cascade)
   unions          Union[]
+  city_areas      CityArea[]
   workers         WorkerProfile[]
 
   @@index([loc_district_id])
@@ -317,6 +314,33 @@ model Union {
   @@index([loc_district_id])
   @@index([loc_division_id])
   @@map("union")
+}
+
+model CityArea {
+  id              String          @id @default(cuid())
+  bbs_code        String?
+  loc_division_id String
+  loc_district_id String
+  loc_upazila_id  String?
+  title_bn        String
+  title_en        String
+  parent_thana    String?
+  postal_code     String?
+  row_status      Int             @default(1)
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt
+
+  division        Division        @relation(fields: [loc_division_id], references: [id], onDelete: Cascade)
+  district        District        @relation(fields: [loc_district_id], references: [id], onDelete: Cascade)
+  upazila         Upazila?        @relation(fields: [loc_upazila_id], references: [id], onDelete: SetNull)
+  workers         WorkerProfile[]
+
+  @@index([loc_division_id])
+  @@index([loc_district_id])
+  @@index([loc_upazila_id])
+  @@index([parent_thana])
+  @@index([row_status])
+  @@map("city_area")
 }
 
 model NewsletterSubscriber {

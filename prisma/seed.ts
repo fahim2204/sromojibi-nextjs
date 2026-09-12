@@ -178,37 +178,11 @@ async function main() {
     });
   }
 
-  // Seed Locations
-  console.log("🏙️ Seeding Launch Locations...");
-  for (const loc of locations) {
-    await prisma.location.upsert({
-      where: { slug: loc.slug },
-      update: {
-        name: loc.name,
-        name_bn: loc.name_bn,
-        division: loc.division,
-        description: loc.description,
-        is_active: true,
-      },
-      create: {
-        name: loc.name,
-        name_bn: loc.name_bn,
-        slug: loc.slug,
-        division: loc.division,
-        description: loc.description,
-        is_active: true,
-      },
-    });
-  }
-
   // Seed Sample Approved Workers
   console.log("👷 Seeding Initial Verified Worker Profiles...");
   for (const w of initialWorkers) {
     const categoryObj = await prisma.category.findUnique({
       where: { slug: w.service_type.toLowerCase().replace(/\s+/g, "-") },
-    });
-    const locationObj = await prisma.location.findUnique({
-      where: { slug: w.city.toLowerCase().replace(/\s+/g, "-") },
     });
 
     await prisma.workerProfile.upsert({
@@ -225,7 +199,6 @@ async function main() {
         rating: w.rating,
         review_count: w.review_count,
         fk_category_id: categoryObj?.id ?? null,
-        fk_location_id: locationObj?.id ?? null,
       },
       create: {
         full_name: w.full_name,
@@ -240,7 +213,6 @@ async function main() {
         rating: w.rating,
         review_count: w.review_count,
         fk_category_id: categoryObj?.id ?? null,
-        fk_location_id: locationObj?.id ?? null,
       },
     });
   }

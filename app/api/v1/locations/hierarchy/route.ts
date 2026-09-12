@@ -2,6 +2,7 @@ import { apiError, apiSuccess } from "@/lib/api-response";
 import { CACHE_TTL, getCached } from "@/lib/cache";
 import { prisma } from "@/lib/prisma";
 
+// Route for location hierarchy (Divisions, Districts, Upazilas, CityAreas, Unions)
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -143,6 +144,16 @@ export async function GET(request: Request) {
                   id: true,
                   title_bn: true,
                   title_en: true,
+                },
+              },
+              city_areas: {
+                where: { row_status: 1 },
+                orderBy: { title_bn: "asc" },
+                select: {
+                  id: true,
+                  title_bn: true,
+                  title_en: true,
+                  parent_thana: true,
                 },
               },
             },

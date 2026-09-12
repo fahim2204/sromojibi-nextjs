@@ -35,7 +35,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     where: { slug },
     include: {
       category: true,
-      location: true,
     },
   });
 
@@ -86,7 +85,6 @@ export default async function WorkerProfilePage({ params }: Props) {
     where: { slug },
     include: {
       category: true,
-      location: true,
       divisionRef: true,
       districtRef: true,
       upazilaRef: true,

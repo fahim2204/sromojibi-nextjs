@@ -26,10 +26,9 @@ export default async function WorkersDirectoryPage() {
     },
   });
 
-  // Fetch active locations with worker count from DB
-  const locations = await prisma.location.findMany({
-    where: { is_active: true },
-    orderBy: { name: "asc" },
+  // Fetch divisions for live client-side searching & filtering
+  const divisions = await prisma.division.findMany({
+    orderBy: { title_en: "asc" },
     include: {
       _count: {
         select: { workers: true },
@@ -37,15 +36,27 @@ export default async function WorkersDirectoryPage() {
     },
   });
 
+  const locations = divisions.map((d) => ({
+    id: d.id,
+    name: d.title_en || d.title,
+    name_bn: d.title_bn,
+    slug: (d.title_en || d.title).toLowerCase().replace(/\s+/g, "-"),
+    workersCount: d._count.workers,
+  }));
+
   // Fetch all approved worker profiles for live client-side searching & filtering
   const allApprovedWorkers = await prisma.workerProfile.findMany({
     where: { status: "APPROVED" },
     orderBy: { created_at: "desc" },
     include: {
       category: { select: { icon: true, name: true } },
-      location: { select: { name: true } },
     },
   });
+
+  const serializedWorkers = allApprovedWorkers.map((w) => ({
+    ...w,
+    rating: Number(w.rating),
+  }));
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 py-16 px-4">
@@ -96,29 +107,29 @@ export default async function WorkersDirectoryPage() {
           </div>
         </div>
 
-        {/* Locations Section */}
+        {/* Browse by Divisions */}
         <div className="space-y-6">
           <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-            <h2 className="text-2xl font-bold text-gray-900">Browse by Launch Cities</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Browse by Division</h2>
             <Link href="/locations" className="text-xs font-semibold text-emerald-600 hover:underline">
               All Locations →
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {locations.map((loc) => (
               <Link
-                key={loc.slug}
+                key={loc.id}
                 href={`/locations/${loc.slug}`}
-                className="p-6 rounded-2xl bg-white border border-gray-200 hover:border-emerald-500/50 hover:shadow-md transition-all space-y-2 group shadow-sm"
+                className="p-5 rounded-2xl bg-white border border-gray-200 hover:border-emerald-500/50 hover:shadow-md transition-all space-y-2 group shadow-sm"
               >
                 <div className="text-2xl">🏙️</div>
-                <h3 className="font-bold text-gray-900 text-lg group-hover:text-emerald-600 transition-colors">
-                  {loc.name} Workers
+                <h3 className="font-bold text-gray-900 text-base group-hover:text-emerald-600 transition-colors">
+                  {loc.name} {loc.name_bn ? `(${loc.name_bn})` : ""}
                 </h3>
-                <p className="text-xs text-gray-500">{loc.description ?? `${loc.name} Division`}</p>
+                <p className="text-xs text-gray-500">{loc.name} Division</p>
                 <div className="text-xs font-semibold text-emerald-600 pt-1 group-hover:translate-x-1 transition-transform">
-                  View {loc._count.workers > 0 ? `${loc._count.workers} ` : ""}{loc.name} Listings →
+                  View {loc.workersCount > 0 ? `${loc.workersCount} ` : ""}Listings →
                 </div>
               </Link>
             ))}
@@ -127,7 +138,7 @@ export default async function WorkersDirectoryPage() {
 
         {/* Live Search & Filterable Worker Showcase */}
         <WorkerSearchFilter
-          initialWorkers={allApprovedWorkers}
+          initialWorkers={serializedWorkers}
           categories={categories}
           locations={locations}
         />

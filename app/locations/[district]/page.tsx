@@ -116,13 +116,15 @@ export default async function DistrictLocationPage({ params }: Props) {
     },
   });
 
-  const locations = await prisma.location.findMany({
-    where: { is_active: true },
-    orderBy: { name: "asc" },
-    include: {
-      _count: { select: { workers: true } },
-    },
+  const divisions = await prisma.division.findMany({
+    orderBy: { title_en: "asc" },
+    select: { id: true, title_en: true, title_bn: true },
   });
+
+  const locations = divisions.map((d) => ({
+    id: d.id,
+    name: d.title_en || d.title_bn || "",
+  }));
 
   // Fetch workers matching this district
   const districtWorkers = await prisma.workerProfile.findMany({
@@ -139,7 +141,6 @@ export default async function DistrictLocationPage({ params }: Props) {
     orderBy: { created_at: "desc" },
     include: {
       category: { select: { icon: true, name: true } },
-      location: { select: { name: true } },
     },
   });
 
@@ -151,9 +152,14 @@ export default async function DistrictLocationPage({ params }: Props) {
           orderBy: { created_at: "desc" },
           include: {
             category: { select: { icon: true, name: true } },
-            location: { select: { name: true } },
+            districtRef: { select: { title: true } },
           },
         });
+
+  const serializedWorkers = allWorkers.map((w) => ({
+    ...w,
+    rating: Number(w.rating),
+  }));
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 py-12 px-4 sm:px-6 lg:px-8">
@@ -251,7 +257,7 @@ export default async function DistrictLocationPage({ params }: Props) {
         {/* Worker Search & Filter Section */}
         <section aria-labelledby="district-workers-heading" className="space-y-6">
           <WorkerSearchFilter
-            initialWorkers={allWorkers}
+            initialWorkers={serializedWorkers}
             categories={categories}
             locations={locations}
           />

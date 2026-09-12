@@ -132,31 +132,38 @@ export default async function UpazilaLocationPage({ params }: Props) {
     },
   });
 
-  const locations = await prisma.location.findMany({
-    where: { is_active: true },
-    orderBy: { name: "asc" },
-    include: {
-      _count: { select: { workers: true } },
-    },
+  const divisions = await prisma.division.findMany({
+    orderBy: { title_en: "asc" },
+    select: { id: true, title_en: true, title_bn: true },
   });
 
-  // Query workers matching upazila or district
+  const locations = divisions.map((d) => ({
+    id: d.id,
+    name: d.title_en || d.title_bn || "",
+  }));
+
+  // Query workers matching upazila or district-wide coverage
   const upazilaWorkers = await prisma.workerProfile.findMany({
     where: {
       status: "APPROVED",
       OR: [
         { fk_upazila_id: dbUpazila.id },
-        { upazila: { contains: upazilaName, mode: "insensitive" } },
+        ...(dbUpazila.loc_district_id
+          ? [
+              {
+                fk_district_id: dbUpazila.loc_district_id,
+                coverage_scope: "ALL_DISTRICT" as const,
+              },
+            ]
+          : []),
+        { coverage_scope: "NATIONWIDE" as const },
+        { upazila: { contains: upazilaName, mode: "insensitive" as const } },
         { upazila: { contains: upazilaNameBn } },
-        { zilla: { contains: districtName, mode: "insensitive" } },
-        { zilla: { contains: districtNameBn } },
-        { city: { contains: districtName, mode: "insensitive" } },
       ],
     },
     orderBy: { created_at: "desc" },
     include: {
       category: { select: { icon: true, name: true } },
-      location: { select: { name: true } },
     },
   });
 
@@ -168,9 +175,13 @@ export default async function UpazilaLocationPage({ params }: Props) {
           orderBy: { created_at: "desc" },
           include: {
             category: { select: { icon: true, name: true } },
-            location: { select: { name: true } },
           },
         });
+
+  const serializedWorkers = allWorkers.map((w) => ({
+    ...w,
+    rating: Number(w.rating),
+  }));
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 py-12 px-4 sm:px-6 lg:px-8">
@@ -240,7 +251,7 @@ export default async function UpazilaLocationPage({ params }: Props) {
         {/* Worker Search & Filter Section */}
         <section aria-labelledby="upazila-directory-heading" className="space-y-6">
           <WorkerSearchFilter
-            initialWorkers={allWorkers}
+            initialWorkers={serializedWorkers}
             categories={categories}
             locations={locations}
           />

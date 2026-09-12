@@ -31,8 +31,14 @@ export async function GET(request: Request, { params }: Props) {
             category: {
               select: { name: true, name_bn: true, slug: true, icon: true },
             },
-            location: {
-              select: { name: true, name_bn: true, slug: true },
+            districtRef: {
+              select: { title: true, title_en: true, title_bn: true },
+            },
+            upazilaRef: {
+              select: { title_en: true, title_bn: true },
+            },
+            cityAreaRef: {
+              select: { title_en: true, title_bn: true },
             },
             reviews: {
               orderBy: { created_at: "desc" },

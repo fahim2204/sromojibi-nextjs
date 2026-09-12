@@ -60,6 +60,10 @@ export default function Navbar() {
     { name: "Contact", href: "/contact" },
   ];
 
+  if (pathname?.startsWith("/sr-admin")) {
+    return null;
+  }
+
   return (
     <NextUINavbar
       onMenuOpenChange={setIsMenuOpen}

@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Plus_Jakarta_Sans } from "next/font/google";
 
 const brandFont = Plus_Jakarta_Sans({
@@ -9,6 +12,12 @@ const brandFont = Plus_Jakarta_Sans({
 });
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith("/sr-admin")) {
+    return null;
+  }
+
   return (
     <footer className="bg-white text-gray-600 text-sm border-t border-gray-200 pt-12 pb-8">
       <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">

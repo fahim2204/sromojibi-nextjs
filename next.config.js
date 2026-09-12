@@ -9,4 +9,5 @@ const nextConfig = {
   trailingSlash: false,
 };
 
+// Trigger restart to reload Prisma client types
 export default nextConfig;
