@@ -185,34 +185,44 @@ async function main() {
       where: { slug: w.service_type.toLowerCase().replace(/\s+/g, "-") },
     });
 
+    const expNum = parseInt(w.experience.replace(/[^0-9]/g, "")) || 5;
+
+    // Find matching division
+    const div = await prisma.division.findFirst({
+      where: {
+        OR: [
+          { title_en: { contains: w.city, mode: "insensitive" } },
+          { title_bn: { contains: w.city, mode: "insensitive" } },
+        ],
+      },
+    });
+
     await prisma.workerProfile.upsert({
       where: { slug: w.slug },
       update: {
         full_name: w.full_name,
         phone: w.phone,
-        service_type: w.service_type,
-        city: w.city,
-        experience: w.experience,
+        experience: expNum,
         details: w.details,
         status: w.status as any,
         is_verified: w.is_verified,
         rating: w.rating,
         review_count: w.review_count,
-        fk_category_id: categoryObj?.id ?? null,
+        category_ids: categoryObj ? [categoryObj.id] : [],
+        fk_division_id: div?.id || null,
       },
       create: {
         full_name: w.full_name,
         phone: w.phone,
         slug: w.slug,
-        service_type: w.service_type,
-        city: w.city,
-        experience: w.experience,
+        experience: expNum,
         details: w.details,
         status: w.status as any,
         is_verified: w.is_verified,
         rating: w.rating,
         review_count: w.review_count,
-        fk_category_id: categoryObj?.id ?? null,
+        category_ids: categoryObj ? [categoryObj.id] : [],
+        fk_division_id: div?.id || null,
       },
     });
   }

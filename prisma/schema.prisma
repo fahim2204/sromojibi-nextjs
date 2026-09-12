@@ -167,54 +167,49 @@ model Category {
   created_at  DateTime        @default(now())
   updated_at  DateTime        @updatedAt
 
-  workers     WorkerProfile[]
+  workerCategories WorkerCategory[]
 
   @@map("category")
 }
 
 model WorkerProfile {
-  id             Int            @id @default(autoincrement())
-  fk_user_id     Int?           @unique
-  full_name      String
-  email          String?
-  phone          String
-  slug           String         @unique
-  service_type   String
-  fk_category_id Int?
+  id              Int            @id @default(autoincrement())
+  fk_user_id      Int?           @unique
+  full_name       String
+  email           String?
+  phone           String
+  slug            String         @unique
 
-  city           String
-  zilla          String?
-  upazila        String?
-  village        String?
+  category_ids    Int[]          @default([])
 
-  fk_division_id String?
-  fk_district_id String?
-  fk_upazila_id  String?
-  fk_union_id    String?
+  fk_division_id  String?
+  fk_district_id  String?
+  fk_upazila_id   String?
+  fk_union_id     String?
   fk_city_area_id String?
-  coverage_scope CoverageScope  @default(SPECIFIC_AREA)
+  coverage_scope  CoverageScope  @default(SPECIFIC_AREA)
 
-  experience     String
-  details        String?        @db.Text
-  status         WorkerStatus   @default(PENDING)
-  is_verified    Boolean        @default(false)
-  rating         Decimal?       @default(0.00) @db.Decimal(3, 2)
-  review_count   Int            @default(0)
-  avatar_url     String?
-  created_at     DateTime       @default(now())
-  updated_at     DateTime       @updatedAt
+  experience      Int            @default(1)
+  details         String?        @db.Text
+  status          WorkerStatus   @default(PENDING)
+  is_verified     Boolean        @default(false)
+  rating          Decimal?       @default(0.00) @db.Decimal(3, 2)
+  review_count    Int            @default(0)
+  avatar_url      String?
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
 
-  user         User?         @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
-  category     Category?     @relation(fields: [fk_category_id], references: [id], onDelete: SetNull)
-  divisionRef  Division?     @relation(fields: [fk_division_id], references: [id], onDelete: SetNull)
-  districtRef  District?     @relation(fields: [fk_district_id], references: [id], onDelete: SetNull)
-  upazilaRef   Upazila?      @relation(fields: [fk_upazila_id], references: [id], onDelete: SetNull)
-  unionRef     Union?        @relation(fields: [fk_union_id], references: [id], onDelete: SetNull)
-  cityAreaRef  CityArea?     @relation(fields: [fk_city_area_id], references: [id], onDelete: SetNull)
-  reviews      WorkerReview[]
+  user             User?            @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
+  workerCategories WorkerCategory[]
+  divisionRef      Division?        @relation(fields: [fk_division_id], references: [id], onDelete: SetNull)
+  districtRef      District?        @relation(fields: [fk_district_id], references: [id], onDelete: SetNull)
+  upazilaRef       Upazila?         @relation(fields: [fk_upazila_id], references: [id], onDelete: SetNull)
+  unionRef         Union?           @relation(fields: [fk_union_id], references: [id], onDelete: SetNull)
+  cityAreaRef      CityArea?        @relation(fields: [fk_city_area_id], references: [id], onDelete: SetNull)
+  reviews          WorkerReview[]
 
   @@index([fk_user_id])
-  @@index([fk_category_id])
+  @@index([category_ids], type: Gin)
   @@index([fk_division_id])
   @@index([fk_district_id])
   @@index([fk_upazila_id])
@@ -222,11 +217,20 @@ model WorkerProfile {
   @@index([fk_city_area_id])
   @@index([coverage_scope])
   @@index([status])
-  @@index([city])
-  @@index([zilla])
-  @@index([upazila])
-  @@index([service_type])
   @@map("worker_profile")
+}
+
+model WorkerCategory {
+  id             Int           @id @default(autoincrement())
+  fk_worker_id   Int
+  fk_category_id Int
+  worker         WorkerProfile @relation(fields: [fk_worker_id], references: [id], onDelete: Cascade)
+  category       Category      @relation(fields: [fk_category_id], references: [id], onDelete: Cascade)
+
+  @@unique([fk_worker_id, fk_category_id])
+  @@index([fk_worker_id])
+  @@index([fk_category_id])
+  @@map("worker_category")
 }
 
 model WorkerReview {

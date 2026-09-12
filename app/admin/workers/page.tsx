@@ -15,11 +15,28 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminWorkersPage() {
-  const allWorkers = await prisma.workerProfile.findMany({
+  const rawWorkers = await prisma.workerProfile.findMany({
     orderBy: { created_at: "desc" },
     include: {
-      category: { select: { icon: true, name: true } },
+      workerCategories: {
+        select: {
+          category: { select: { icon: true, name: true } },
+        },
+      },
+      divisionRef: { select: { title_en: true, title_bn: true } },
+      districtRef: { select: { title_en: true, title_bn: true } },
     },
+  });
+
+  const allWorkers = rawWorkers.map((w) => {
+    const cats = w.workerCategories.map((wc) => wc.category);
+    return {
+      ...w,
+      city: w.divisionRef?.title_en || w.divisionRef?.title_bn || "Bangladesh",
+      experience: `${w.experience} ${w.experience > 1 ? "Years" : "Year"}`,
+      category: cats[0] ?? null,
+      service_type: cats.map((c) => c.name).join(", "),
+    };
   });
 
   return (

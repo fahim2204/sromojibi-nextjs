@@ -34,7 +34,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const worker = await prisma.workerProfile.findUnique({
     where: { slug },
     include: {
-      category: true,
+      divisionRef: true,
+      districtRef: true,
+      upazilaRef: true,
+      cityAreaRef: true,
     },
   });
 
@@ -45,16 +48,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const title = `${worker.full_name} - ${worker.service_type} in ${worker.city} | Sromojibi (শ্রমজীবী)`;
-  const description = `${worker.full_name} - ${worker.experience} অভিজ্ঞতা সম্পন্ন ${worker.service_type} (${worker.city})। সরাসরি যোগাযোগের নম্বর: ${worker.phone}। Find verified ${worker.service_type} in ${worker.city} on Sromojibi.`;
+  const categories = await prisma.category.findMany({
+    where: { id: { in: worker.category_ids } },
+    select: { name: true, name_bn: true },
+  });
+  const serviceType = categories[0]?.name_bn || categories[0]?.name || "দক্ষ মিস্ত্রি";
+  const city = worker.districtRef?.title_bn || worker.divisionRef?.title_bn || worker.districtRef?.title_en || worker.divisionRef?.title_en || "বাংলাদেশ";
+
+  const title = `${worker.full_name} - ${serviceType} in ${city} | Sromojibi (শ্রমজীবী)`;
+  const description = `${worker.full_name} - ${worker.experience} বছর অভিজ্ঞতা সম্পন্ন ${serviceType} (${city})। সরাসরি যোগাযোগের নম্বর: ${worker.phone}। Find verified ${serviceType} in ${city} on Sromojibi.`;
 
   return {
     title,
     description,
     keywords: [
       worker.full_name,
-      `${worker.service_type} ${worker.city}`,
-      `${worker.service_type} bangladesh`,
+      `${serviceType} ${city}`,
+      `${serviceType} bangladesh`,
       "sromojibi worker profile",
       "local mistri contact",
     ],
@@ -84,10 +94,10 @@ export default async function WorkerProfilePage({ params }: Props) {
   const worker = await prisma.workerProfile.findUnique({
     where: { slug },
     include: {
-      category: true,
       divisionRef: true,
       districtRef: true,
       upazilaRef: true,
+      cityAreaRef: true,
       unionRef: true,
       reviews: {
         orderBy: { created_at: "desc" },
@@ -99,35 +109,64 @@ export default async function WorkerProfilePage({ params }: Props) {
     notFound();
   }
 
-  // Fetch related/recommended approved workers (same category or city)
-  const relatedWorkers = await prisma.workerProfile.findMany({
+  const categories = await prisma.category.findMany({
+    where: { id: { in: worker.category_ids } },
+  });
+  const primaryCategory = categories[0] || null;
+  const serviceType = primaryCategory?.name_bn || primaryCategory?.name || "কারিগর";
+
+  const city = worker.divisionRef?.title_bn || worker.divisionRef?.title_en || "বাংলাদেশ";
+  const zilla = worker.districtRef?.title_bn || worker.districtRef?.title_en || null;
+  const upazila = worker.cityAreaRef?.title_bn || worker.cityAreaRef?.title_en || worker.upazilaRef?.title_bn || worker.upazilaRef?.title_en || null;
+  const union = worker.unionRef?.title_bn || worker.unionRef?.title_en || null;
+  const locationDisplay = upazila || zilla || city;
+
+  // Fetch related/recommended approved workers (same category or district/division)
+  const relatedWorkersRaw = await prisma.workerProfile.findMany({
     where: {
       status: "APPROVED",
       id: { not: worker.id },
       OR: [
-        { fk_category_id: worker.fk_category_id ?? -1 },
-        { service_type: { equals: worker.service_type, mode: "insensitive" } },
-        { city: { equals: worker.city, mode: "insensitive" } },
+        ...(worker.category_ids.length > 0 ? [{ category_ids: { hasSome: worker.category_ids } }] : []),
+        ...(worker.fk_district_id ? [{ fk_district_id: worker.fk_district_id }] : []),
+        ...(worker.fk_division_id ? [{ fk_division_id: worker.fk_division_id }] : []),
       ],
     },
     take: 3,
     orderBy: { rating: "desc" },
     include: {
-      category: { select: { icon: true, name: true } },
+      divisionRef: true,
+      districtRef: true,
+      upazilaRef: true,
+      cityAreaRef: true,
     },
   });
+
+  const allRelatedCatIds = Array.from(new Set(relatedWorkersRaw.flatMap((w) => w.category_ids)));
+  const relatedCategories = allRelatedCatIds.length > 0 ? await prisma.category.findMany({
+    where: { id: { in: allRelatedCatIds } },
+    select: { id: true, name: true, name_bn: true },
+  }) : [];
+  const catMap = new Map(relatedCategories.map((c) => [c.id, c.name_bn || c.name]));
+
+  const relatedWorkers = relatedWorkersRaw.map((rw) => ({
+    ...rw,
+    service_type: catMap.get(rw.category_ids[0]) || "মিস্ত্রি",
+    city: rw.districtRef?.title_bn || rw.divisionRef?.title_bn || "বাংলাদেশ",
+    experienceDisplay: `${rw.experience} বছর অভিজ্ঞতা`,
+  }));
 
   // Generate Schema.org structured data for SEO (LocalBusiness / Person)
   const workerSchema = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     name: worker.full_name,
-    description: worker.details || `${worker.service_type} services in ${worker.city}`,
+    description: worker.details || `${serviceType} services in ${city}`,
     telephone: worker.phone,
     address: {
       "@type": "PostalAddress",
-      addressLocality: worker.upazila || worker.city,
-      addressRegion: worker.zilla || worker.city,
+      addressLocality: locationDisplay,
+      addressRegion: zilla || city,
       addressCountry: "BD",
     },
     aggregateRating:
@@ -143,15 +182,16 @@ export default async function WorkerProfilePage({ params }: Props) {
   };
 
   const ratingVal = Number(worker.rating ?? 5.0).toFixed(1);
-  const iconEmoji = worker.category?.icon || "👷‍♂️";
+  const iconEmoji = primaryCategory?.icon || "👷‍♂️";
 
   // Skill tags based on trade
   const skillChips = [
-    worker.service_type,
-    `${worker.city} কভারেজ`,
+    serviceType,
+    ...categories.slice(1).map((c) => c.name_bn || c.name),
+    `${city} কভারেজ`,
     "জরুরি হোম সার্ভিস",
     "সরাসরি ফোন সার্ভিস",
-    worker.experience ? `${worker.experience} অভিজ্ঞতা` : "অভিজ্ঞ কারিগর",
+    `${worker.experience} বছর অভিজ্ঞতা`,
   ];
 
   return (
@@ -172,11 +212,11 @@ export default async function WorkerProfilePage({ params }: Props) {
           <Link href="/workers" className="hover:text-emerald-600 transition-colors">
             মিস্ত্রি ডিরেক্টরি (Directory)
           </Link>
-          {worker.category && (
+          {primaryCategory && (
             <>
               <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-              <Link href={`/categories/${worker.category.slug}`} className="hover:text-emerald-600 transition-colors">
-                {worker.category.name_bn || worker.category.name}
+              <Link href={`/categories/${primaryCategory.slug}`} className="hover:text-emerald-600 transition-colors">
+                {primaryCategory.name_bn || primaryCategory.name}
               </Link>
             </>
           )}
@@ -223,9 +263,9 @@ export default async function WorkerProfilePage({ params }: Props) {
 
                 <p className="text-sm font-bold text-emerald-600 flex items-center gap-1.5">
                   <Briefcase className="w-4 h-4 shrink-0" />
-                  <span>{worker.service_type}</span>
+                  <span>{serviceType}</span>
                   <span className="text-slate-300">•</span>
-                  <span className="text-slate-600 font-medium">{worker.city}</span>
+                  <span className="text-slate-600 font-medium">{locationDisplay}</span>
                 </p>
 
                 {/* Rating & Reviews summary */}
@@ -258,7 +298,7 @@ export default async function WorkerProfilePage({ params }: Props) {
             <WorkerProfileActions
               phone={worker.phone}
               fullName={worker.full_name}
-              serviceType={worker.service_type}
+              serviceType={serviceType}
             />
           </div>
         </section>
@@ -271,7 +311,7 @@ export default async function WorkerProfilePage({ params }: Props) {
               <span>অভিজ্ঞতা (Exp.)</span>
             </div>
             <p className="text-base sm:text-lg font-black text-slate-900">
-              {worker.experience || "অভিজ্ঞ"}
+              {worker.experience} বছর
             </p>
           </div>
 
@@ -281,7 +321,7 @@ export default async function WorkerProfilePage({ params }: Props) {
               <span>এলাকা (Location)</span>
             </div>
             <p className="text-base sm:text-lg font-black text-slate-900 truncate">
-              {worker.upazila || worker.city}
+              {locationDisplay}
             </p>
           </div>
 
@@ -291,7 +331,7 @@ export default async function WorkerProfilePage({ params }: Props) {
               <span>সেবার ধরণ</span>
             </div>
             <p className="text-base sm:text-lg font-black text-slate-900 truncate">
-              {worker.service_type}
+              {serviceType}
             </p>
           </div>
 
@@ -324,7 +364,7 @@ export default async function WorkerProfilePage({ params }: Props) {
               <div className="space-y-4">
                 <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-sm text-slate-700 leading-relaxed font-normal">
                   {worker.details ||
-                    `${worker.full_name} একজন দক্ষ ${worker.service_type}। তিনি ${worker.city} এবং আশেপাশের এলাকায় বিশ্বস্ততার সাথে বাসাবাড়ি ও অফিসের সেবা প্রদান করে আসছেন।`}
+                    `${worker.full_name} একজন দক্ষ ${serviceType}। তিনি ${locationDisplay} এবং আশেপাশের এলাকায় বিশ্বস্ততার সাথে বাসাবাড়ি ও অফিসের সেবা প্রদান করে আসছেন।`}
                 </div>
 
                 {/* Skill Chips */}
@@ -366,22 +406,24 @@ export default async function WorkerProfilePage({ params }: Props) {
               <div className="space-y-2.5 text-xs text-slate-600">
                 <div className="flex justify-between py-1 border-b border-slate-100">
                   <span className="text-slate-400 font-medium">বিভাগ (Division):</span>
-                  <span className="font-bold text-slate-900">{worker.divisionRef?.title_bn || worker.city}</span>
+                  <span className="font-bold text-slate-900">{city}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-400 font-medium">জেলা (District):</span>
-                  <span className="font-bold text-slate-900">{worker.districtRef?.title_bn || worker.zilla || worker.city}</span>
-                </div>
-                {worker.upazila && (
+                {zilla && (
                   <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-400 font-medium">উপজেলা (Upazila):</span>
-                    <span className="font-bold text-slate-900">{worker.upazilaRef?.title_bn || worker.upazila}</span>
+                    <span className="text-slate-400 font-medium">জেলা (District):</span>
+                    <span className="font-bold text-slate-900">{zilla}</span>
                   </div>
                 )}
-                {worker.village && (
+                {upazila && (
                   <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-400 font-medium">গ্রাম / মহল্লা:</span>
-                    <span className="font-bold text-slate-900">{worker.village}</span>
+                    <span className="text-slate-400 font-medium">উপজেলা / এলাকা:</span>
+                    <span className="font-bold text-slate-900">{upazila}</span>
+                  </div>
+                )}
+                {union && (
+                  <div className="flex justify-between py-1 border-b border-slate-100">
+                    <span className="text-slate-400 font-medium">ইউনিয়ন / ওয়ার্ড:</span>
+                    <span className="font-bold text-slate-900">{union}</span>
                   </div>
                 )}
               </div>
@@ -440,7 +482,7 @@ export default async function WorkerProfilePage({ params }: Props) {
                         </span>
                       </div>
                       <div className="flex items-center justify-between pt-1">
-                        <span className="text-[10px] text-slate-400 font-semibold">{rw.experience}</span>
+                        <span className="text-[10px] text-slate-400 font-semibold">{rw.experienceDisplay}</span>
                         <a
                           href={`tel:${rw.phone}`}
                           className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold transition-all"

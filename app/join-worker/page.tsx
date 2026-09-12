@@ -356,6 +356,8 @@ export default function JoinWorkerPage() {
         },
         body: JSON.stringify({
           ...formData,
+          experience: parseInt(String(formData.experience).replace(/[^0-9]/g, "")) || 1,
+          serviceTypes: selectedTrades,
           coverageScope,
           details: formData.details || undefined,
           divisionId: selectedDivisionId || undefined,

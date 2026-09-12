@@ -10,8 +10,9 @@ const createWorkerSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
   email: z.string().email("Invalid email address").optional().or(z.literal("")),
   phone: z.string().min(11, "Please enter a valid phone number"),
-  serviceType: z.string().min(2, "Please select a service category"),
-  city: z.string().min(2, "Please select a city"),
+  serviceType: z.string().optional(),
+  serviceTypes: z.array(z.string()).optional(),
+  city: z.string().optional(),
   zilla: z.string().optional().or(z.literal("")),
   upazila: z.string().optional().or(z.literal("")),
   village: z.string().optional().or(z.literal("")),
@@ -21,7 +22,7 @@ const createWorkerSchema = z.object({
   unionId: z.string().optional().or(z.literal("")),
   cityAreaId: z.string().optional().or(z.literal("")),
   coverageScope: z.enum(["SPECIFIC_AREA", "ALL_UPAZILA", "ALL_DISTRICT", "ALL_DIVISION", "NATIONWIDE"]).optional(),
-  experience: z.string().min(1, "Please select your experience level"),
+  experience: z.union([z.number(), z.string()]).default(1),
   details: z.string().optional(),
 });
 
@@ -50,21 +51,34 @@ export async function GET(request: Request) {
         whereCondition.status = statusParam as any;
       }
       if (category) {
-        whereCondition.OR = [
-          { service_type: { equals: category, mode: "insensitive" } },
-          { category: { slug: category } },
-        ];
+        whereCondition.workerCategories = {
+          some: {
+            category: {
+              OR: [
+                { slug: category },
+                { name: { equals: category, mode: "insensitive" } },
+              ],
+            },
+          },
+        };
       }
       if (city) {
-        whereCondition.city = { equals: city, mode: "insensitive" };
+        whereCondition.OR = [
+          { divisionRef: { title_en: { equals: city, mode: "insensitive" } } },
+          { districtRef: { title_en: { equals: city, mode: "insensitive" } } },
+        ];
       }
 
-      return await prisma.workerProfile.findMany({
+      const rawWorkers = await prisma.workerProfile.findMany({
         where: whereCondition,
         orderBy: { created_at: "desc" },
         include: {
-          category: {
-            select: { name: true, name_bn: true, slug: true, icon: true },
+          workerCategories: {
+            select: {
+              category: {
+                select: { id: true, name: true, name_bn: true, slug: true, icon: true },
+              },
+            },
           },
           divisionRef: { select: { id: true, title_bn: true, title_en: true } },
           districtRef: { select: { id: true, title_bn: true, title_en: true } },
@@ -72,6 +86,24 @@ export async function GET(request: Request) {
           unionRef: { select: { id: true, title_bn: true, title_en: true } },
           cityAreaRef: { select: { id: true, title_bn: true, title_en: true, parent_thana: true } },
         },
+      });
+
+      return rawWorkers.map((w) => {
+        const categories = w.workerCategories.map((wc) => wc.category);
+        const city = w.divisionRef?.title_en || w.divisionRef?.title_bn || "Bangladesh";
+        const zilla = w.districtRef?.title_en || w.districtRef?.title_bn || null;
+        const upazila = w.cityAreaRef?.title_en || w.upazilaRef?.title_en || w.upazilaRef?.title_bn || null;
+        const village = w.unionRef?.title_en || w.unionRef?.title_bn || null;
+        return {
+          ...w,
+          city,
+          zilla,
+          upazila,
+          village,
+          categories,
+          category: categories[0] ?? null,
+          service_type: categories.map((c) => c.name).join(", "),
+        };
       });
     });
 
@@ -120,12 +152,42 @@ export async function POST(request: Request) {
       attempts++;
     }
 
-    const categorySlug = payload.serviceType.toLowerCase().replace(/\s+/g, "-");
-    const locationSlug = payload.city.toLowerCase().replace(/\s+/g, "-");
+    // Parse multiple service trades / categories
+    const requestedTrades: string[] =
+      payload.serviceTypes && payload.serviceTypes.length > 0
+        ? payload.serviceTypes
+        : (payload.serviceType || "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
 
-    const categoryRecord = await prisma.category.findUnique({
-      where: { slug: categorySlug },
-    });
+    // Fetch all active categories to match requested trades
+    const allCategories = await prisma.category.findMany();
+    const matchedCategoryIds: number[] = [];
+    const matchedServiceTypes: string[] = [];
+
+    for (const trade of requestedTrades) {
+      const lower = trade.toLowerCase().trim();
+      const slug = lower.replace(/\s+/g, "-");
+      const matched = allCategories.find(
+        (c) =>
+          c.name.toLowerCase() === lower ||
+          c.slug.toLowerCase() === slug ||
+          (c.name_bn && trade.includes(c.name_bn))
+      );
+      if (matched) {
+        if (!matchedCategoryIds.includes(matched.id)) {
+          matchedCategoryIds.push(matched.id);
+          matchedServiceTypes.push(matched.name);
+        }
+      } else {
+        if (!matchedServiceTypes.includes(trade)) {
+          matchedServiceTypes.push(trade);
+        }
+      }
+    }
+
+    const primaryCategoryId = matchedCategoryIds[0] ?? null;
 
     // Verify location FKs before assigning to avoid FK violation crash
     const validDivision = payload.divisionId
@@ -144,6 +206,11 @@ export async function POST(request: Request) {
       ? await prisma.cityArea.findUnique({ where: { id: payload.cityAreaId }, select: { id: true } })
       : null;
 
+    const expNum =
+      typeof payload.experience === "number"
+        ? payload.experience
+        : parseInt(String(payload.experience).replace(/[^0-9]/g, "")) || 1;
+
     const worker = await prisma.workerProfile.create({
       data: {
         fk_user_id: sessionUser.id,
@@ -151,21 +218,21 @@ export async function POST(request: Request) {
         email: payload.email || sessionUser.email,
         phone: payload.phone,
         slug,
-        service_type: payload.serviceType,
-        city: payload.city,
-        zilla: payload.zilla || null,
-        upazila: payload.upazila || null,
-        village: payload.village || null,
+        category_ids: matchedCategoryIds,
+        workerCategories: {
+          create: matchedCategoryIds.map((catId) => ({
+            category: { connect: { id: catId } },
+          })),
+        },
         fk_division_id: validDivision?.id ?? null,
         fk_district_id: validDistrict?.id ?? null,
         fk_upazila_id: validUpazila?.id ?? null,
         fk_union_id: validUnion?.id ?? null,
         fk_city_area_id: validCityArea?.id ?? null,
         coverage_scope: payload.coverageScope ?? "SPECIFIC_AREA",
-        experience: payload.experience,
+        experience: expNum,
         details: payload.details ?? null,
         status: "PENDING",
-        fk_category_id: categoryRecord?.id ?? null,
       },
       include: {
         divisionRef: true,
@@ -193,18 +260,14 @@ export async function POST(request: Request) {
         message: "Worker profile registered successfully and pending approval.",
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof ZodError) {
-      return apiError(
-        "INVALID_INPUT",
-        error.issues[0]?.message ?? "Invalid worker profile data",
-        { status: 400 }
-      );
+      return apiError("BAD_REQUEST", error.issues?.[0]?.message || "Invalid input", {
+        status: 400,
+      });
     }
-
     console.error("POST /api/v1/workers error:", error);
-    const detailMsg = error instanceof Error ? error.message : "Failed to create worker profile";
-    return apiError("INTERNAL_SERVER_ERROR", detailMsg, {
+    return apiError("INTERNAL_SERVER_ERROR", "Failed to register worker profile", {
       status: 500,
     });
   }

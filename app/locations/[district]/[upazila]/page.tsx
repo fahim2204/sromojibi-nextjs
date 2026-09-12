@@ -128,7 +128,7 @@ export default async function UpazilaLocationPage({ params }: Props) {
     where: { is_active: true },
     orderBy: { name: "asc" },
     include: {
-      _count: { select: { workers: true } },
+      _count: { select: { workerCategories: true } },
     },
   });
 
@@ -157,13 +157,19 @@ export default async function UpazilaLocationPage({ params }: Props) {
             ]
           : []),
         { coverage_scope: "NATIONWIDE" as const },
-        { upazila: { contains: upazilaName, mode: "insensitive" as const } },
-        { upazila: { contains: upazilaNameBn } },
       ],
     },
     orderBy: { created_at: "desc" },
     include: {
-      category: { select: { icon: true, name: true } },
+      workerCategories: {
+        select: {
+          category: { select: { icon: true, name: true } },
+        },
+      },
+      divisionRef: { select: { title_en: true, title_bn: true } },
+      districtRef: { select: { title_en: true, title_bn: true, title: true } },
+      upazilaRef: { select: { title_en: true, title_bn: true } },
+      cityAreaRef: { select: { title_en: true, title_bn: true } },
     },
   });
 
@@ -174,14 +180,34 @@ export default async function UpazilaLocationPage({ params }: Props) {
           where: { status: "APPROVED" },
           orderBy: { created_at: "desc" },
           include: {
-            category: { select: { icon: true, name: true } },
+            workerCategories: {
+              select: {
+                category: { select: { icon: true, name: true } },
+              },
+            },
+            divisionRef: { select: { title_en: true, title_bn: true } },
+            districtRef: { select: { title_en: true, title_bn: true, title: true } },
+            upazilaRef: { select: { title_en: true, title_bn: true } },
+            cityAreaRef: { select: { title_en: true, title_bn: true } },
           },
         });
 
-  const serializedWorkers = allWorkers.map((w) => ({
-    ...w,
-    rating: Number(w.rating),
-  }));
+  const serializedWorkers = allWorkers.map((w: any) => {
+    const cats = w.workerCategories?.map((wc: any) => wc.category) || [];
+    const city = w.divisionRef?.title_en || w.divisionRef?.title_bn || "Bangladesh";
+    const zilla = w.districtRef?.title_en || w.districtRef?.title_bn || w.districtRef?.title || null;
+    const upazila = w.cityAreaRef?.title_en || w.upazilaRef?.title_en || w.upazilaRef?.title_bn || null;
+    return {
+      ...w,
+      city,
+      zilla,
+      upazila,
+      rating: Number(w.rating),
+      categories: cats,
+      category: cats[0] ?? null,
+      service_type: cats.map((c: any) => c.name).join(", "),
+    };
+  });
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 py-12 px-4 sm:px-6 lg:px-8">

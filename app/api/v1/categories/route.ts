@@ -10,15 +10,22 @@ export async function GET() {
       CACHE_KEYS.categories(),
       CACHE_TTL.FIFTEEN_MINUTES,
       async () => {
-        return await prisma.category.findMany({
+        const rawCategories = await prisma.category.findMany({
           where: { is_active: true },
           orderBy: { name: "asc" },
           include: {
             _count: {
-              select: { workers: true },
+              select: { workerCategories: true },
             },
           },
         });
+
+        return rawCategories.map((c) => ({
+          ...c,
+          _count: {
+            workers: c._count.workerCategories,
+          },
+        }));
       }
     );
 
