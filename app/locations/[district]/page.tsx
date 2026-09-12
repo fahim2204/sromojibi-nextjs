@@ -189,7 +189,7 @@ export default async function DistrictLocationPage({ params }: Props) {
       rating: Number(w.rating),
       categories: cats,
       category: cats[0] ?? null,
-      service_type: cats.map((c: any) => c.name).join(", "),
+      service_type: cats.length > 0 ? cats.map((c: any) => c.name_bn || c.name).join(", ") : "কারিগর",
     };
   });
 

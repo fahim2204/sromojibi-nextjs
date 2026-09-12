@@ -197,7 +197,7 @@ async function main() {
       },
     });
 
-    await prisma.workerProfile.upsert({
+    const upsertedWorker = await prisma.workerProfile.upsert({
       where: { slug: w.slug },
       update: {
         full_name: w.full_name,
@@ -208,7 +208,6 @@ async function main() {
         is_verified: w.is_verified,
         rating: w.rating,
         review_count: w.review_count,
-        category_ids: categoryObj ? [categoryObj.id] : [],
         fk_division_id: div?.id || null,
       },
       create: {
@@ -221,10 +220,25 @@ async function main() {
         is_verified: w.is_verified,
         rating: w.rating,
         review_count: w.review_count,
-        category_ids: categoryObj ? [categoryObj.id] : [],
         fk_division_id: div?.id || null,
       },
     });
+
+    if (categoryObj) {
+      await prisma.workerCategory.upsert({
+        where: {
+          fk_worker_id_fk_category_id: {
+            fk_worker_id: upsertedWorker.id,
+            fk_category_id: categoryObj.id,
+          },
+        },
+        update: {},
+        create: {
+          fk_worker_id: upsertedWorker.id,
+          fk_category_id: categoryObj.id,
+        },
+      });
+    }
   }
 
   console.log("✅ Database Seeding Completed Successfully!");

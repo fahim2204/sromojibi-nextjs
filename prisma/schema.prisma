@@ -80,6 +80,7 @@ model User {
   worker_profile WorkerProfile?
   otps           EmailVerificationOtp[]
   reviews        WorkerReview[]
+  contact_logs   WorkerContactLog[]
 
   @@map("user")
 }
@@ -180,8 +181,6 @@ model WorkerProfile {
   phone           String
   slug            String         @unique
 
-  category_ids    Int[]          @default([])
-
   fk_division_id  String?
   fk_district_id  String?
   fk_upazila_id   String?
@@ -207,9 +206,9 @@ model WorkerProfile {
   unionRef         Union?           @relation(fields: [fk_union_id], references: [id], onDelete: SetNull)
   cityAreaRef      CityArea?        @relation(fields: [fk_city_area_id], references: [id], onDelete: SetNull)
   reviews          WorkerReview[]
+  contact_logs     WorkerContactLog[]
 
   @@index([fk_user_id])
-  @@index([category_ids], type: Gin)
   @@index([fk_division_id])
   @@index([fk_district_id])
   @@index([fk_upazila_id])
@@ -250,6 +249,25 @@ model WorkerReview {
   @@index([fk_user_id])
   @@map("worker_review")
 }
+
+model WorkerContactLog {
+  id           Int           @id @default(autoincrement())
+  fk_worker_id Int
+  fk_user_id   Int?
+  channel      String        @default("PHONE")
+  ip_address   String?
+  user_agent   String?       @db.Text
+  created_at   DateTime      @default(now())
+
+  worker       WorkerProfile @relation(fields: [fk_worker_id], references: [id], onDelete: Cascade)
+  user         User?         @relation(fields: [fk_user_id], references: [id], onDelete: SetNull)
+
+  @@index([fk_worker_id])
+  @@index([fk_user_id])
+  @@index([created_at])
+  @@map("worker_contact_log")
+}
+
 
 model Division {
   id         String          @id

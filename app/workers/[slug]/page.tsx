@@ -34,6 +34,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const worker = await prisma.workerProfile.findUnique({
     where: { slug },
     include: {
+      workerCategories: {
+        include: {
+          category: { select: { name: true, name_bn: true } },
+        },
+      },
       divisionRef: true,
       districtRef: true,
       upazilaRef: true,
@@ -48,15 +53,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const categories = await prisma.category.findMany({
-    where: { id: { in: worker.category_ids } },
-    select: { name: true, name_bn: true },
-  });
+  const categories = worker.workerCategories.map((wc) => wc.category);
   const serviceType = categories[0]?.name_bn || categories[0]?.name || "দক্ষ মিস্ত্রি";
   const city = worker.districtRef?.title_bn || worker.divisionRef?.title_bn || worker.districtRef?.title_en || worker.divisionRef?.title_en || "বাংলাদেশ";
 
   const title = `${worker.full_name} - ${serviceType} in ${city} | Sromojibi (শ্রমজীবী)`;
-  const description = `${worker.full_name} - ${worker.experience} বছর অভিজ্ঞতা সম্পন্ন ${serviceType} (${city})। সরাসরি যোগাযোগের নম্বর: ${worker.phone}। Find verified ${serviceType} in ${city} on Sromojibi.`;
+  const description = `${worker.full_name} - ${worker.experience} বছর অভিজ্ঞতা সম্পন্ন ${serviceType} (${city})। সরাসরি যোগাযোগ করুন ও নির্ভরযোগ্য সেবা গ্রহণ করুন শ্রমজীবী প্ল্যাটফর্মে।`;
 
   return {
     title,
@@ -94,6 +96,11 @@ export default async function WorkerProfilePage({ params }: Props) {
   const worker = await prisma.workerProfile.findUnique({
     where: { slug },
     include: {
+      workerCategories: {
+        include: {
+          category: true,
+        },
+      },
       divisionRef: true,
       districtRef: true,
       upazilaRef: true,
@@ -109,9 +116,7 @@ export default async function WorkerProfilePage({ params }: Props) {
     notFound();
   }
 
-  const categories = await prisma.category.findMany({
-    where: { id: { in: worker.category_ids } },
-  });
+  const categories = worker.workerCategories.map((wc) => wc.category);
   const primaryCategory = categories[0] || null;
   const serviceType = primaryCategory?.name_bn || primaryCategory?.name || "কারিগর";
 
@@ -122,12 +127,13 @@ export default async function WorkerProfilePage({ params }: Props) {
   const locationDisplay = upazila || zilla || city;
 
   // Fetch related/recommended approved workers (same category or district/division)
+  const catIds = categories.map((c) => c.id);
   const relatedWorkersRaw = await prisma.workerProfile.findMany({
     where: {
       status: "APPROVED",
       id: { not: worker.id },
       OR: [
-        ...(worker.category_ids.length > 0 ? [{ category_ids: { hasSome: worker.category_ids } }] : []),
+        ...(catIds.length > 0 ? [{ workerCategories: { some: { fk_category_id: { in: catIds } } } }] : []),
         ...(worker.fk_district_id ? [{ fk_district_id: worker.fk_district_id }] : []),
         ...(worker.fk_division_id ? [{ fk_division_id: worker.fk_division_id }] : []),
       ],
@@ -135,6 +141,11 @@ export default async function WorkerProfilePage({ params }: Props) {
     take: 3,
     orderBy: { rating: "desc" },
     include: {
+      workerCategories: {
+        include: {
+          category: true,
+        },
+      },
       divisionRef: true,
       districtRef: true,
       upazilaRef: true,
@@ -142,19 +153,16 @@ export default async function WorkerProfilePage({ params }: Props) {
     },
   });
 
-  const allRelatedCatIds = Array.from(new Set(relatedWorkersRaw.flatMap((w) => w.category_ids)));
-  const relatedCategories = allRelatedCatIds.length > 0 ? await prisma.category.findMany({
-    where: { id: { in: allRelatedCatIds } },
-    select: { id: true, name: true, name_bn: true },
-  }) : [];
-  const catMap = new Map(relatedCategories.map((c) => [c.id, c.name_bn || c.name]));
-
-  const relatedWorkers = relatedWorkersRaw.map((rw) => ({
-    ...rw,
-    service_type: catMap.get(rw.category_ids[0]) || "মিস্ত্রি",
-    city: rw.districtRef?.title_bn || rw.divisionRef?.title_bn || "বাংলাদেশ",
-    experienceDisplay: `${rw.experience} বছর অভিজ্ঞতা`,
-  }));
+  const relatedWorkers = relatedWorkersRaw.map((rw) => {
+    const rwCats = rw.workerCategories.map((wc) => wc.category);
+    const rwPrimary = rwCats[0];
+    return {
+      ...rw,
+      service_type: rwPrimary?.name_bn || rwPrimary?.name || "মিস্ত্রি",
+      city: rw.districtRef?.title_bn || rw.divisionRef?.title_bn || "বাংলাদেশ",
+      experienceDisplay: `${rw.experience} বছর অভিজ্ঞতা`,
+    };
+  });
 
   // Generate Schema.org structured data for SEO (LocalBusiness / Person)
   const workerSchema = {
@@ -162,7 +170,6 @@ export default async function WorkerProfilePage({ params }: Props) {
     "@type": "LocalBusiness",
     name: worker.full_name,
     description: worker.details || `${serviceType} services in ${city}`,
-    telephone: worker.phone,
     address: {
       "@type": "PostalAddress",
       addressLocality: locationDisplay,
@@ -296,7 +303,8 @@ export default async function WorkerProfilePage({ params }: Props) {
           {/* Action Buttons Component */}
           <div className="pt-2 border-t border-slate-100">
             <WorkerProfileActions
-              phone={worker.phone}
+              workerId={worker.id}
+              workerSlug={worker.slug}
               fullName={worker.full_name}
               serviceType={serviceType}
             />
@@ -483,12 +491,12 @@ export default async function WorkerProfilePage({ params }: Props) {
                       </div>
                       <div className="flex items-center justify-between pt-1">
                         <span className="text-[10px] text-slate-400 font-semibold">{rw.experienceDisplay}</span>
-                        <a
-                          href={`tel:${rw.phone}`}
-                          className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold transition-all"
+                        <Link
+                          href={`/workers/${rw.slug}`}
+                          className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition-all"
                         >
-                          কল করুন
-                        </a>
+                          প্রোফাইল দেখুন
+                        </Link>
                       </div>
                     </div>
                   ))}

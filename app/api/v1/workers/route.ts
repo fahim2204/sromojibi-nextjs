@@ -4,6 +4,8 @@ import { CACHE_KEYS, CACHE_TTL, clearCache, getCached } from "@/lib/cache";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/modules/auth";
 
+import { generateWorkerSlug } from "@/lib/slug";
+
 export const runtime = "nodejs";
 
 const createWorkerSchema = z.object({
@@ -25,16 +27,6 @@ const createWorkerSchema = z.object({
   experience: z.union([z.number(), z.string()]).default(1),
   details: z.string().optional(),
 });
-
-function generateSlug(fullName: string): string {
-  const base = fullName
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-");
-  const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-  return `${base}-${randomSuffix}`;
-}
 
 export async function GET(request: Request) {
   try {
@@ -143,12 +135,12 @@ export async function POST(request: Request) {
     const payload = createWorkerSchema.parse(body);
 
     // Generate unique slug for profile
-    let slug = generateSlug(payload.fullName);
+    let slug = generateWorkerSlug(payload.fullName, payload.serviceType);
     let attempts = 0;
     while (attempts < 5) {
       const existing = await prisma.workerProfile.findUnique({ where: { slug } });
       if (!existing) break;
-      slug = generateSlug(payload.fullName);
+      slug = generateWorkerSlug(payload.fullName, payload.serviceType);
       attempts++;
     }
 
@@ -218,7 +210,6 @@ export async function POST(request: Request) {
         email: payload.email || sessionUser.email,
         phone: payload.phone,
         slug,
-        category_ids: matchedCategoryIds,
         workerCategories: {
           create: matchedCategoryIds.map((catId) => ({
             category: { connect: { id: catId } },
