@@ -1,33 +1,11 @@
 import { apiError, apiSuccess } from "@/lib/api-response";
-import { CACHE_KEYS, CACHE_TTL, getCached } from "@/lib/cache";
-import { prisma } from "@/lib/prisma";
+import { getCategories } from "@/services/categoryService";
 
 export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    const categories = await getCached(
-      CACHE_KEYS.categories(),
-      CACHE_TTL.ONE_HOUR,
-      async () => {
-        const rawCategories = await prisma.category.findMany({
-          where: { is_active: true },
-          orderBy: { name: "asc" },
-          include: {
-            _count: {
-              select: { workerCategories: true },
-            },
-          },
-        });
-
-        return rawCategories.map((c) => ({
-          ...c,
-          _count: {
-            workers: c._count.workerCategories,
-          },
-        }));
-      }
-    );
+    const categories = await getCategories();
 
     return apiSuccess(categories, {
       meta: { count: categories.length },

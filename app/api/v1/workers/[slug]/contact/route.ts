@@ -51,6 +51,7 @@ export async function POST(
         id: true,
         full_name: true,
         phone: true,
+        secondary_phone: true,
         status: true,
       },
     });
@@ -122,6 +123,7 @@ export async function POST(
       {
         data: {
           phone: worker.phone,
+          secondaryPhone: worker.secondary_phone,
           fullName: worker.full_name,
         },
         error: null,

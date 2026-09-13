@@ -179,6 +179,7 @@ model WorkerProfile {
   full_name       String
   email           String?
   phone           String
+  secondary_phone String?
   slug            String         @unique
 
   fk_division_id  String?

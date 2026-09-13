@@ -12,6 +12,8 @@ const createWorkerSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
   email: z.string().email("Invalid email address").optional().or(z.literal("")),
   phone: z.string().min(11, "Please enter a valid phone number"),
+  secondaryPhone: z.string().optional().or(z.literal("")),
+  secondary_phone: z.string().optional().or(z.literal("")),
   serviceType: z.string().optional(),
   serviceTypes: z.array(z.string()).optional(),
   city: z.string().optional(),
@@ -209,6 +211,7 @@ export async function POST(request: Request) {
         full_name: payload.fullName,
         email: payload.email || sessionUser.email,
         phone: payload.phone,
+        secondary_phone: payload.secondaryPhone || payload.secondary_phone || null,
         slug,
         workerCategories: {
           create: matchedCategoryIds.map((catId) => ({

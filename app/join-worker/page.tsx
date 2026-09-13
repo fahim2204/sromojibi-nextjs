@@ -64,7 +64,7 @@ export default function JoinWorkerPage() {
   const [cityAreasList, setCityAreasList] = useState<LocationItem[]>([]);
   const [loadingUnions, setLoadingUnions] = useState(false);
 
-  const [selectedTrades, setSelectedTrades] = useState<string[]>(["Electrician"]);
+  const [selectedTrades, setSelectedTrades] = useState<string[]>([]);
   const [coverageScope, setCoverageScope] = useState<"SPECIFIC_AREA" | "ALL_UPAZILA" | "ALL_DISTRICT" | "ALL_DIVISION" | "NATIONWIDE">("SPECIFIC_AREA");
 
   // Form Data State
@@ -72,7 +72,8 @@ export default function JoinWorkerPage() {
     fullName: "",
     email: "",
     phone: "",
-    serviceType: "Electrician",
+    secondaryPhone: "",
+    serviceType: "",
     city: "", // Division title
     zilla: "", // District title
     upazila: "", // Upazila / Metro Thana title
@@ -327,6 +328,11 @@ export default function JoinWorkerPage() {
       return;
     }
 
+    if (!selectedTrades.length) {
+      setErrorMsg("অনুগ্রহ করে অন্তত ১টি কাজের ধরন (Service Trade) নির্বাচন করুন।");
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMsg(null);
 
@@ -513,12 +519,13 @@ export default function JoinWorkerPage() {
                       setSelectedUpazilaId("");
                       setSelectedUnionId("");
                       setCoverageScope("SPECIFIC_AREA");
-                      setSelectedTrades(["Electrician"]);
+                      setSelectedTrades([]);
                       setFormData({
                         fullName: "",
                         email: "",
                         phone: "",
-                        serviceType: "Electrician",
+                        secondaryPhone: "",
+                        serviceType: "",
                         city: "",
                         zilla: "",
                         upazila: "",
@@ -712,21 +719,23 @@ export default function JoinWorkerPage() {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <Input
-                      isRequired
-                      labelPlacement="outside"
-                      type="text"
-                      label="Full Name / নাম"
-                      placeholder="যেমন: আবুল কাশেম মিস্ত্রি"
-                      variant="bordered"
-                      value={formData.fullName}
-                      onValueChange={(val) => setFormData({ ...formData, fullName: val })}
-                      classNames={{
-                        label: "text-slate-700 font-semibold text-xs mb-1.5",
-                        input: "text-slate-900 text-sm placeholder:text-slate-400",
-                        inputWrapper: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs h-11",
-                      }}
-                    />
+                    <div className="sm:col-span-2">
+                      <Input
+                        isRequired
+                        labelPlacement="outside"
+                        type="text"
+                        label="Full Name / নাম"
+                        placeholder="যেমন: আবুল কাশেম মিস্ত্রি"
+                        variant="bordered"
+                        value={formData.fullName}
+                        onValueChange={(val) => setFormData({ ...formData, fullName: val })}
+                        classNames={{
+                          label: "text-slate-700 font-semibold text-xs mb-1.5",
+                          input: "text-slate-900 text-sm placeholder:text-slate-400",
+                          inputWrapper: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs h-11",
+                        }}
+                      />
+                    </div>
 
                     <Input
                       isRequired
@@ -737,6 +746,21 @@ export default function JoinWorkerPage() {
                       variant="bordered"
                       value={formData.phone}
                       onValueChange={(val) => setFormData({ ...formData, phone: val })}
+                      classNames={{
+                        label: "text-slate-700 font-semibold text-xs mb-1.5",
+                        input: "text-slate-900 text-sm placeholder:text-slate-400",
+                        inputWrapper: "border-slate-200 hover:border-emerald-500 focus-within:!border-emerald-500 bg-slate-50/50 rounded-xl shadow-2xs h-11",
+                      }}
+                    />
+
+                    <Input
+                      labelPlacement="outside"
+                      type="tel"
+                      label="Secondary Phone (Optional) / বিকল্প নম্বর (ঐচ্ছিক)"
+                      placeholder="যেমন: 01800000000"
+                      variant="bordered"
+                      value={formData.secondaryPhone}
+                      onValueChange={(val) => setFormData({ ...formData, secondaryPhone: val })}
                       classNames={{
                         label: "text-slate-700 font-semibold text-xs mb-1.5",
                         input: "text-slate-900 text-sm placeholder:text-slate-400",
@@ -757,7 +781,7 @@ export default function JoinWorkerPage() {
                     selectedKeys={new Set(selectedTrades)}
                     onSelectionChange={(keys) => {
                       const selected = Array.from(keys) as string[];
-                      if (selected.length > 0 && selected.length <= 3) {
+                      if (selected.length <= 3) {
                         setSelectedTrades(selected);
                         setFormData((prev) => ({
                           ...prev,
