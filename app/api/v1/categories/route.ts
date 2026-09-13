@@ -8,7 +8,7 @@ export async function GET() {
   try {
     const categories = await getCached(
       CACHE_KEYS.categories(),
-      CACHE_TTL.FIFTEEN_MINUTES,
+      CACHE_TTL.ONE_HOUR,
       async () => {
         const rawCategories = await prisma.category.findMany({
           where: { is_active: true },

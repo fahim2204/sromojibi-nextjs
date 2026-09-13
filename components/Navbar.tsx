@@ -15,7 +15,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Plus_Jakarta_Sans } from "next/font/google";
-import { UserPlus, Sparkles, LogOut, ShieldCheck, ChevronDown, User as UserIcon } from "lucide-react";
+import { UserPlus, Sparkles, LogOut, ShieldCheck, ChevronDown, User as UserIcon, LogIn, ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const brandFont = Plus_Jakarta_Sans({
@@ -80,7 +80,7 @@ export default function Navbar() {
         <NavbarBrand>
           <Link
             href="/"
-            className="flex items-center gap-1.5 sm:gap-2 font-extrabold text-gray-900 group transition-all"
+            className="flex items-center gap-0.5 sm:gap-1 font-extrabold text-gray-900 group transition-all"
           >
             <Image
               src="/icon-512.png"
@@ -107,11 +107,10 @@ export default function Navbar() {
             <NavbarItem key={link.href}>
               <Link
                 href={link.href}
-                className={`px-3 py-1.5 lg:px-3.5 rounded-lg text-xs lg:text-sm font-semibold transition-colors ${
-                  isActive
+                className={`px-3 py-1.5 lg:px-3.5 rounded-lg text-xs lg:text-sm font-semibold transition-colors ${isActive
                     ? "text-emerald-700 bg-emerald-50 font-bold"
                     : "text-gray-600 hover:text-emerald-600 hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 {link.name}
               </Link>
@@ -120,8 +119,8 @@ export default function Navbar() {
         })}
       </NavbarContent>
 
-      {/* Primary Action Button (Responsive for all screen sizes) */}
-      <NavbarContent justify="end" className="gap-2 sm:gap-3">
+      {/* Action Buttons & User Menu */}
+      <NavbarContent justify="end" className="gap-2 sm:gap-2.5">
         {isAuthenticated && user ? (
           <div className="relative hidden sm:block" ref={userMenuRef}>
             <button
@@ -187,23 +186,23 @@ export default function Navbar() {
           <NavbarItem className="hidden sm:block">
             <Link
               href="/sign-in"
-              className="px-3.5 py-2 rounded-xl text-xs lg:text-sm font-semibold text-gray-700 hover:text-emerald-600 hover:bg-gray-50 transition-colors"
+              className="h-8 px-3 rounded-lg border border-slate-200 bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-300 font-semibold text-xs transition-colors inline-flex items-center justify-center gap-1.5 shadow-2xs"
             >
-              Sign In
+              <LogIn className="w-3.5 h-3.5 text-slate-500" />
+              <span>Sign In</span>
             </Link>
           </NavbarItem>
         )}
 
         <NavbarItem>
-          <Button
-            as={Link}
+          <Link
             href="/join-worker"
-            className="h-9 sm:h-10 px-3 sm:px-5 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs sm:text-sm transition-all shadow-md shadow-emerald-600/25 hover:shadow-lg hover:shadow-emerald-600/40 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer border border-emerald-400/30"
+            className="group h-8 px-3 sm:px-3.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-xs hover:shadow-sm active:scale-[0.98] inline-flex items-center justify-center gap-1.5 border border-emerald-500/40"
           >
-            <UserPlus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-200 shrink-0" />
+            <UserPlus className="w-3.5 h-3.5 text-emerald-100 group-hover:text-white transition-colors shrink-0" />
             <span className="truncate">Join as Worker</span>
-            <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse shrink-0 hidden sm:inline-block" />
-          </Button>
+            <ArrowRight className="w-3 h-3 text-emerald-200 group-hover:text-white group-hover:translate-x-0.5 transition-all shrink-0" />
+          </Link>
         </NavbarItem>
       </NavbarContent>
 
@@ -265,11 +264,10 @@ export default function Navbar() {
           return (
             <NavbarMenuItem key={item.href}>
               <Link
-                className={`w-full text-base py-3 px-4 rounded-xl font-semibold flex items-center justify-between transition-colors ${
-                  isActive
+                className={`w-full text-base py-3 px-4 rounded-xl font-semibold flex items-center justify-between transition-colors ${isActive
                     ? "text-emerald-700 bg-emerald-50 font-bold border border-emerald-200/80"
                     : "text-gray-800 hover:bg-gray-50"
-                }`}
+                  }`}
                 href={item.href}
                 onClick={() => setIsMenuOpen(false)}
               >

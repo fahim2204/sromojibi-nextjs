@@ -8,10 +8,23 @@ const memoryCache = new Map<string, CacheEntry<any>>();
 const promiseCache = new Map<string, Promise<any>>();
 const knownKeys = new Set<string>();
 
+// Development mode e make revalidate time 1000 times fast
+const isDev = process.env.NODE_ENV === "development";
+const devDivisor = isDev ? 1000 : 1;
+
 export const CACHE_TTL = {
-  FIVE_MINUTES: 5 * 60 * 1000,
-  FIFTEEN_MINUTES: 15 * 60 * 1000,
-  ONE_HOUR: 60 * 60 * 1000,
+  FIVE_MINUTES: (5 * 60 * 1000) / devDivisor,
+  FIFTEEN_MINUTES: (15 * 60 * 1000) / devDivisor,
+  ONE_HOUR: (60 * 60 * 1000) / devDivisor,
+  TWO_HOURS: (2 * 60 * 60 * 1000) / devDivisor,
+  THREE_HOURS: (3 * 60 * 60 * 1000) / devDivisor,
+  FOUR_HOURS: (4 * 60 * 60 * 1000) / devDivisor,
+  SIX_HOURS: (6 * 60 * 60 * 1000) / devDivisor,
+  TEN_HOURS: (10 * 60 * 60 * 1000) / devDivisor,
+  TWELVE_HOURS: (12 * 60 * 60 * 1000) / devDivisor,
+  ONE_DAY: (24 * 60 * 60 * 1000) / devDivisor,
+  TWO_DAYS: (2 * 24 * 60 * 60 * 1000) / devDivisor,
+  SEVEN_DAYS: (7 * 24 * 60 * 60 * 1000) / devDivisor,
 } as const;
 
 export const CACHE_KEYS = {
