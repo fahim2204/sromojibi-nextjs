@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 import WorkerSearchFilter from "@/components/WorkerSearchFilter";
 import { ChevronRight, Briefcase, PhoneCall, ShieldCheck, MapPin } from "lucide-react";
 
-export const dynamic = "force-dynamic";
+import Script from "next/script";
+
 export const revalidate = 60;
 
 const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sromojibi.com";
@@ -15,6 +16,34 @@ export const metadata: Metadata = {
     "Explore Bangladesh's verified local worker directory. Discover electricians, plumbers, tiles mistris, rajmistris, painters and technicians near you on Sromojibi.",
   alternates: {
     canonical: `${siteUrl}/workers`,
+  },
+  openGraph: {
+    title: "Workers Directory - Discover Local Mistris & Technicians | Sromojibi",
+    description:
+      "Explore Bangladesh's verified local worker directory. Discover electricians, plumbers, tiles mistris, rajmistris, painters and technicians near you on Sromojibi.",
+    url: `${siteUrl}/workers`,
+    siteName: "Sromojibi",
+    locale: "bn_BD",
+    type: "website",
+    images: [
+      {
+        url: `${siteUrl}/icon-512.png`,
+        width: 512,
+        height: 512,
+        alt: "Sromojibi Workers Directory Bangladesh",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Workers Directory - Discover Local Mistris & Technicians | Sromojibi",
+    description:
+      "Explore Bangladesh's verified local worker directory. Discover electricians, plumbers, tiles mistris, rajmistris, painters and technicians near you on Sromojibi.",
+    images: [`${siteUrl}/icon-512.png`],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
@@ -93,8 +122,49 @@ export default async function WorkersDirectoryPage() {
     };
   });
 
+  // SEO Schema.org Structured Data
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Workers", item: `${siteUrl}/workers` },
+    ],
+  };
+
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Workers Directory - Sromojibi",
+    description: "Verified local mistris, technicians, and skilled workers across Bangladesh",
+    numberOfItems: rawWorkers.length,
+    publisher: {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      name: "Sromojibi",
+    },
+    itemListElement: rawWorkers.slice(0, 20).map((w, idx) => ({
+      "@type": "ListItem",
+      position: idx + 1,
+      name: w.full_name,
+      url: `${siteUrl}/workers/${w.slug}`,
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 py-12 px-4 sm:px-6 lg:px-8">
+      {/* Schema.org Structured Data Scripts */}
+      <Script
+        id="workers-breadcrumb-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <Script
+        id="workers-itemlist-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
+
       <div className="max-w-6xl mx-auto space-y-10">
         {/* Breadcrumb Header */}
         <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">

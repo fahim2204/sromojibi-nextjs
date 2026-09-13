@@ -1,5 +1,5 @@
-import React from "react";
 import Link from "next/link";
+import Script from "next/script";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
@@ -23,7 +23,6 @@ type Props = {
   params: { slug: string };
 };
 
-export const dynamic = "force-dynamic";
 export const revalidate = 60;
 
 const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sromojibi.com";
@@ -63,13 +62,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
-    keywords: [
-      worker.full_name,
-      `${serviceType} ${city}`,
-      `${serviceType} bangladesh`,
-      "sromojibi worker profile",
-      "local mistri contact",
-    ],
     alternates: {
       canonical: `${siteUrl}/workers/${worker.slug}`,
     },
@@ -80,11 +72,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: "Sromojibi",
       locale: "bn_BD",
       type: "profile",
+      images: [
+        {
+          url: worker.avatar_url || `${siteUrl}/icon-512.png`,
+          width: 512,
+          height: 512,
+          alt: `${worker.full_name} - ${serviceType} in ${city}`,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [worker.avatar_url || `${siteUrl}/icon-512.png`],
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }
@@ -168,13 +173,21 @@ export default async function WorkerProfilePage({ params }: Props) {
   const workerSchema = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
+    "@id": `${siteUrl}/workers/${worker.slug}/#worker`,
     name: worker.full_name,
     description: worker.details || `${serviceType} services in ${city}`,
+    url: `${siteUrl}/workers/${worker.slug}`,
+    image: worker.avatar_url || `${siteUrl}/icon-512.png`,
     address: {
       "@type": "PostalAddress",
       addressLocality: locationDisplay,
       addressRegion: zilla || city,
       addressCountry: "BD",
+    },
+    parentOrganization: {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      name: "Sromojibi",
     },
     aggregateRating:
       worker.review_count > 0
@@ -186,6 +199,16 @@ export default async function WorkerProfilePage({ params }: Props) {
             worstRating: "1",
           }
         : undefined,
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Workers", item: `${siteUrl}/workers` },
+      { "@type": "ListItem", position: 3, name: worker.full_name, item: `${siteUrl}/workers/${worker.slug}` },
+    ],
   };
 
   const ratingVal = Number(worker.rating ?? 5.0).toFixed(1);
@@ -204,7 +227,13 @@ export default async function WorkerProfilePage({ params }: Props) {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 py-10 px-4 sm:px-6 lg:px-8 selection:bg-emerald-500 selection:text-white">
       {/* Schema.org Structured Data */}
-      <script
+      <Script
+        id={`worker-${worker.slug}-breadcrumb-jsonld`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <Script
+        id={`worker-${worker.slug}-localbusiness-jsonld`}
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(workerSchema) }}
       />

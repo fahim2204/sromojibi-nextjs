@@ -1,15 +1,15 @@
 import Link from "next/link";
+import Script from "next/script";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import WorkerSearchFilter from "@/components/WorkerSearchFilter";
-import { ChevronRight, Wrench, ShieldCheck, UserCheck, PhoneCall } from "lucide-react";
+import { ChevronRight, Wrench, ShieldCheck, UserCheck, PhoneCall, HelpCircle } from "lucide-react";
 
 type Props = {
   params: { slug: string };
 };
 
-export const dynamic = "force-dynamic";
 export const revalidate = 60;
 
 const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sromojibi.com";
@@ -37,14 +37,42 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const categoryName = category?.name || slug.replace(/-/g, " ");
   const categoryBn = category?.name_bn ? ` (${category.name_bn})` : "";
+  const title = `${categoryName}${categoryBn} Workers & Technicians in Bangladesh | Sromojibi`;
+  const description =
+    category?.description ||
+    `Discover experienced ${categoryName} mistris, technicians, and specialists in Bangladesh. Free directory listing on Sromojibi.`;
 
   return {
-    title: `${categoryName}${categoryBn} Workers & Technicians in Bangladesh | Sromojibi`,
-    description:
-      category?.description ||
-      `Discover experienced ${categoryName} mistris, technicians, and specialists in Bangladesh. Free directory listing on Sromojibi.`,
+    title,
+    description,
     alternates: {
       canonical: `${siteUrl}/categories/${slug}`,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${siteUrl}/categories/${slug}`,
+      siteName: "Sromojibi",
+      locale: "bn_BD",
+      type: "website",
+      images: [
+        {
+          url: `${siteUrl}/icon-512.png`,
+          width: 512,
+          height: 512,
+          alt: `${categoryName} Workers Directory Bangladesh`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`${siteUrl}/icon-512.png`],
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }
@@ -110,33 +138,114 @@ export default async function CategoryPage({ params }: Props) {
       ? workerCats.map((c) => c.name_bn || c.name).join(", ")
       : category.name_bn || category.name;
 
-    const city = w.divisionRef?.title_bn || w.divisionRef?.title_en || "বাংলাদেশ";
-    const zilla = w.districtRef?.title_bn || w.districtRef?.title_en || null;
-    const upazila = w.cityAreaRef?.title_bn || w.cityAreaRef?.title_en || w.upazilaRef?.title_bn || w.upazilaRef?.title_en || null;
+    const locationName = w.cityAreaRef?.title_bn ||
+      w.cityAreaRef?.title_en ||
+      w.unionRef?.title_bn ||
+      w.unionRef?.title_en ||
+      w.upazilaRef?.title_bn ||
+      w.upazilaRef?.title_en ||
+      w.districtRef?.title_bn ||
+      w.districtRef?.title_en ||
+      "বাংলাদেশ";
 
     return {
       id: w.id,
       full_name: w.full_name,
       slug: w.slug,
       service_type: serviceType,
-      city,
-      zilla,
-      upazila,
+      city: locationName,
+      zilla: w.districtRef?.title_en || w.districtRef?.title || "",
+      upazila: w.upazilaRef?.title_en || w.upazilaRef?.title_bn || "",
       coverage_scope: w.coverage_scope,
       experience: w.experience,
       details: w.details,
       is_verified: w.is_verified,
       rating: Number(w.rating ?? 5.0),
       review_count: w.review_count,
-      category: primaryCat ? { name: primaryCat.name, icon: primaryCat.icon } : { name: category.name, icon: category.icon },
+      category: primaryCat ? { name: primaryCat.name, icon: primaryCat.icon } : null,
       categories: workerCats,
     };
   });
 
   const categoryNameBn = category.name_bn || category.name;
 
+  // FAQ Content for user and Google Search
+  const faqs = [
+    {
+      question: `কিভাবে ${categoryNameBn} মিস্ত্রির সাথে যোগাযোগ করবেন?`,
+      answer: `শ্রমজীবী প্ল্যাটফর্মে যে কোনো ${categoryNameBn} কর্মীর প্রোফাইলে গিয়ে "ফোন নম্বর দেখুন" বাটনে ক্লিক করলেই সরাসরি তার প্রাথমিক ও বিকল্প মোবাইল নম্বর প্রদর্শিত হবে। আপনি সরাসরি কল বা WhatsApp মেসেজ পাঠাতে পারবেন।`,
+    },
+    {
+      question: `শ্রমজীবী প্ল্যাটফর্মে মিস্ত্রি খুঁজতে কি কোনো চার্জ বা কমিশন দিতে হয়?`,
+      answer: `না, শ্রমজীবী সম্পূর্ণ ফ্রি এবং উন্মুক্ত ডিরেক্টরি। কাস্টমার এবং কর্মীদের মধ্যে কোনো মধ্যস্থতাকারী নেই, তাই কোনো প্রকার কমিশন বা অতিরিক্ত চার্জ প্রদান করতে হয় না।`,
+    },
+    {
+      question: `কাজের রেট বা মজুরি কিভাবে নির্ধারিত হয়?`,
+      answer: `কাজের ধরন, সময় এবং পরিধি অনুযায়ী আপনি সরাসরি কর্মীর সাথে আলোচনা করে ন্যায্য পারিশ্রমিক নির্ধারণ করতে পারবেন।`,
+    },
+  ];
+
+  // Structured Data (Schema.org) for Googlebot
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Categories", item: `${siteUrl}/categories` },
+      { "@type": "ListItem", position: 3, name: category.name, item: `${siteUrl}/categories/${category.slug}` },
+    ],
+  };
+
+  const collectionJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `${category.name} Workers & Technicians in Bangladesh`,
+    description: category.description || `Verified ${category.name} directory on Sromojibi.`,
+    url: `${siteUrl}/categories/${category.slug}`,
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: categoryWorkers.length,
+      itemListElement: categoryWorkers.slice(0, 10).map((w, idx) => ({
+        "@type": "ListItem",
+        position: idx + 1,
+        name: w.full_name,
+        url: `${siteUrl}/workers/${w.slug}`,
+      })),
+    },
+  };
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: f.answer,
+      },
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 py-12 px-4 sm:px-6 lg:px-8">
+      {/* Schema.org Structured Data with unique IDs */}
+      <Script
+        id={`category-${slug}-breadcrumb-jsonld`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <Script
+        id={`category-${slug}-collection-jsonld`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
+      />
+      <Script
+        id={`category-${slug}-faq-jsonld`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+
       <div className="max-w-6xl mx-auto space-y-10">
         {/* Breadcrumb Header */}
         <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
@@ -199,6 +308,28 @@ export default async function CategoryPage({ params }: Props) {
             categories={categories}
             locations={locations}
           />
+        </section>
+
+        {/* Frequently Asked Questions (FAQ) Section for Users and SEO */}
+        <section aria-labelledby="category-faq-heading" className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+            <HelpCircle className="w-5 h-5 text-emerald-600" />
+            <h2 id="category-faq-heading" className="text-lg sm:text-xl font-bold text-slate-900">
+              সাধারণ জিজ্ঞাসা (FAQ) - {categoryNameBn} সেবা
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {faqs.map((faq, idx) => (
+              <div key={idx} className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+                <h3 className="text-sm font-bold text-slate-900 leading-snug">
+                  {faq.question}
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  {faq.answer}
+                </p>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* Footer Navigation */}

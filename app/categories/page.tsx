@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Script from "next/script";
 import { Metadata } from "next";
 import { getCategories } from "@/services/categoryService";
 import CategoryExplorer from "./CategoryExplorer";
@@ -6,12 +7,42 @@ import { ChevronRight, ArrowRight, UserPlus, Users } from "lucide-react";
 
 export const revalidate = 60;
 
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sromojibi.com";
+
 export const metadata: Metadata = {
-  title: "Service Categories | কাজের ধরন অনুযায়ী কর্মী ও শ্রমজীবী ডিরেক্টরি | Sromojibi",
+  title: "Service Categories - Local Mistris & Technicians | Sromojibi",
   description:
-    "Explore worker service categories including Rajmistri, Electrician, Plumber, Day Labour, Shifting Labour, Van Puller, Painter, Carpenter, and Technicians in Bangladesh.",
+    "Explore verified worker categories including Rajmistri, Electrician, Plumber, Day Labour, Van Puller, and Technicians across Bangladesh with direct contact.",
   alternates: {
-    canonical: "/categories",
+    canonical: `${siteUrl}/categories`,
+  },
+  openGraph: {
+    title: "Service Categories - Local Mistris & Technicians | Sromojibi",
+    description:
+      "Explore verified worker categories including Rajmistri, Electrician, Plumber, Day Labour, Van Puller, and Technicians across Bangladesh with direct contact.",
+    url: `${siteUrl}/categories`,
+    siteName: "Sromojibi",
+    locale: "bn_BD",
+    type: "website",
+    images: [
+      {
+        url: `${siteUrl}/icon-512.png`,
+        width: 512,
+        height: 512,
+        alt: "Sromojibi Service Categories Directory",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Service Categories - Local Mistris & Technicians | Sromojibi",
+    description:
+      "Explore verified worker categories including Rajmistri, Electrician, Plumber, Day Labour, Van Puller, and Technicians across Bangladesh with direct contact.",
+    images: [`${siteUrl}/icon-512.png`],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
@@ -19,8 +50,59 @@ export default async function CategoriesPage() {
   const categories = await getCategories();
   const totalWorkers = categories.reduce((acc, c) => acc + (c._count?.workers || 0), 0);
 
+  // SEO Schema.org Structured Data
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: siteUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Categories",
+        item: `${siteUrl}/categories`,
+      },
+    ],
+  };
+
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Service Categories - Sromojibi",
+    description: "Verified trade and worker categories in Bangladesh on Sromojibi directory network",
+    numberOfItems: categories.length,
+    publisher: {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      name: "Sromojibi",
+    },
+    itemListElement: categories.map((cat, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: cat.name_bn ? `${cat.name} (${cat.name_bn})` : cat.name,
+      url: `${siteUrl}/categories/${cat.slug}`,
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 py-8 px-4 sm:px-6 lg:px-8">
+      {/* Structured Data Scripts for Google Search Engine Optimization */}
+      <Script
+        id="categories-breadcrumb-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <Script
+        id="categories-itemlist-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
+
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
