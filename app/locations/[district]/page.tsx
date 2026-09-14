@@ -48,6 +48,10 @@ async function getDistrictBySlug(slugParam: string) {
       upazilas: {
         orderBy: { title_en: "asc" },
       },
+      city_areas: {
+        where: { row_status: 1 },
+        orderBy: { title_en: "asc" },
+      },
     },
   });
 
@@ -58,6 +62,10 @@ async function getDistrictBySlug(slugParam: string) {
     include: {
       division: true,
       upazilas: {
+        orderBy: { title_en: "asc" },
+      },
+      city_areas: {
+        where: { row_status: 1 },
         orderBy: { title_en: "asc" },
       },
     },
@@ -253,11 +261,43 @@ export default async function DistrictLocationPage({ params }: Props) {
           </div>
         </header>
 
+        {/* City Areas Sub-directory Grid (if city areas exist, e.g. Dhaka) */}
+        {dbDistrict?.city_areas && dbDistrict.city_areas.length > 0 && (
+          <section className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-4">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+              <MapPin className="w-5 h-5 text-emerald-600" />
+              <span>{districtNameBn} সিটির এলাকাসমূহ (City Areas & Thanas)</span>
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+              {dbDistrict.city_areas.map((area) => {
+                const areaSlug = toSlug(area.title_en || area.title_bn);
+                return (
+                  <Link
+                    key={area.id}
+                    href={`/locations/${params.district}/${areaSlug}`}
+                    className="p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-center transition-all group"
+                  >
+                    <div className="font-bold text-slate-900 text-xs group-hover:text-emerald-700">
+                      {area.title_bn || area.title_en}
+                    </div>
+                    {area.title_en && (
+                      <div className="text-[10px] text-slate-400 font-medium capitalize">
+                        {area.title_en}
+                      </div>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         {/* Upazilas Sub-directory Grid (if upazilas exist) */}
         {dbDistrict?.upazilas && dbDistrict.upazilas.length > 0 && (
-          <section className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-4">
-            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-              <span>📍</span> {districtNameBn} জেলার উপজেলা সমূহ (Upazilas)
+          <section className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-4">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+              <MapPin className="w-5 h-5 text-emerald-600" />
+              <span>{districtNameBn} জেলার উপজেলা সমূহ (Upazilas)</span>
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
               {dbDistrict.upazilas.map((upazila) => {

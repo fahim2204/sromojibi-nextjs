@@ -57,13 +57,37 @@ async function getUpazilaAndDistrict(districtParam: string, upazilaParam: string
       district: {
         include: { division: true },
       },
+      unions: {
+        where: { row_status: 1 },
+        orderBy: { title_bn: "asc" },
+        select: {
+          id: true,
+          title_bn: true,
+          title_en: true,
+        },
+      },
     },
   });
 
-  if (dbUpazila) return dbUpazila;
+  if (dbUpazila) return { ...dbUpazila, isCityArea: false };
 
-  // 2. Fallback: match via toSlug
-  const allUpazilas = await prisma.upazila.findMany({
+  // 2. Direct query matching city_area and district
+  let dbCityArea = await prisma.cityArea.findFirst({
+    where: {
+      OR: [
+        { title_en: { equals: formattedUpazila, mode: "insensitive" } },
+        { title_bn: { equals: decodedUpazila } },
+        { title_bn: { contains: formattedUpazila } },
+      ],
+      district: {
+        OR: [
+          { title_en: { equals: formattedDistrict, mode: "insensitive" } },
+          { title: { equals: formattedDistrict, mode: "insensitive" } },
+          { title_bn: { equals: decodedDistrict } },
+          { title_bn: { contains: formattedDistrict } },
+        ],
+      },
+    },
     include: {
       district: {
         include: { division: true },
@@ -71,18 +95,62 @@ async function getUpazilaAndDistrict(districtParam: string, upazilaParam: string
     },
   });
 
-  return (
-    allUpazilas.find((u) => {
-      const uSlugMatch =
-        toSlug(u.title_en) === decodedUpazila ||
-        toSlug(u.title_bn) === decodedUpazila;
-      const dSlugMatch =
-        toSlug(u.district?.title_en) === decodedDistrict ||
-        toSlug(u.district?.title_bn) === decodedDistrict ||
-        toSlug(u.district?.title) === decodedDistrict;
-      return uSlugMatch && dSlugMatch;
-    }) || null
-  );
+  if (dbCityArea) return { ...dbCityArea, isCityArea: true };
+
+  // 3. Fallback: match via toSlug on Upazilas
+  const allUpazilas = await prisma.upazila.findMany({
+    include: {
+      district: {
+        include: { division: true },
+      },
+      unions: {
+        where: { row_status: 1 },
+        orderBy: { title_bn: "asc" },
+        select: {
+          id: true,
+          title_bn: true,
+          title_en: true,
+        },
+      },
+    },
+  });
+
+  const matchedUpz = allUpazilas.find((u) => {
+    const uSlugMatch =
+      toSlug(u.title_en) === decodedUpazila ||
+      toSlug(u.title_bn) === decodedUpazila;
+    const dSlugMatch =
+      toSlug(u.district?.title_en) === decodedDistrict ||
+      toSlug(u.district?.title_bn) === decodedDistrict ||
+      toSlug(u.district?.title) === decodedDistrict;
+    return uSlugMatch && dSlugMatch;
+  });
+
+  if (matchedUpz) return { ...matchedUpz, isCityArea: false };
+
+  // 4. Fallback: match via toSlug on City Areas
+  const allCityAreas = await prisma.cityArea.findMany({
+    include: {
+      district: {
+        include: { division: true },
+      },
+    },
+  });
+
+  const matchedCityArea = allCityAreas.find((ca) => {
+    const caSlugMatch =
+      toSlug(ca.title_en) === decodedUpazila ||
+      toSlug(ca.title_bn) === decodedUpazila;
+    const dSlugMatch =
+      toSlug(ca.district?.title_en) === decodedDistrict ||
+      toSlug(ca.district?.title_bn) === decodedDistrict ||
+      toSlug(ca.district?.title) === decodedDistrict;
+    return caSlugMatch && dSlugMatch;
+  });
+
+  if (matchedCityArea) return { ...matchedCityArea, isCityArea: true };
+
+  return null;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -121,6 +189,9 @@ export default async function UpazilaLocationPage({ params }: Props) {
   const upazilaNameBn = dbUpazila.title_bn || upazilaName;
   const districtNameBn = dbUpazila.district?.title_bn || districtName;
   const divisionNameBn = dbUpazila.district?.division?.title_bn || "";
+  const unions = !dbUpazila.isCityArea && "unions" in dbUpazila
+    ? ((dbUpazila as any).unions as Array<{ id: string; title_bn: string | null; title_en: string | null }>)
+    : [];
 
   // Fetch active categories & locations for filter dropdowns
   const categories = await prisma.category.findMany({
@@ -141,12 +212,16 @@ export default async function UpazilaLocationPage({ params }: Props) {
     name: d.title_en || d.title_bn || "",
   }));
 
+  const areaLabelBn = dbUpazila.isCityArea ? "সিটি এলাকা" : "উপজেলা";
+
   // Query workers matching upazila or district-wide coverage
   const upazilaWorkers = await prisma.workerProfile.findMany({
     where: {
       status: "APPROVED",
       OR: [
-        { fk_upazila_id: dbUpazila.id },
+        ...(dbUpazila.isCityArea
+          ? [{ fk_city_area_id: dbUpazila.id }]
+          : [{ fk_upazila_id: dbUpazila.id }]),
         ...(dbUpazila.loc_district_id
           ? [
               {
@@ -227,7 +302,7 @@ export default async function UpazilaLocationPage({ params }: Props) {
             {districtNameBn} জেলা
           </Link>
           <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-          <span className="text-slate-900 font-bold">{upazilaNameBn} উপজেলা</span>
+          <span className="text-slate-900 font-bold">{upazilaNameBn} {areaLabelBn}</span>
         </nav>
 
         {/* Hero Section */}
@@ -240,12 +315,12 @@ export default async function UpazilaLocationPage({ params }: Props) {
           <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
             <span>Skilled Local Workers in {upazilaName}</span>
             <span className="block text-2xl sm:text-3xl font-extrabold text-blue-600 mt-2">
-              {upazilaNameBn} উপজেলায় দক্ষ লোকাল মিস্ত্রি ও কারিগর
+              {upazilaNameBn} {areaLabelBn}য় দক্ষ লোকাল মিস্ত্রি ও কারিগর
             </span>
           </h1>
 
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            {upazilaNameBn} উপজেলা এবং {districtNameBn} জেলার অভিজ্ঞ টেকনিশিয়ান, কারিগর ও ইলেকট্রিক প্লাম্বিং সার্ভিস ডিরেক্টরি।
+            {upazilaNameBn} {areaLabelBn} এবং {districtNameBn} জেলার অভিজ্ঞ টেকনিশিয়ান, কারিগর ও ইলেকট্রিক প্লাম্বিং সার্ভিস ডিরেক্টরি।
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
@@ -272,6 +347,29 @@ export default async function UpazilaLocationPage({ params }: Props) {
             </div>
           </div>
         </header>
+
+        {/* Unions Section (for Upazilas with Unions) */}
+        {unions.length > 0 && (
+          <section className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-emerald-600" />
+                <span>{upazilaNameBn} উপজেলার অন্তর্ভুক্ত ইউনিয়নসমূহ ({unions.length}টি ইউনিয়ন)</span>
+              </h2>
+              <span className="text-xs text-slate-500 font-medium">লোকাল সার্ভিস ইউনিয়ন</span>
+            </div>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {unions.map((union) => (
+                <div
+                  key={union.id}
+                  className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-50 border border-slate-200/80 text-slate-800"
+                >
+                  <span>{union.title_bn || union.title_en}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Worker Search & Filter Section */}
         <section aria-labelledby="upazila-directory-heading" className="space-y-6">

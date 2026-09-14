@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import {
   Phone,
   PhoneCall,
-  MessageSquare,
   Share2,
   Check,
   ShieldCheck,
@@ -39,37 +38,16 @@ export default function WorkerProfileActions({
   const [copiedLink, setCopiedLink] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  // WhatsApp formatting helper
-  const getWhatsAppLink = (phone: string) => {
-    const clean = phone.replace(/\D/g, "");
-    const number = clean.startsWith("88")
-      ? clean
-      : clean.startsWith("0")
-      ? `88${clean}`
-      : `880${clean}`;
-
-    const text = encodeURIComponent(
-      `আসসালামু আলাইকুম ${fullName} ভাই, আমি শ্রমজীবী (Sromojibi) প্ল্যাটফর্ম থেকে আপনার নম্বরটি পেয়েছি। আপনার ${serviceType} সার্ভিস সম্পর্কে কথা বলতে চাই।`
-    );
-
-    return `https://wa.me/${number}?text=${text}`;
-  };
-
   // Fetch number from authenticated API and record audit log
-  const handleReveal = async (
-    channel: "PHONE" | "WHATSAPP",
-    autoAction: boolean = false
-  ) => {
+  const handleReveal = async (autoCall: boolean = false) => {
     if (!isAuthenticated) {
       setShowLoginModal(true);
       return;
     }
 
     if (revealedPhone) {
-      if (channel === "PHONE" && autoAction) {
+      if (autoCall) {
         window.location.href = `tel:${revealedPhone}`;
-      } else if (channel === "WHATSAPP") {
-        window.open(getWhatsAppLink(revealedPhone), "_blank", "noopener,noreferrer");
       }
       return;
     }
@@ -89,7 +67,7 @@ export default function WorkerProfileActions({
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ channel }),
+        body: JSON.stringify({ channel: "PHONE" }),
       });
 
       const json = await res.json();
@@ -112,10 +90,8 @@ export default function WorkerProfileActions({
         if (secondaryPhone) {
           setRevealedSecondaryPhone(secondaryPhone);
         }
-        if (channel === "PHONE" && autoAction) {
+        if (autoCall) {
           window.location.href = `tel:${phone}`;
-        } else if (channel === "WHATSAPP") {
-          window.open(getWhatsAppLink(phone), "_blank", "noopener,noreferrer");
         }
       } else {
         setRevealError("মিস্ত্রির ফোন নম্বর পাওয়া যায়নি।");
@@ -164,13 +140,13 @@ export default function WorkerProfileActions({
       {/* Action Area */}
       {!revealedPhone ? (
         /* State 1: Hidden / Unrevealed */
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
           {/* Primary Reveal / Call Button */}
           <button
             type="button"
             disabled={isRevealing}
-            onClick={() => handleReveal("PHONE", false)}
-            className="flex-1 sm:flex-initial px-5 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:bg-emerald-500 text-white font-bold text-xs sm:text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+            onClick={() => handleReveal(false)}
+            className="w-full sm:w-auto flex-1 px-5 py-3.5 sm:py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:bg-emerald-500 text-white font-bold text-sm sm:text-base transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-98"
           >
             {isRevealing ? (
               <>
@@ -185,31 +161,16 @@ export default function WorkerProfileActions({
             ) : (
               <>
                 <Eye className="w-4 h-4 text-emerald-200" />
-                <span>ফোন নম্বর দেখুন</span>
+                <span>ফোন নম্বর দেখুন / কল করুন</span>
               </>
             )}
-          </button>
-
-          {/* WhatsApp Message Button */}
-          <button
-            type="button"
-            disabled={isRevealing}
-            onClick={() => handleReveal("WHATSAPP", false)}
-            className="flex-1 sm:flex-initial px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-98"
-          >
-            {isAuthenticated ? (
-              <MessageSquare className="w-4 h-4 text-emerald-400" />
-            ) : (
-              <Lock className="w-4 h-4 text-slate-400" />
-            )}
-            <span>WhatsApp মেসেজ</span>
           </button>
 
           {/* Share Profile Link */}
           <button
             type="button"
             onClick={handleCopyLink}
-            className="px-3.5 py-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold text-xs transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+            className="w-full sm:w-auto px-4 py-3 sm:py-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-98"
             title="প্রোফাইল লিংক শেয়ার করুন"
           >
             {copiedLink ? (
@@ -220,25 +181,25 @@ export default function WorkerProfileActions({
             ) : (
               <>
                 <Share2 className="w-3.5 h-3.5 text-slate-400" />
-                <span>শেয়ার</span>
+                <span>শেয়ার করুন</span>
               </>
             )}
           </button>
         </div>
       ) : (
         /* State 2: Revealed Number UI */
-        <div className="p-3.5 sm:p-4 rounded-xl bg-slate-50 border border-slate-200/90 space-y-3">
+        <div className="p-3.5 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3.5">
           {/* Revealed Number Display Card */}
-          <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
-                <Phone className="w-4 h-4" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold shrink-0">
+                <Phone className="w-5 h-5" />
               </div>
               <div>
                 <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
                   সরাসরি মোবাইল নম্বর
                 </span>
-                <span className="text-base sm:text-lg font-black text-slate-900 tracking-wide font-mono">
+                <span className="text-base sm:text-xl font-black text-slate-900 tracking-wide font-mono select-all">
                   {revealedPhone}
                 </span>
               </div>
@@ -248,7 +209,7 @@ export default function WorkerProfileActions({
             <button
               type="button"
               onClick={handleCopyPhone}
-              className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="self-start sm:self-center px-3.5 py-2 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               {copiedPhone ? (
                 <>
@@ -266,27 +227,27 @@ export default function WorkerProfileActions({
 
           {/* Optional Secondary Phone Card */}
           {revealedSecondaryPhone && (
-            <div className="flex flex-wrap items-center justify-between gap-2 py-2.5 px-3 rounded-lg bg-white border border-slate-200/80">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 py-2.5 px-3 rounded-xl bg-white border border-slate-200/80">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-md bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
-                  <Phone className="w-3.5 h-3.5" />
+                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold shrink-0">
+                  <Phone className="w-4 h-4" />
                 </div>
                 <div>
                   <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">
                     বিকল্প নম্বর (Secondary)
                   </span>
-                  <span className="text-sm sm:text-base font-bold text-slate-800 tracking-wide font-mono">
+                  <span className="text-sm sm:text-base font-bold text-slate-800 tracking-wide font-mono select-all">
                     {revealedSecondaryPhone}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2 self-start sm:self-center">
                 <a
                   href={`tel:${revealedSecondaryPhone}`}
-                  className="px-2.5 py-1 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold flex items-center gap-1 transition-colors"
+                  className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold flex items-center gap-1 transition-colors"
                 >
-                  <PhoneCall className="w-3 h-3" />
+                  <PhoneCall className="w-3.5 h-3.5" />
                   <span>কল</span>
                 </a>
                 <button
@@ -300,16 +261,16 @@ export default function WorkerProfileActions({
                       console.error("Failed to copy phone:", err);
                     }
                   }}
-                  className="px-2.5 py-1 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
                 >
                   {copiedSecondaryPhone ? (
                     <>
-                      <Check className="w-3 h-3 text-emerald-600" />
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
                       <span className="text-emerald-700 font-bold">কপি</span>
                     </>
                   ) : (
                     <>
-                      <Copy className="w-3 h-3 text-slate-400" />
+                      <Copy className="w-3.5 h-3.5 text-slate-400" />
                       <span>কপি</span>
                     </>
                   )}
@@ -319,32 +280,21 @@ export default function WorkerProfileActions({
           )}
 
           {/* Action Links */}
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
             {/* Direct Call Button */}
             <a
               href={`tel:${revealedPhone}`}
-              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto flex-1 px-6 py-3.5 sm:py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm sm:text-base transition-all shadow-sm flex items-center justify-center gap-2.5 cursor-pointer active:scale-98"
             >
-              <PhoneCall className="w-4 h-4" />
-              <span>সরাসরি কল করুন</span>
-            </a>
-
-            {/* WhatsApp Link */}
-            <a
-              href={getWhatsAppLink(revealedPhone)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-xs"
-            >
-              <MessageSquare className="w-4 h-4 text-emerald-400" />
-              <span>WhatsApp চ্যাট</span>
+              <PhoneCall className="w-5 h-5 text-white animate-pulse" />
+              <span>সরাসরি কল করুন ({revealedPhone})</span>
             </a>
 
             {/* Share Profile Link */}
             <button
               type="button"
               onClick={handleCopyLink}
-              className="px-3 py-2.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              className="w-full sm:w-auto px-4 py-3 sm:py-3 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
             >
               {copiedLink ? (
                 <>
@@ -354,7 +304,7 @@ export default function WorkerProfileActions({
               ) : (
                 <>
                   <Share2 className="w-3.5 h-3.5 text-slate-400" />
-                  <span>শেয়ার</span>
+                  <span>শেয়ার করুন</span>
                 </>
               )}
             </button>
@@ -367,9 +317,56 @@ export default function WorkerProfileActions({
         <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
         <span>
           {isAuthenticated
-            ? "শ্রমজীবী প্ল্যাটফর্মে সরাসরি ফোন কলে বা WhatsApp-এ যোগাযোগ সম্পূর্ণ ফ্রি!"
+            ? "শ্রমজীবী প্ল্যাটফর্মে সরাসরি ফোন কলে যোগাযোগ সম্পূর্ণ ফ্রি!"
             : "মিস্ত্রির সরাসরি ফোন নম্বর দেখতে ও যোগাযোগ করতে অনুগ্রহ করে লগইন করুন।"}
         </span>
+      </div>
+
+      {/* Mobile Sticky Bottom Call Bar */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
+        <div className="flex items-center gap-2.5">
+          {!revealedPhone ? (
+            <button
+              type="button"
+              disabled={isRevealing}
+              onClick={() => handleReveal(false)}
+              className="flex-1 py-3 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:bg-emerald-500 text-white font-bold text-sm transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+            >
+              {isRevealing ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-emerald-100" />
+                  <span>লোড হচ্ছে...</span>
+                </>
+              ) : (
+                <>
+                  <PhoneCall className="w-4 h-4 text-emerald-200" />
+                  <span>ফোন নম্বর দেখুন / কল করুন</span>
+                </>
+              )}
+            </button>
+          ) : (
+            <a
+              href={`tel:${revealedPhone}`}
+              className="flex-1 py-3 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+            >
+              <PhoneCall className="w-4 h-4 text-white animate-pulse" />
+              <span>সরাসরি কল করুন</span>
+            </a>
+          )}
+
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors cursor-pointer shrink-0"
+            title="লিংক শেয়ার"
+          >
+            {copiedLink ? (
+              <Check className="w-4 h-4 text-emerald-600" />
+            ) : (
+              <Share2 className="w-4 h-4 text-slate-500" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Login Prompt Modal */}
@@ -377,7 +374,7 @@ export default function WorkerProfileActions({
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
         title="মিস্ত্রির ফোন নম্বর দেখতে লগইন করুন"
-        message={`${fullName} এর সাথে সরাসরি ফোনে কথা বলতে বা WhatsApp মেসেজ পাঠাতে অনুগ্রহ করে আপনার অ্যাকাউন্টে সাইন-ইন করুন।`}
+        message={`${fullName} এর সাথে সরাসরি ফোনে কথা বলতে অনুগ্রহ করে আপনার অ্যাকাউন্টে সাইন-ইন করুন।`}
       />
     </div>
   );

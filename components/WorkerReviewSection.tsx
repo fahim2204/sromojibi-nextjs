@@ -66,39 +66,43 @@ export default function WorkerReviewSection({ workerSlug, initialReviews }: Prop
   };
 
   return (
-    <div className="space-y-8 pt-6 border-t border-gray-200">
-      <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-gray-900">Customer Reviews & Feedback</h3>
-        <span className="text-xs text-emerald-600 font-semibold">{reviews.length} Total Feedback</span>
+    <div className="space-y-6 sm:space-y-8 pt-5 sm:pt-6 border-t border-gray-200">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900">Customer Reviews & Feedback</h3>
+        <span className="text-xs text-emerald-600 font-semibold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+          {reviews.length} Total Feedback
+        </span>
       </div>
 
       {/* Review Submission Form */}
-      <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-white border border-gray-200 space-y-5 shadow-sm">
+      <form onSubmit={handleSubmit} className="p-4 sm:p-6 rounded-2xl bg-white border border-gray-200 space-y-4 sm:space-y-5 shadow-xs">
         <h4 className="font-bold text-gray-900 text-sm">Write a Customer Review</h4>
 
         {/* Rating Selector */}
         <div className="space-y-1.5">
           <label className="text-xs font-semibold text-gray-700">Your Rating (1 - 5 Stars)</label>
-          <div className="flex items-center gap-2">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                type="button"
-                key={star}
-                onClick={() => setRating(star)}
-                onMouseEnter={() => setHoverRating(star)}
-                onMouseLeave={() => setHoverRating(0)}
-                className="text-2xl transition-transform hover:scale-125 focus:outline-none cursor-pointer"
-              >
-                <span className={(hoverRating || rating) >= star ? "text-amber-500" : "text-gray-300"}>
-                  ★
-                </span>
-              </button>
-            ))}
-            <span className="text-xs font-bold text-amber-600 ml-2">{rating} / 5 Stars</span>
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  type="button"
+                  key={star}
+                  onClick={() => setRating(star)}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  className="text-xl sm:text-2xl transition-transform hover:scale-125 focus:outline-none cursor-pointer p-0.5"
+                >
+                  <span className={(hoverRating || rating) >= star ? "text-amber-500" : "text-gray-300"}>
+                    ★
+                  </span>
+                </button>
+              ))}
+            </div>
+            <span className="text-xs font-bold text-amber-600 ml-1 sm:ml-2">{rating} / 5 Stars</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <Input
             isRequired
             type="text"
@@ -161,17 +165,17 @@ export default function WorkerReviewSection({ workerSlug, initialReviews }: Prop
         <Button
           type="submit"
           isLoading={isSubmitting}
-          className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs px-6 rounded-xl transition-all shadow-sm"
+          className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs px-6 py-3 rounded-xl transition-all shadow-sm"
         >
           Submit Review
         </Button>
       </form>
 
       {/* Reviews List */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {reviews.length > 0 ? (
           reviews.map((rev) => (
-            <div key={rev.id} className="p-4 rounded-2xl bg-white border border-gray-200 space-y-2 shadow-sm">
+            <div key={rev.id} className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-gray-200 space-y-2 shadow-xs">
               <div className="flex items-center justify-between">
                 <div>
                   <h5 className="font-bold text-gray-900 text-sm">{rev.reviewer_name}</h5>

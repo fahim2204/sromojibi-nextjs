@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const city = worker.districtRef?.title_bn || worker.divisionRef?.title_bn || worker.districtRef?.title_en || worker.divisionRef?.title_en || "বাংলাদেশ";
 
   const title = `${worker.full_name} - ${serviceType} in ${city} | Sromojibi (শ্রমজীবী)`;
-  const description = `${worker.full_name} - ${worker.experience} বছর অভিজ্ঞতা সম্পন্ন ${serviceType} (${city})। সরাসরি যোগাযোগ করুন ও নির্ভরযোগ্য সেবা গ্রহণ করুন শ্রমজীবী প্ল্যাটফর্মে।`;
+  const description = `${worker.full_name} - ${worker.experience} বছর অভিজ্ঞতা সম্পন্ন ${serviceType} (${city})। সরাসরি ফোন কলে যোগাযোগ করুন ও নির্ভরযোগ্য সেবা গ্রহণ করুন শ্রমজীবী প্ল্যাটফর্মে।`;
 
   return {
     title,
@@ -225,7 +225,7 @@ export default async function WorkerProfilePage({ params }: Props) {
   ];
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900 py-10 px-4 sm:px-6 lg:px-8 selection:bg-emerald-500 selection:text-white">
+    <main className="min-h-screen bg-slate-50 text-slate-900 pt-5 pb-24 sm:py-10 px-3.5 sm:px-6 lg:px-8 selection:bg-emerald-500 selection:text-white">
       {/* Schema.org Structured Data */}
       <Script
         id={`worker-${worker.slug}-breadcrumb-jsonld`}
@@ -238,79 +238,84 @@ export default async function WorkerProfilePage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(workerSchema) }}
       />
 
-      <div className="max-w-5xl mx-auto space-y-8">
+      <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8">
         {/* Breadcrumb Navigation */}
-        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
+        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-semibold text-slate-500">
           <Link href="/" className="hover:text-emerald-600 transition-colors">
             হোম (Home)
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           <Link href="/workers" className="hover:text-emerald-600 transition-colors">
-            মিস্ত্রি ডিরেক্টরি (Directory)
+            মিস্ত্রি ডিরেক্টরি
           </Link>
           {primaryCategory && (
             <>
-              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-              <Link href={`/categories/${primaryCategory.slug}`} className="hover:text-emerald-600 transition-colors">
+              <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <Link
+                href={`/categories/${primaryCategory.slug}`}
+                className="hover:text-emerald-600 transition-colors truncate max-w-[120px] sm:max-w-none"
+              >
                 {primaryCategory.name_bn || primaryCategory.name}
               </Link>
             </>
           )}
-          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-          <span className="text-slate-900 font-bold">{worker.full_name}</span>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <span className="text-slate-900 font-bold truncate max-w-[140px] sm:max-w-none">
+            {worker.full_name}
+          </span>
         </nav>
 
         {/* Worker Hero Profile Header Card */}
-        <section className="relative overflow-hidden rounded-3xl bg-white border border-slate-200/90 shadow-xl p-6 sm:p-8 space-y-6">
+        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-sm sm:shadow-md p-4 sm:p-8 space-y-5 sm:space-y-6">
           {/* Top Decorative Background Bar */}
-          <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
+          <div className="absolute top-0 left-0 right-0 h-2 sm:h-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-2">
-            <div className="flex items-start sm:items-center gap-5">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6 pt-1 sm:pt-2">
+            <div className="flex items-start gap-3.5 sm:gap-5 w-full sm:w-auto">
               {/* Avatar Icon */}
               <div className="relative shrink-0">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 text-emerald-800 border-2 border-emerald-300 flex items-center justify-center font-black text-3xl sm:text-4xl shadow-inner">
+                <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 text-emerald-800 border-2 border-emerald-300 flex items-center justify-center font-black text-2xl sm:text-4xl shadow-inner">
                   {iconEmoji}
                 </div>
                 {worker.is_verified && (
-                  <div className="absolute -bottom-2 -right-2 bg-emerald-600 text-white rounded-full p-1.5 shadow-md border-2 border-white" title="Verified Worker">
-                    <CheckCircle2 className="w-4 h-4" />
+                  <div className="absolute -bottom-1.5 -right-1.5 sm:-bottom-2 sm:-right-2 bg-emerald-600 text-white rounded-full p-1 sm:p-1.5 shadow-md border-2 border-white" title="Verified Worker">
+                    <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </div>
                 )}
               </div>
 
               {/* Name & Basic Info */}
-              <div className="space-y-1.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              <div className="space-y-1 sm:space-y-1.5 min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  <h1 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight break-words">
                     {worker.full_name}
                   </h1>
                   {worker.is_verified ? (
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-bold flex items-center gap-1">
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 text-[11px] sm:text-xs font-bold flex items-center gap-1 shrink-0">
                       <UserCheck className="w-3 h-3 text-emerald-600" />
                       ভেরিফাইড মিস্ত্রি
                     </span>
                   ) : (
-                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold">
+                    <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[11px] sm:text-xs font-semibold shrink-0">
                       তালিকাভুক্ত কারিগর
                     </span>
                   )}
                 </div>
 
-                <p className="text-sm font-bold text-emerald-600 flex items-center gap-1.5">
-                  <Briefcase className="w-4 h-4 shrink-0" />
+                <p className="text-xs sm:text-sm font-bold text-emerald-600 flex flex-wrap items-center gap-1 sm:gap-1.5">
+                  <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                   <span>{serviceType}</span>
                   <span className="text-slate-300">•</span>
                   <span className="text-slate-600 font-medium">{locationDisplay}</span>
                 </p>
 
                 {/* Rating & Reviews summary */}
-                <div className="flex items-center gap-3 pt-0.5">
-                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-0.5">
+                  <div className="flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold">
                     <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                     <span>{ratingVal} / 5.0</span>
                   </div>
-                  <span className="text-xs text-slate-500 font-medium">
+                  <span className="text-[11px] sm:text-xs text-slate-500 font-medium">
                     ({worker.review_count}টি কাস্টমার রিভিউ)
                   </span>
                 </div>
@@ -318,8 +323,8 @@ export default async function WorkerProfilePage({ params }: Props) {
             </div>
 
             {/* Quick Status Tag */}
-            <div className="shrink-0 flex sm:flex-col items-end gap-2">
-              <span className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold flex items-center gap-1.5">
+            <div className="shrink-0 flex items-center sm:items-end justify-between w-full sm:w-auto pt-1 sm:pt-0 border-t sm:border-t-0 border-slate-100 sm:border-transparent">
+              <span className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold flex items-center gap-1.5">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -341,56 +346,56 @@ export default async function WorkerProfilePage({ params }: Props) {
         </section>
 
         {/* Highlights Stat Cards Grid */}
-        <section aria-label="Worker Stats" className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1 hover:border-emerald-300 transition-all">
-            <div className="flex items-center gap-2 text-slate-400 text-xs font-semibold">
-              <Award className="w-4 h-4 text-emerald-600" />
-              <span>অভিজ্ঞতা (Exp.)</span>
+        <section aria-label="Worker Stats" className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
+          <div className="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1 hover:border-emerald-300 transition-all">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-slate-400 text-xs font-semibold">
+              <Award className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span className="truncate">অভিজ্ঞতা (Exp.)</span>
             </div>
-            <p className="text-base sm:text-lg font-black text-slate-900">
+            <p className="text-sm sm:text-lg font-black text-slate-900">
               {worker.experience} বছর
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1 hover:border-emerald-300 transition-all">
-            <div className="flex items-center gap-2 text-slate-400 text-xs font-semibold">
-              <MapPin className="w-4 h-4 text-teal-600" />
-              <span>এলাকা (Location)</span>
+          <div className="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1 hover:border-emerald-300 transition-all">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-slate-400 text-xs font-semibold">
+              <MapPin className="w-4 h-4 text-teal-600 shrink-0" />
+              <span className="truncate">এলাকা (Location)</span>
             </div>
-            <p className="text-base sm:text-lg font-black text-slate-900 truncate">
+            <p className="text-sm sm:text-lg font-black text-slate-900 truncate" title={locationDisplay}>
               {locationDisplay}
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1 hover:border-emerald-300 transition-all">
-            <div className="flex items-center gap-2 text-slate-400 text-xs font-semibold">
-              <Wrench className="w-4 h-4 text-cyan-600" />
-              <span>সেবার ধরণ</span>
+          <div className="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1 hover:border-emerald-300 transition-all">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-slate-400 text-xs font-semibold">
+              <Wrench className="w-4 h-4 text-cyan-600 shrink-0" />
+              <span className="truncate">সেবার ধরণ</span>
             </div>
-            <p className="text-base sm:text-lg font-black text-slate-900 truncate">
+            <p className="text-sm sm:text-lg font-black text-slate-900 truncate" title={serviceType}>
               {serviceType}
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1 hover:border-emerald-300 transition-all">
-            <div className="flex items-center gap-2 text-slate-400 text-xs font-semibold">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>ভেরিফিকেশন</span>
+          <div className="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1 hover:border-emerald-300 transition-all">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-slate-400 text-xs font-semibold">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span className="truncate">ভেরিফিকেশন</span>
             </div>
-            <p className="text-base sm:text-lg font-black text-emerald-700">
+            <p className="text-sm sm:text-lg font-black text-emerald-700 truncate">
               {worker.is_verified ? "ভেরিফাইড" : "তালিকাভুক্ত"}
             </p>
           </div>
         </section>
 
         {/* Detailed Info Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Left Column (Main Details & Reviews) */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
             {/* Service & Skill Details Card */}
-            <section className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-6">
-              <div className="space-y-2 border-b border-slate-100 pb-4">
-                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <section className="p-4 sm:p-8 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/80 shadow-xs sm:shadow-sm space-y-4 sm:space-y-6">
+              <div className="space-y-1 sm:space-y-2 border-b border-slate-100 pb-3 sm:pb-4">
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
                   <span>🛠️</span> সেবা ও দক্ষতার বিবরণ (Services & Specialty)
                 </h2>
                 <p className="text-xs text-slate-500">
@@ -399,7 +404,7 @@ export default async function WorkerProfilePage({ params }: Props) {
               </div>
 
               <div className="space-y-4">
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-sm text-slate-700 leading-relaxed font-normal">
+                <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
                   {worker.details ||
                     `${worker.full_name} একজন দক্ষ ${serviceType}। তিনি ${locationDisplay} এবং আশেপাশের এলাকায় বিশ্বস্ততার সাথে বাসাবাড়ি ও অফিসের সেবা প্রদান করে আসছেন।`}
                 </div>
@@ -409,11 +414,11 @@ export default async function WorkerProfilePage({ params }: Props) {
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
                     বিশেষ দক্ষতা সমূহ (Key Specialty)
                   </h3>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {skillChips.map((chip, index) => (
                       <span
                         key={index}
-                        className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-semibold"
+                        className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-[11px] sm:text-xs font-semibold"
                       >
                         ✓ {chip}
                       </span>
@@ -424,7 +429,7 @@ export default async function WorkerProfilePage({ params }: Props) {
             </section>
 
             {/* Reviews Section */}
-            <section className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/80 shadow-sm">
+            <section className="p-4 sm:p-8 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/80 shadow-xs sm:shadow-sm">
               <WorkerReviewSection
                 workerSlug={worker.slug}
                 initialReviews={worker.reviews}
@@ -433,14 +438,14 @@ export default async function WorkerProfilePage({ params }: Props) {
           </div>
 
           {/* Right Sidebar (Location, Safety Guidelines, Nearby Workers) */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Detailed Location Card */}
-            <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-4">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-                <MapPin className="w-4 h-4 text-emerald-600" />
+            <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/80 shadow-xs sm:shadow-sm space-y-3.5 sm:space-y-4">
+              <h3 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-2.5 sm:pb-3">
+                <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>কভারেজ এলাকা (Service Location)</span>
               </h3>
-              <div className="space-y-2.5 text-xs text-slate-600">
+              <div className="space-y-2 text-xs text-slate-600">
                 <div className="flex justify-between py-1 border-b border-slate-100">
                   <span className="text-slate-400 font-medium">বিভাগ (Division):</span>
                   <span className="font-bold text-slate-900">{city}</span>
@@ -467,9 +472,9 @@ export default async function WorkerProfilePage({ params }: Props) {
             </div>
 
             {/* Safety & Hiring Guide Card */}
-            <div className="p-6 rounded-3xl bg-emerald-950 text-white space-y-3 shadow-md relative overflow-hidden border border-emerald-800">
+            <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-emerald-950 text-white space-y-3 shadow-sm relative overflow-hidden border border-emerald-800">
               <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-wider">
-                <AlertTriangle className="w-4 h-4 text-emerald-400" />
+                <AlertTriangle className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>নিরাপত্তা পরামর্শ • Safety Tip</span>
               </div>
               <h4 className="font-extrabold text-sm text-white">কাজ করানোর আগে লক্ষণীয়:</h4>
@@ -491,30 +496,30 @@ export default async function WorkerProfilePage({ params }: Props) {
 
             {/* Related Workers Box */}
             {relatedWorkers.length > 0 && (
-              <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-4">
-                <h3 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center justify-between">
+              <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/80 shadow-xs sm:shadow-sm space-y-3 sm:space-y-4">
+                <h3 className="text-sm sm:text-base font-bold text-slate-900 border-b border-slate-100 pb-2.5 sm:pb-3 flex items-center justify-between">
                   <span>নিকটস্থ অন্যান্য মিস্ত্রি</span>
                   <span className="text-xs text-emerald-600 font-normal">Related</span>
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-2.5 sm:space-y-3">
                   {relatedWorkers.map((rw) => (
                     <div
                       key={rw.id}
-                      className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-emerald-400 transition-all space-y-2"
+                      className="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-emerald-400 transition-all space-y-2"
                     >
-                      <div className="flex items-center justify-between">
-                        <div>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0 flex-1">
                           <Link
                             href={`/workers/${rw.slug}`}
-                            className="font-bold text-slate-900 text-xs hover:text-emerald-600 transition-colors"
+                            className="font-bold text-slate-900 text-xs hover:text-emerald-600 transition-colors block truncate"
                           >
                             {rw.full_name}
                           </Link>
-                          <p className="text-[11px] text-slate-500 font-medium">
+                          <p className="text-[11px] text-slate-500 font-medium truncate">
                             {rw.service_type} • {rw.city}
                           </p>
                         </div>
-                        <span className="text-xs text-amber-600 font-bold">
+                        <span className="text-xs text-amber-600 font-bold shrink-0">
                           ★ {Number(rw.rating ?? 5.0).toFixed(1)}
                         </span>
                       </div>
@@ -522,7 +527,7 @@ export default async function WorkerProfilePage({ params }: Props) {
                         <span className="text-[10px] text-slate-400 font-semibold">{rw.experienceDisplay}</span>
                         <Link
                           href={`/workers/${rw.slug}`}
-                          className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition-all"
+                          className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition-all shrink-0"
                         >
                           প্রোফাইল দেখুন
                         </Link>
@@ -536,17 +541,17 @@ export default async function WorkerProfilePage({ params }: Props) {
         </div>
 
         {/* Back Link Footer */}
-        <div className="pt-6 border-t border-slate-200 flex flex-wrap items-center justify-between gap-4">
+        <div className="pt-4 sm:pt-6 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
           <Link
             href="/workers"
-            className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-emerald-600 transition-colors"
+            className="inline-flex items-center gap-2 font-bold text-slate-600 hover:text-emerald-600 transition-colors"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
+            <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
             <span>সকল মিস্ত্রি ডিরেক্টরিতে ফিরে যান</span>
           </Link>
           <Link
             href="/join-worker"
-            className="text-xs font-bold text-emerald-600 hover:underline"
+            className="font-bold text-emerald-600 hover:underline"
           >
             আপনিও মিস্ত্রি হিসেবে রেজিস্ট্রেশন করুন →
           </Link>
