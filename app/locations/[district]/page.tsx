@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Script from "next/script";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
@@ -93,12 +94,40 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const districtName = dbDistrict.title_en || formatSlug(params.district);
   const bnTitle = dbDistrict.title_bn ? ` (${dbDistrict.title_bn})` : "";
+  const title = `Local Workers in ${districtName}${bnTitle} District | Sromojibi`;
+  const description = `Find verified electricians, plumbers, rajmistris, tiles workers, and technicians in ${districtName}${bnTitle} district, Bangladesh. Direct phone numbers.`;
 
   return {
-    title: `Local Workers in ${districtName}${bnTitle} District | Sromojibi`,
-    description: `Find verified electricians, plumbers, rajmistris, tiles workers, and technicians in ${districtName}${bnTitle} district, Bangladesh. Direct phone numbers.`,
+    title,
+    description,
     alternates: {
       canonical: `${siteUrl}/locations/${params.district}`,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${siteUrl}/locations/${params.district}`,
+      siteName: "Sromojibi",
+      locale: "bn_BD",
+      type: "website",
+      images: [
+        {
+          url: `${siteUrl}/icon-512.png`,
+          width: 512,
+          height: 512,
+          alt: `Workers in ${districtName} District`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`${siteUrl}/icon-512.png`],
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }
@@ -200,8 +229,82 @@ export default async function DistrictLocationPage({ params }: Props) {
     };
   });
 
+  const faqs = [
+    {
+      question: `${districtNameBn} জেলায় দক্ষ মিস্ত্রি বা টেকনিশিয়ান কিভাবে খুঁজে পাবো?`,
+      answer: `শ্রমজীবী প্ল্যাটফর্মে ${districtNameBn} জেলার সংশ্লিষ্ট উপজেলা বা শহর এলাকা সিলেক্ট করে আপনার প্রয়োজনীয় সার্ভিস ক্যাটাগরি (যেমন ইলেকট্রিশিয়ান, প্লাম্বার, রাজমিস্ত্রি) ফিল্টার করুন এবং সরাসরি কর্মীর মোবাইল নম্বরে কল করুন।`,
+    },
+    {
+      question: `${districtNameBn} জেলায় মিস্ত্রি কল করার জন্য কি কোনো ফি দিতে হয়?`,
+      answer: `না, শ্রমজীবী সম্পূর্ণ উন্মুক্ত ও ফ্রি ডিরেক্টরি। কোনো প্রকার কমিশন বা অতিরিক্ত চার্জ ছাড়াই সরাসরি মিস্ত্রিদের সাথে কথা বলে কাজ ও পারিশ্রমিক ঠিক করতে পারবেন।`,
+    },
+    {
+      question: `${districtNameBn} জেলার কোন কোন এলাকায় সার্ভিস পাওয়া যায়?`,
+      answer: `${districtNameBn} জেলার আওতাধীন সকল উপজেলা এবং পৌরসভা এলাকায় স্থানীয় অভিজ্ঞ মিস্ত্রিরা সার্ভিস প্রদান করে থাকেন।`,
+    },
+  ];
+
+  // Schema.org Structured Data
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Locations", item: `${siteUrl}/locations` },
+      { "@type": "ListItem", position: 3, name: `${districtName} District`, item: `${siteUrl}/locations/${params.district}` },
+    ],
+  };
+
+  const collectionJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `Local Workers in ${districtName} District, Bangladesh`,
+    description: `Find verified electricians, plumbers, rajmistris, tiles workers, and technicians in ${districtName} district, Bangladesh.`,
+    url: `${siteUrl}/locations/${params.district}`,
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: districtWorkers.length,
+      itemListElement: districtWorkers.slice(0, 10).map((w: any, idx: number) => ({
+        "@type": "ListItem",
+        position: idx + 1,
+        name: w.full_name,
+        url: `${siteUrl}/workers/${w.slug}`,
+      })),
+    },
+  };
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: f.answer,
+      },
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 py-12 px-4 sm:px-6 lg:px-8">
+      {/* Schema.org Structured Data with unique IDs */}
+      <Script
+        id={`district-${params.district}-breadcrumb-jsonld`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <Script
+        id={`district-${params.district}-collection-jsonld`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
+      />
+      <Script
+        id={`district-${params.district}-faq-jsonld`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+
       <div className="max-w-6xl mx-auto space-y-10">
         {/* Breadcrumb Header */}
         <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">

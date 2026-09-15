@@ -1,9 +1,10 @@
 import Link from "next/link";
+import Script from "next/script";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import WorkerSearchFilter from "@/components/WorkerSearchFilter";
-import { ChevronRight, MapPin, Wrench, ShieldCheck, UserCheck } from "lucide-react";
+import { ChevronRight, MapPin, Wrench, ShieldCheck, UserCheck, Sparkles } from "lucide-react";
 
 type Props = {
   params: { district: string; upazila: string };
@@ -166,12 +167,40 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const upazilaName = dbUpazila.title_en || formatSlug(params.upazila);
   const districtName = dbUpazila.district?.title_en || formatSlug(params.district);
   const bnTitle = dbUpazila.title_bn ? ` (${dbUpazila.title_bn})` : "";
+  const title = `Local Workers in ${upazilaName}${bnTitle}, ${districtName} | Sromojibi`;
+  const description = `Find verified local workers, electricians, plumbers, mistris, and technicians in ${upazilaName}${bnTitle} upazila, ${districtName} district. Direct phone numbers.`;
 
   return {
-    title: `Local Workers in ${upazilaName}${bnTitle}, ${districtName} | Sromojibi`,
-    description: `Find verified local workers, electricians, plumbers, mistris, and technicians in ${upazilaName}${bnTitle} upazila, ${districtName} district.`,
+    title,
+    description,
     alternates: {
       canonical: `${siteUrl}/locations/${params.district}/${params.upazila}`,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${siteUrl}/locations/${params.district}/${params.upazila}`,
+      siteName: "Sromojibi",
+      locale: "bn_BD",
+      type: "website",
+      images: [
+        {
+          url: `${siteUrl}/icon-512.png`,
+          width: 512,
+          height: 512,
+          alt: `Workers in ${upazilaName}, ${districtName}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`${siteUrl}/icon-512.png`],
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }
@@ -283,8 +312,83 @@ export default async function UpazilaLocationPage({ params }: Props) {
     };
   });
 
+  const faqs = [
+    {
+      question: `${upazilaNameBn} এলাকায় মিস্ত্রিদের সাথে কিভাবে সরাসরি যোগাযোগ করব?`,
+      answer: `শ্রমজীবী ডিরেক্টরিতে ${upazilaNameBn} এলাকার তালিকাভুক্ত মিস্ত্রি ও টেকনিশিয়ানদের প্রোফাইল থেকে সরাসরি তাদের মোবাইল নম্বরে ফোন কল বা হোয়াটসঅ্যাপে কথা বলে বুকিং করতে পারেন।`,
+    },
+    {
+      question: `${upazilaNameBn} ${areaLabelBn}য় কাজের পারিশ্রমিক কেমন?`,
+      answer: `কাজের পরিধি ও সময় অনুযায়ী আপনি সরাসরি শ্রমজীবী কর্মীর সাথে আলোচনা করে দরদাম ও সঠিক পারিশ্রমিক নির্ধারণ করতে পারেন। এতে কোনো তৃতীয় পক্ষ বা কমিশন নেই।`,
+    },
+    {
+      question: `শ্রমজীবীর মিস্ত্রি সার্ভিস কি ফ্রি?`,
+      answer: `হ্যাঁ, শ্রমজীবী গ্রাহকদের জন্য সম্পূর্ণ ফ্রি প্ল্যাটফর্ম। মিস্ত্রিদের নাম্বার দেখতে বা যোগাযোগ করতে কোনো ফি বা চার্জ দিতে হয় না।`,
+    },
+  ];
+
+  // Schema.org Structured Data
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Locations", item: `${siteUrl}/locations` },
+      { "@type": "ListItem", position: 3, name: `${districtName} District`, item: `${siteUrl}/locations/${params.district}` },
+      { "@type": "ListItem", position: 4, name: `${upazilaName} ${areaLabelBn}`, item: `${siteUrl}/locations/${params.district}/${params.upazila}` },
+    ],
+  };
+
+  const collectionJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `Local Workers in ${upazilaName}, ${districtName}, Bangladesh`,
+    description: `Find verified local workers, electricians, plumbers, mistris, and technicians in ${upazilaName} ${areaLabelBn}, ${districtName} district.`,
+    url: `${siteUrl}/locations/${params.district}/${params.upazila}`,
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: upazilaWorkers.length,
+      itemListElement: (upazilaWorkers.length > 0 ? upazilaWorkers : allWorkers).slice(0, 10).map((w: any, idx: number) => ({
+        "@type": "ListItem",
+        position: idx + 1,
+        name: w.full_name,
+        url: `${siteUrl}/workers/${w.slug}`,
+      })),
+    },
+  };
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: f.answer,
+      },
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 py-12 px-4 sm:px-6 lg:px-8">
+      {/* Schema.org Structured Data with unique IDs */}
+      <Script
+        id={`upazila-${params.district}-${params.upazila}-breadcrumb-jsonld`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <Script
+        id={`upazila-${params.district}-${params.upazila}-collection-jsonld`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
+      />
+      <Script
+        id={`upazila-${params.district}-${params.upazila}-faq-jsonld`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Breadcrumb Header */}
         <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
@@ -366,6 +470,30 @@ export default async function UpazilaLocationPage({ params }: Props) {
                 >
                   <span>{union.title_bn || union.title_en}</span>
                 </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Popular Category Links in this Location */}
+        {categories.length > 0 && (
+          <section className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-600" />
+                <span>{upazilaNameBn} এলাকার জনপ্রিয় সেবা ও মিস্ত্রি</span>
+              </h2>
+              <span className="text-xs text-slate-500 font-medium">ক্যাটাগরি ভিত্তিক সেবা</span>
+            </div>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {categories.slice(0, 14).map((cat) => (
+                <Link
+                  key={cat.id}
+                  href={`/locations/${params.district}/${params.upazila}/${cat.slug}`}
+                  className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200 hover:border-emerald-300 transition-colors"
+                >
+                  {cat.name_bn || cat.name}
+                </Link>
               ))}
             </div>
           </section>

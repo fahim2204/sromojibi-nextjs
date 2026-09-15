@@ -170,6 +170,15 @@ export default async function WorkerProfilePage({ params }: Props) {
   });
 
   // Generate Schema.org structured data for SEO (LocalBusiness / Person)
+  const workerSkills = categories.map((c) => c.name_bn || c.name);
+  const areasServedList = Array.from(
+    new Set(
+      [locationDisplay, zilla, city, "Bangladesh"].filter(
+        (loc): loc is string => Boolean(loc)
+      )
+    )
+  );
+
   const workerSchema = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -178,10 +187,18 @@ export default async function WorkerProfilePage({ params }: Props) {
     description: worker.details || `${serviceType} services in ${city}`,
     url: `${siteUrl}/workers/${worker.slug}`,
     image: worker.avatar_url || `${siteUrl}/icon-512.png`,
+    priceRange: "৳৳ (Negotiable / আলোচনা সাপেক্ষে)",
+    currenciesAccepted: "BDT",
+    paymentAccepted: "Cash, bKash, Nagad, Mobile Banking",
+    knowsAbout: workerSkills,
+    areaServed: areasServedList.map((loc) => ({
+      "@type": "AdministrativeArea",
+      name: loc,
+    })),
     address: {
       "@type": "PostalAddress",
-      addressLocality: locationDisplay,
-      addressRegion: zilla || city,
+      addressLocality: locationDisplay || undefined,
+      addressRegion: zilla || city || undefined,
       addressCountry: "BD",
     },
     parentOrganization: {
