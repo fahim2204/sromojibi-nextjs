@@ -376,4 +376,137 @@ export async function processSromojibiSync(
   };
 }
 
+export async function getCollectorStats(collector: {
+  id: number;
+  username: string;
+  role?: string;
+}) {
+  const isAdmin = collector.role === "ADMIN" || collector.username === "admin";
+  const userFilter = isAdmin
+    ? "1=1"
+    : `(fk_fcadmin_user_id = ${Number(collector.id)} OR collector_username = '${collector.username.replace(/'/g, "''")}')`;
+
+  const [todayRows, totalRows, verifiedRows, recentItems] = await Promise.all([
+    prisma.$queryRawUnsafe<any[]>(
+      `SELECT COUNT(*)::int as count FROM raw_collection_log WHERE ${userFilter} AND created_at >= (NOW() AT TIME ZONE 'UTC')::date`
+    ).catch(() => [{ count: 0 }]),
+    prisma.$queryRawUnsafe<any[]>(
+      `SELECT COUNT(*)::int as count FROM raw_collection_log WHERE ${userFilter}`
+    ).catch(() => [{ count: 0 }]),
+    prisma.$queryRawUnsafe<any[]>(
+      `SELECT COUNT(*)::int as count FROM raw_collection_log WHERE ${userFilter} AND (is_verified = true OR review_status = 'APPROVED')`
+    ).catch(() => [{ count: 0 }]),
+    prisma.$queryRawUnsafe<any[]>(
+      `SELECT id, collection_uuid, entity_type, collector_username, latitude, longitude, accuracy_meters, is_verified, ai_status, review_status, captured_at, created_at, raw_payload
+       FROM raw_collection_log
+       WHERE ${userFilter}
+       ORDER BY created_at DESC
+       LIMIT 10`
+    ).catch(() => []),
+  ]);
+
+  const todayCount = Number(todayRows[0]?.count || 0);
+  const totalCount = Number(totalRows[0]?.count || 0);
+  const verifiedCount = Number(verifiedRows[0]?.count || 0);
+
+  return {
+    todayCount,
+    totalCount,
+    verifiedCount,
+    pendingReviewCount: Math.max(0, totalCount - verifiedCount),
+    recentItems,
+  };
+}
+
+export async function getCollectorHistory(
+  collector: { id: number; username: string; role?: string },
+  limit = 100
+) {
+  const isAdmin = collector.role === "ADMIN" || collector.username === "admin";
+  const userFilter = isAdmin
+    ? "1=1"
+    : `(fk_fcadmin_user_id = ${Number(collector.id)} OR collector_username = '${collector.username.replace(/'/g, "''")}')`;
+
+  const items = await prisma.$queryRawUnsafe<any[]>(
+    `SELECT id, collection_uuid, entity_type, collector_username, latitude, longitude, accuracy_meters, is_verified, app_version, device_info, photos, raw_payload, ai_status, review_status, captured_at, created_at
+     FROM raw_collection_log
+     WHERE ${userFilter}
+     ORDER BY created_at DESC
+     LIMIT ${Math.max(1, Math.min(100, Number(limit)))}`
+  ).catch(async () => {
+    return await prisma.rawCollectionLog.findMany({
+      orderBy: { created_at: "desc" },
+      take: limit,
+    });
+  });
+
+  return items;
+}
+
+export async function verifyCollectionRecord(input: {
+  collectionUuid: string;
+  isVerified?: boolean;
+  reviewStatus?: "APPROVED" | "REJECTED" | "FLAGGED_DUPLICATE" | "PENDING";
+  reviewerUsername?: string;
+  notes?: string;
+  rawPayload?: any;
+}) {
+  if (!input.collectionUuid) {
+    throw new FcServiceError("Collection UUID is required", 400, "BAD_REQUEST");
+  }
+
+  const isVerified =
+    input.isVerified !== undefined
+      ? input.isVerified
+      : input.reviewStatus === "APPROVED"
+      ? true
+      : undefined;
+
+  if (input.rawPayload) {
+    await prisma.$executeRawUnsafe(
+      `UPDATE raw_collection_log
+       SET raw_payload = $1::jsonb,
+           is_verified = COALESCE($2, is_verified),
+           review_status = COALESCE($3, review_status),
+           reviewed_by = COALESCE($4, reviewed_by),
+           reviewed_at = NOW(),
+           admin_notes = COALESCE($5, admin_notes),
+           updated_at = NOW()
+       WHERE collection_uuid = $6`,
+      JSON.stringify(input.rawPayload),
+      isVerified,
+      input.reviewStatus || null,
+      input.reviewerUsername || "admin",
+      input.notes || null,
+      input.collectionUuid
+    );
+  } else {
+    await prisma.$executeRawUnsafe(
+      `UPDATE raw_collection_log
+       SET is_verified = COALESCE($1, is_verified),
+           review_status = COALESCE($2, review_status),
+           reviewed_by = COALESCE($3, reviewed_by),
+           reviewed_at = NOW(),
+           admin_notes = COALESCE($4, admin_notes),
+           updated_at = NOW()
+       WHERE collection_uuid = $5`,
+      isVerified,
+      input.reviewStatus || null,
+      input.reviewerUsername || "admin",
+      input.notes || null,
+      input.collectionUuid
+    );
+  }
+
+  return {
+    collectionUuid: input.collectionUuid,
+    isVerified,
+    reviewStatus: input.reviewStatus,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+
+
+
 

@@ -2,8 +2,8 @@ import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-// Reloaded after schema migration for worker_contact_log
-const SCHEMA_VERSION = "20260913_worker_contact_log_v1";
+// Reloaded after schema migration for is_verified
+const SCHEMA_VERSION = "20260916_add_is_verified_v1";
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;

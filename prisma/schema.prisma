@@ -516,6 +516,7 @@ model RawCollectionLog {
 
   // Stage 4: Editorial Review & Publishing
   review_status         String    @default("PENDING") // PENDING, APPROVED, REJECTED, NEEDS_REVISIT
+  is_verified           Boolean   @default(false)
   reviewed_by           String?
   reviewed_at           DateTime?
   rejection_reason      String?
@@ -534,13 +535,10 @@ model RawCollectionLog {
   @@index([entity_type, ai_status])
   @@index([normalization_status])
   @@index([review_status])
+  @@index([is_verified])
   @@index([collection_source])
   @@index([fk_collector_id])
   @@index([fk_fcadmin_user_id])
   @@index([fk_worker_id])
   @@map("raw_collection_log")
 }
-
-
-
-
