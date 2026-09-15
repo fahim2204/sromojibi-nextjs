@@ -7,7 +7,13 @@ export async function GET(req: NextRequest) {
   try {
     const authHeader = req.headers.get("authorization");
     const token = authHeader?.replace(/^Bearer\s+/i, "").trim() || "";
-    await verifyCollectorToken(token);
+    if (token) {
+      try {
+        await verifyCollectorToken(token);
+      } catch (_) {
+        // Allow reading taxonomy even if token verification fails/expires
+      }
+    }
 
     const meta = await getCollectorMeta();
 

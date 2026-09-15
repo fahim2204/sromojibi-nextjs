@@ -51,6 +51,7 @@ export async function POST(
         id: true,
         full_name: true,
         phone: true,
+        whatsapp_number: true,
         secondary_phone: true,
         status: true,
       },
@@ -123,6 +124,8 @@ export async function POST(
       {
         data: {
           phone: worker.phone,
+          whatsappNumber: worker.whatsapp_number,
+          whatsapp_number: worker.whatsapp_number,
           secondaryPhone: worker.secondary_phone,
           fullName: worker.full_name,
         },

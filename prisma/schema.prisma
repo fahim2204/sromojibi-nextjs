@@ -36,6 +36,12 @@ enum OAuthProvider {
   FACEBOOK
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
 enum UserRole {
   USER
   WORKER
@@ -81,6 +87,7 @@ model User {
   otps           EmailVerificationOtp[]
   reviews        WorkerReview[]
   contact_logs   WorkerContactLog[]
+  raw_collections RawCollectionLog[]
 
   @@map("user")
 }
@@ -179,7 +186,11 @@ model WorkerProfile {
   full_name       String
   email           String?
   phone           String
+  whatsapp_number String?
   secondary_phone String?
+  gender          Gender         @default(MALE)
+  age             Int?
+  landmark        String?
   slug            String         @unique
 
   fk_division_id  String?
@@ -189,15 +200,18 @@ model WorkerProfile {
   fk_city_area_id String?
   coverage_scope  CoverageScope  @default(SPECIFIC_AREA)
 
-  experience      Int            @default(1)
-  details         String?        @db.Text
-  status          WorkerStatus   @default(PENDING)
-  is_verified     Boolean        @default(false)
-  rating          Decimal?       @default(0.00) @db.Decimal(3, 2)
-  review_count    Int            @default(0)
-  avatar_url      String?
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @updatedAt
+  experience          Int            @default(1)
+  details             String?        @db.Text
+  status              WorkerStatus   @default(PENDING)
+  is_active           Boolean        @default(true)
+  is_published        Boolean        @default(true)
+  is_verified         Boolean        @default(false)
+  is_field_collected  Boolean        @default(false)
+  rating              Decimal?       @default(0.00) @db.Decimal(3, 2)
+  review_count        Int            @default(0)
+  avatar_url          String?
+  created_at          DateTime       @default(now())
+  updated_at          DateTime       @updatedAt
 
   user             User?            @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
   workerCategories WorkerCategory[]
@@ -208,6 +222,7 @@ model WorkerProfile {
   cityAreaRef      CityArea?        @relation(fields: [fk_city_area_id], references: [id], onDelete: SetNull)
   reviews          WorkerReview[]
   contact_logs     WorkerContactLog[]
+  raw_collections  RawCollectionLog[]
 
   @@index([fk_user_id])
   @@index([fk_division_id])
@@ -216,7 +231,12 @@ model WorkerProfile {
   @@index([fk_union_id])
   @@index([fk_city_area_id])
   @@index([coverage_scope])
+  @@index([gender])
   @@index([status])
+  @@index([is_active])
+  @@index([is_published])
+  @@index([is_verified])
+  @@index([is_field_collected])
   @@map("worker_profile")
 }
 
@@ -224,12 +244,15 @@ model WorkerCategory {
   id             Int           @id @default(autoincrement())
   fk_worker_id   Int
   fk_category_id Int
+  is_primary     Boolean       @default(false)
+  display_order  Int           @default(0)
   worker         WorkerProfile @relation(fields: [fk_worker_id], references: [id], onDelete: Cascade)
   category       Category      @relation(fields: [fk_category_id], references: [id], onDelete: Cascade)
 
   @@unique([fk_worker_id, fk_category_id])
   @@index([fk_worker_id])
   @@index([fk_category_id])
+  @@index([fk_worker_id, is_primary])
   @@map("worker_category")
 }
 
@@ -378,21 +401,13 @@ model NewsletterSubscriber {
 }
 
 // ==========================================
-// FIELD COLLECTOR ENGINE & ADMIN (fcadmin_* & fc_*)
+// FIELD COLLECTOR AUTH & AUDIT (fcadmin_*)
 // ==========================================
 
 enum FcAdminRole {
   COLLECTOR
   LEAD
   ADMIN
-}
-
-enum FcRecordStatus {
-  DRAFT
-  PENDING_REVIEW
-  VERIFIED
-  MERGED
-  REJECTED
 }
 
 model FcAdminUser {
@@ -409,7 +424,7 @@ model FcAdminUser {
 
   sessions      FcAdminSession[]
   logs          FcAdminLog[]
-  sessions_run  FcCollectionSession[]
+  raw_collections RawCollectionLog[]
 
   @@map("fcadmin_user")
 }
@@ -443,61 +458,89 @@ model FcAdminLog {
   @@map("fcadmin_log")
 }
 
-model FcCollectionSession {
-  id                 String              @id
-  fk_collector_id    Int?
-  collector_username String
-  location_name      String
-  area               String?
-  division_id        String?
-  district_id        String?
-  upazila_id         String?
-  latitude           Decimal?            @db.Decimal(10, 7)
-  longitude          Decimal?            @db.Decimal(10, 7)
-  accuracy           Decimal?            @db.Decimal(6, 2)
-  started_at         DateTime
-  ended_at           DateTime?
-  total_collected    Int                 @default(0)
-  notes              String?             @db.Text
-  created_at         DateTime            @default(now())
-  updated_at         DateTime            @updatedAt
+// ==========================================
+// RAW COLLECTION & AI EXTRACTION LOGS
+// ==========================================
 
-  collector          FcAdminUser?        @relation(fields: [fk_collector_id], references: [id], onDelete: SetNull)
-  collected_workers  FcCollectedWorker[]
+model RawCollectionLog {
+  id                    Int       @id @default(autoincrement())
+  collection_uuid       String    @unique @default(uuid())
+  parent_log_id         Int?
 
-  @@index([collector_username])
-  @@index([created_at])
-  @@map("fc_collection_session")
+  // Linked Worker Entity / Context
+  entity_type           String    @default("WORKER")
+  fk_worker_id          Int?
+
+  // Surveyor / Provenance
+  fk_collector_id       Int?
+  fk_fcadmin_user_id    Int?
+  collector_username    String?
+  collection_source     String    @default("FIELD_COLLECTOR") // FIELD_COLLECTOR, PROVIDER_SUBMISSION, WEB_SCRAPED, ADMIN
+  session_id            String?
+  device_info           String?
+  app_version           String?
+  ip_address            String?
+
+  // Geolocation & Timing
+  latitude              Decimal?  @db.Decimal(10, 7)
+  longitude             Decimal?  @db.Decimal(10, 7)
+  accuracy_meters       Decimal?  @db.Decimal(6, 2)
+  captured_at           DateTime?
+
+  // Media & Raw Payload
+  photos                Json?     // [{ file_id, storage_provider, mime_type, type, width, height, checksum, url }]
+  raw_payload           Json?     // Original surveyor input snapshot
+
+  // Stage 1: AI Vision & OCR Extraction
+  ai_status             String    @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  ai_started_at         DateTime?
+  ai_attempts           Int       @default(0)
+  ai_model              String?
+  ai_prompt_version     String?
+  ocr_raw_text          String?   @db.Text
+  ai_extracted_json     Json?
+  ai_confidence         Decimal?  @db.Decimal(4, 3)
+  ai_error              String?
+  ai_processed_at       DateTime?
+
+  // Stage 2: Normalization & Validation
+  normalization_status  String    @default("PENDING") // PENDING, NORMALIZED, FAILED
+  normalized_json       Json?
+  normalization_error   String?
+  normalized_at         DateTime?
+
+  // Stage 3: Deduplication & Match Candidate
+  matched_entity_type   String?
+  matched_entity_id     Int?
+  match_confidence      Decimal?  @db.Decimal(4, 3)
+
+  // Stage 4: Editorial Review & Publishing
+  review_status         String    @default("PENDING") // PENDING, APPROVED, REJECTED, NEEDS_REVISIT
+  reviewed_by           String?
+  reviewed_at           DateTime?
+  rejection_reason      String?
+  admin_notes           String?   @db.Text
+
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  parent                RawCollectionLog?  @relation("ParentChildLogs", fields: [parent_log_id], references: [id], onDelete: SetNull)
+  children              RawCollectionLog[] @relation("ParentChildLogs")
+  worker                WorkerProfile?     @relation(fields: [fk_worker_id], references: [id], onDelete: SetNull)
+  collector             User?              @relation(fields: [fk_collector_id], references: [id], onDelete: SetNull)
+  fcadmin_user          FcAdminUser?       @relation(fields: [fk_fcadmin_user_id], references: [id], onDelete: SetNull)
+
+  @@index([collection_uuid])
+  @@index([entity_type, ai_status])
+  @@index([normalization_status])
+  @@index([review_status])
+  @@index([collection_source])
+  @@index([fk_collector_id])
+  @@index([fk_fcadmin_user_id])
+  @@index([fk_worker_id])
+  @@map("raw_collection_log")
 }
 
-model FcCollectedWorker {
-  id              String              @id
-  session_id      String
-  full_name       String
-  phone           String
-  service_type    String
-  category_id     Int?
-  division_id     String?
-  district_id     String?
-  upazila_id      String?
-  village         String?
-  experience      String?
-  details         String?             @db.Text
-  status          FcRecordStatus      @default(DRAFT)
-  is_duplicate    Boolean             @default(false)
-  duplicate_notes String?
-  photos          Json?
-  raw_metadata    Json?
-  created_at      DateTime            @default(now())
-  updated_at      DateTime            @updatedAt
 
-  session         FcCollectionSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
-
-  @@index([session_id])
-  @@index([phone])
-  @@index([status])
-  @@index([created_at])
-  @@map("fc_collected_worker")
-}
 
 

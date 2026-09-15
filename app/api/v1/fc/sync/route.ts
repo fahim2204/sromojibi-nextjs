@@ -9,9 +9,20 @@ export async function POST(req: NextRequest) {
     const token = authHeader?.replace(/^Bearer\s+/i, "").trim() || "";
     const collector = await verifyCollectorToken(token);
 
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      null;
+    const userAgent = req.headers.get("user-agent") || null;
+
     const body = await req.json();
     const result = await processSromojibiSync(
-      { id: collector.id, username: collector.username },
+      {
+        id: collector.id,
+        username: collector.username,
+        ip: ip || undefined,
+        userAgent: userAgent || undefined,
+      },
       body
     );
 
