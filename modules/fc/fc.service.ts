@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { hashSecret, verifySecretHash } from "@/modules/auth/auth.service";
+import { generateWorkerSlug } from "@/lib/slug";
 import { randomBytes } from "crypto";
 
 export class FcServiceError extends Error {
@@ -455,53 +456,394 @@ export async function verifyCollectionRecord(input: {
     throw new FcServiceError("Collection UUID is required", 400, "BAD_REQUEST");
   }
 
+  // Find existing raw collection log record
+  const rawLog = await prisma.rawCollectionLog.findUnique({
+    where: { collection_uuid: input.collectionUuid },
+  });
+
+  if (!rawLog) {
+    throw new FcServiceError("Collection record not found", 404, "NOT_FOUND");
+  }
+
+  const reviewStatus =
+    input.reviewStatus || (rawLog.review_status as any) || "PENDING";
+
+  const payload = input.rawPayload || (rawLog.raw_payload as any) || {};
+  const rawMeta = payload.rawMetadata || payload.raw_metadata || {};
+
   const isVerified =
     input.isVerified !== undefined
-      ? input.isVerified
-      : input.reviewStatus === "APPROVED"
-      ? true
-      : undefined;
+      ? Boolean(input.isVerified)
+      : payload.isVerified !== undefined
+      ? Boolean(payload.isVerified)
+      : payload.is_verified !== undefined
+      ? Boolean(payload.is_verified)
+      : rawMeta.isVerified !== undefined
+      ? Boolean(rawMeta.isVerified)
+      : rawMeta.is_verified !== undefined
+      ? Boolean(rawMeta.is_verified)
+      : rawLog.is_verified ?? false;
 
-  if (input.rawPayload) {
-    await prisma.$executeRawUnsafe(
-      `UPDATE raw_collection_log
-       SET raw_payload = $1::jsonb,
-           is_verified = COALESCE($2, is_verified),
-           review_status = COALESCE($3, review_status),
-           reviewed_by = COALESCE($4, reviewed_by),
-           reviewed_at = NOW(),
-           admin_notes = COALESCE($5, admin_notes),
-           updated_at = NOW()
-       WHERE collection_uuid = $6`,
-      JSON.stringify(input.rawPayload),
-      isVerified,
-      input.reviewStatus || null,
-      input.reviewerUsername || "admin",
-      input.notes || null,
-      input.collectionUuid
+  let linkedWorkerId = rawLog.fk_worker_id;
+
+  // When review status is APPROVED, populate and sync to production WorkerProfile & WorkerCategory
+  if (reviewStatus === "APPROVED") {
+    // 1. Sanitize string fields
+    const fullName = (
+      payload.fullName ||
+      payload.full_name ||
+      payload.name ||
+      rawMeta.fullName ||
+      rawMeta.full_name ||
+      "Worker"
+    ).trim();
+
+    const phone = (
+      payload.phone ||
+      payload.mobile ||
+      rawMeta.phone ||
+      ""
+    ).trim();
+
+    const whatsappNumber =
+      (
+        payload.whatsappNumber ||
+        payload.whatsapp_number ||
+        rawMeta.whatsappNumber ||
+        rawMeta.whatsapp_number ||
+        ""
+      ).trim() || null;
+
+    const secondaryPhone =
+      (
+        payload.secondaryPhone ||
+        payload.secondary_phone ||
+        rawMeta.secondaryPhone ||
+        rawMeta.secondary_phone ||
+        ""
+      ).trim() || null;
+
+    const email =
+      (payload.email || rawMeta.email || "").trim() || null;
+
+    // 2. Enum validations
+    const rawGender = (payload.gender || rawMeta.gender || "MALE").toUpperCase();
+    const gender = (
+      rawGender === "FEMALE" || rawGender === "OTHER" ? rawGender : "MALE"
+    ) as "MALE" | "FEMALE" | "OTHER";
+
+    const rawAge = payload.age ?? rawMeta.age;
+    const age = rawAge
+      ? parseInt(String(rawAge).replace(/[^0-9]/g, ""), 10) || null
+      : null;
+
+    const rawExp = payload.experience ?? rawMeta.experience ?? rawMeta.experience_num;
+    const experience = rawExp
+      ? Math.max(1, parseInt(String(rawExp).replace(/[^0-9]/g, ""), 10) || 1)
+      : 1;
+
+    const rawScope = (
+      payload.coverageScope ||
+      payload.coverage_scope ||
+      rawMeta.coverageScope ||
+      rawMeta.coverage_scope ||
+      "SPECIFIC_AREA"
+    ).toUpperCase();
+    const validScopes = [
+      "SPECIFIC_AREA",
+      "ALL_UPAZILA",
+      "ALL_DISTRICT",
+      "ALL_DIVISION",
+      "NATIONWIDE",
+    ];
+    const normalizedScope =
+      rawScope === "UPAZILA_WIDE"
+        ? "ALL_UPAZILA"
+        : rawScope === "DISTRICT_WIDE"
+        ? "ALL_DISTRICT"
+        : rawScope === "DIVISION_WIDE"
+        ? "ALL_DIVISION"
+        : validScopes.includes(rawScope)
+        ? rawScope
+        : "SPECIFIC_AREA";
+    const coverageScope = normalizedScope as
+      | "SPECIFIC_AREA"
+      | "ALL_UPAZILA"
+      | "ALL_DISTRICT"
+      | "ALL_DIVISION"
+      | "NATIONWIDE";
+
+    const landmark =
+      (
+        payload.landmark ||
+        payload.village ||
+        rawMeta.landmark ||
+        rawMeta.village ||
+        ""
+      ).trim() || null;
+
+    const details =
+      (payload.details || rawMeta.details || "").trim() || null;
+
+    // 3. Foreign key validations for location models
+    const divId =
+      payload.division_id ||
+      payload.fk_division_id ||
+      payload.divisionId ||
+      rawMeta.division_id ||
+      rawMeta.fk_division_id ||
+      rawMeta.divisionId ||
+      null;
+    const distId =
+      payload.district_id ||
+      payload.fk_district_id ||
+      payload.districtId ||
+      rawMeta.district_id ||
+      rawMeta.fk_district_id ||
+      rawMeta.districtId ||
+      null;
+    const upzId =
+      payload.upazila_id ||
+      payload.fk_upazila_id ||
+      payload.upazilaId ||
+      rawMeta.upazila_id ||
+      rawMeta.fk_upazila_id ||
+      rawMeta.upazilaId ||
+      null;
+    const unionId =
+      payload.union_id ||
+      payload.fk_union_id ||
+      payload.unionId ||
+      rawMeta.union_id ||
+      rawMeta.fk_union_id ||
+      rawMeta.unionId ||
+      null;
+    const cityId =
+      payload.city_area_id ||
+      payload.fk_city_area_id ||
+      payload.cityAreaId ||
+      rawMeta.city_area_id ||
+      rawMeta.fk_city_area_id ||
+      rawMeta.cityAreaId ||
+      null;
+
+    const [validDiv, validDist, validUpz, validUnion, validCity] =
+      await Promise.all([
+        divId
+          ? prisma.division.findUnique({ where: { id: divId }, select: { id: true } })
+          : null,
+        distId
+          ? prisma.district.findUnique({ where: { id: distId }, select: { id: true } })
+          : null,
+        upzId
+          ? prisma.upazila.findUnique({ where: { id: upzId }, select: { id: true } })
+          : null,
+        unionId
+          ? prisma.union.findUnique({ where: { id: unionId }, select: { id: true } })
+          : null,
+        cityId
+          ? prisma.cityArea.findUnique({ where: { id: cityId }, select: { id: true } })
+          : null,
+      ]);
+
+    // 4. Resolve Categories
+    const rawCatIds: number[] = [];
+    if (Array.isArray(payload.category_ids)) rawCatIds.push(...payload.category_ids);
+    if (Array.isArray(payload.categoryIds)) rawCatIds.push(...payload.categoryIds);
+    if (Array.isArray(rawMeta.category_ids)) rawCatIds.push(...rawMeta.category_ids);
+    if (Array.isArray(rawMeta.categoryIds)) rawCatIds.push(...rawMeta.categoryIds);
+    if (payload.category_id && typeof payload.category_id === "number") {
+      rawCatIds.push(payload.category_id);
+    }
+    if (rawMeta.category_id && typeof rawMeta.category_id === "number") {
+      rawCatIds.push(rawMeta.category_id);
+    }
+
+    if (Array.isArray(payload.categories)) {
+      for (const c of payload.categories) {
+        if (c?.id && typeof c.id === "number") rawCatIds.push(c.id);
+      }
+    }
+    if (Array.isArray(rawMeta.categories)) {
+      for (const c of rawMeta.categories) {
+        if (c?.id && typeof c.id === "number") rawCatIds.push(c.id);
+      }
+    }
+
+    const uniqueCatIds = Array.from(new Set(rawCatIds)).filter(
+      (id) => Number.isInteger(id) && id > 0
     );
-  } else {
-    await prisma.$executeRawUnsafe(
-      `UPDATE raw_collection_log
-       SET is_verified = COALESCE($1, is_verified),
-           review_status = COALESCE($2, review_status),
-           reviewed_by = COALESCE($3, reviewed_by),
-           reviewed_at = NOW(),
-           admin_notes = COALESCE($4, admin_notes),
-           updated_at = NOW()
-       WHERE collection_uuid = $5`,
-      isVerified,
-      input.reviewStatus || null,
-      input.reviewerUsername || "admin",
-      input.notes || null,
-      input.collectionUuid
-    );
+
+    let validCategories: Array<{ id: number; name: string }> = [];
+    if (uniqueCatIds.length > 0) {
+      validCategories = await prisma.category.findMany({
+        where: { id: { in: uniqueCatIds } },
+        select: { id: true, name: true },
+      });
+    }
+
+    if (validCategories.length === 0) {
+      const serviceType =
+        payload.serviceType || payload.service_type || rawMeta.serviceType || "";
+      if (serviceType) {
+        const tradeNames = serviceType
+          .split(",")
+          .map((s: string) => s.trim().toLowerCase())
+          .filter(Boolean);
+        const allCats = await prisma.category.findMany({
+          select: { id: true, name: true, slug: true, name_bn: true },
+        });
+        const matched = allCats.filter((c) =>
+          tradeNames.some(
+            (t: string) =>
+              c.name.toLowerCase().includes(t) ||
+              (c.name_bn && c.name_bn.includes(t)) ||
+              c.slug.toLowerCase().includes(t)
+          )
+        );
+        validCategories = matched.map((c) => ({ id: c.id, name: c.name }));
+      }
+    }
+
+    // 5. Extract Avatar Image URL
+    const photos = payload.photos || rawLog.photos || [];
+    let avatarUrl: string | null = null;
+    if (Array.isArray(photos) && photos.length > 0) {
+      const first = photos[0];
+      if (
+        typeof first === "string" &&
+        (first.startsWith("http") || first.startsWith("/") || first.startsWith("data:"))
+      ) {
+        avatarUrl = first;
+      } else if (first && typeof first === "object" && typeof first.url === "string") {
+        avatarUrl = first.url;
+      }
+    }
+
+    // 6. Check existing WorkerProfile or Create New
+    const existingWorker = linkedWorkerId
+      ? await prisma.workerProfile.findUnique({ where: { id: linkedWorkerId } })
+      : null;
+
+    const primaryTradeName = validCategories[0]?.name || "worker";
+
+    if (existingWorker) {
+      const updatedWorker = await prisma.workerProfile.update({
+        where: { id: existingWorker.id },
+        data: {
+          full_name: fullName,
+          phone,
+          whatsapp_number: whatsappNumber,
+          secondary_phone: secondaryPhone,
+          email,
+          gender,
+          age,
+          experience,
+          coverage_scope: coverageScope,
+          landmark,
+          details,
+          fk_division_id: validDiv?.id ?? null,
+          fk_district_id: validDist?.id ?? null,
+          fk_upazila_id: validUpz?.id ?? null,
+          fk_union_id: validUnion?.id ?? null,
+          fk_city_area_id: validCity?.id ?? null,
+          status: "APPROVED",
+          is_active: true,
+          is_published: true,
+          is_verified: isVerified,
+          is_field_collected: true,
+          avatar_url: avatarUrl || existingWorker.avatar_url,
+        },
+      });
+      linkedWorkerId = updatedWorker.id;
+    } else {
+      let slug = generateWorkerSlug(fullName, primaryTradeName);
+      let attempts = 0;
+      while (attempts < 5) {
+        const checkSlug = await prisma.workerProfile.findUnique({ where: { slug } });
+        if (!checkSlug) break;
+        slug = generateWorkerSlug(fullName, primaryTradeName);
+        attempts++;
+      }
+
+      const createdWorker = await prisma.workerProfile.create({
+        data: {
+          full_name: fullName,
+          phone,
+          whatsapp_number: whatsappNumber,
+          secondary_phone: secondaryPhone,
+          email,
+          gender,
+          age,
+          experience,
+          coverage_scope: coverageScope,
+          landmark,
+          details,
+          slug,
+          fk_division_id: validDiv?.id ?? null,
+          fk_district_id: validDist?.id ?? null,
+          fk_upazila_id: validUpz?.id ?? null,
+          fk_union_id: validUnion?.id ?? null,
+          fk_city_area_id: validCity?.id ?? null,
+          status: "APPROVED",
+          is_active: true,
+          is_published: true,
+          is_verified: isVerified,
+          is_field_collected: true,
+          avatar_url: avatarUrl,
+        },
+      });
+      linkedWorkerId = createdWorker.id;
+    }
+
+    // 7. Sync WorkerCategory Relations
+    if (linkedWorkerId && validCategories.length > 0) {
+      await prisma.workerCategory.deleteMany({
+        where: { fk_worker_id: linkedWorkerId },
+      });
+      await prisma.workerCategory.createMany({
+        data: validCategories.map((c, idx) => ({
+          fk_worker_id: linkedWorkerId!,
+          fk_category_id: c.id,
+          is_primary: idx === 0,
+          display_order: idx,
+        })),
+        skipDuplicates: true,
+      });
+    }
+  } else if (reviewStatus === "REJECTED" && linkedWorkerId) {
+    // If status is rejected, deactivate in production
+    await prisma.workerProfile
+      .update({
+        where: { id: linkedWorkerId },
+        data: {
+          status: "REJECTED",
+          is_published: false,
+          is_verified: false,
+        },
+      })
+      .catch(() => null);
   }
+
+  // 8. Update RawCollectionLog record
+  await prisma.rawCollectionLog.update({
+    where: { collection_uuid: input.collectionUuid },
+    data: {
+      raw_payload: input.rawPayload || rawLog.raw_payload || undefined,
+      is_verified: isVerified,
+      review_status: reviewStatus,
+      reviewed_by: input.reviewerUsername || "admin",
+      reviewed_at: new Date(),
+      admin_notes: input.notes || rawLog.admin_notes || null,
+      fk_worker_id: linkedWorkerId || rawLog.fk_worker_id || null,
+    },
+  });
 
   return {
     collectionUuid: input.collectionUuid,
     isVerified,
-    reviewStatus: input.reviewStatus,
+    reviewStatus,
+    workerId: linkedWorkerId,
     updatedAt: new Date().toISOString(),
   };
 }
